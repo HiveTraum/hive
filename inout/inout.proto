@@ -167,11 +167,15 @@ message ChangedUserViewsEventV1 {
     repeated int64 identifiers = 1;
 }
 
-message EventV1 {
-    string title = 1;
-    oneof test_oneof {
-        CreatePhoneConfirmationEventV1 phoneConfirmationEvent = 2;
-        CreateEmailConfirmationEventV1 emailConfirmationEvent = 3;
-        ChangedUserViewsEventV1 changedUserViewsEvent = 4;
+message Event {
+    string sender = 1;
+    string object = 2;
+    string action = 3;
+    string event_version = 4;
+    string data_version = 5;
+    oneof data {
+        CreatePhoneConfirmationEventV1 phoneConfirmationEvent = 6;
+        CreateEmailConfirmationEventV1 emailConfirmationEvent = 7;
+        ChangedUserViewsEventV1 changedUserViewsEvent = 8;
     }
 }

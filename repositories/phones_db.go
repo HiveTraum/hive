@@ -5,13 +5,10 @@ import (
 	"auth/models"
 	"context"
 	"errors"
-	"fmt"
 	"github.com/getsentry/sentry-go"
-	"github.com/go-redis/redis/v7"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"strings"
-	"time"
 )
 
 func createPhoneSQL() string {
@@ -50,10 +47,6 @@ func scanPhone(row pgx.Row) (int, *models.Phone) {
 	return enums.Ok, phone
 }
 
-func getPhoneConfirmationCodeKey(phone string) string {
-	return fmt.Sprintf("%s:%s", enums.PhoneConfirmationCode, phone)
-}
-
 func CreatePhone(db DB, ctx context.Context, userId int64, value string) (int, *models.Phone) {
 	sql := createPhoneSQL()
 	row := db.QueryRow(ctx, sql, userId, value)
@@ -64,26 +57,4 @@ func GetPhone(db DB, ctx context.Context, phone string) (int, *models.Phone) {
 	sql := getPhoneSQL()
 	row := db.QueryRow(ctx, sql, phone)
 	return scanPhone(row)
-}
-
-func CreatePhoneConfirmationCode(cache *redis.Client, phone string, code string, duration time.Duration) *models.PhoneConfirmation {
-	key := getPhoneConfirmationCodeKey(phone)
-	cache.Set(key, code, duration)
-	created := time.Now()
-	return &models.PhoneConfirmation{
-		Created: created.Unix(),
-		Expire:  created.Add(duration).Unix(),
-		Phone:   phone,
-		Code:    code,
-	}
-}
-
-func GetPhoneConfirmationCode(cache *redis.Client, phone string) (string, error) {
-	key := getPhoneConfirmationCodeKey(phone)
-	code, err := cache.Get(key).Result()
-	if err != nil {
-		return "", err
-	}
-
-	return code, nil
 }

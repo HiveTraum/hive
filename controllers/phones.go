@@ -27,8 +27,8 @@ func getPhone(phone string) string {
 	return phonenumbers.Format(num, phonenumbers.E164)
 }
 
-func checkPhoneConfirmationCode(store infrastructure.StoreInterface, phone string, code string) int {
-	cachedCode := store.GetPhoneConfirmationCode(phone)
+func checkPhoneConfirmationCode(store infrastructure.StoreInterface, ctx context.Context, phone string, code string) int {
+	cachedCode := store.GetPhoneConfirmationCode(ctx, phone)
 	if cachedCode == "" {
 		return enums.PhoneNotFound
 	} else if cachedCode != code {
@@ -38,21 +38,21 @@ func checkPhoneConfirmationCode(store infrastructure.StoreInterface, phone strin
 	return enums.Ok
 }
 
-func validatePhone(store infrastructure.StoreInterface, phone string, code string) (int, string) {
+func validatePhone(store infrastructure.StoreInterface, ctx context.Context, phone string, code string) (int, string) {
 	phone = getPhone(phone)
 
 	if phone == "" {
 		return enums.IncorrectPhone, ""
 	}
 
-	status := checkPhoneConfirmationCode(store, phone, code)
+	status := checkPhoneConfirmationCode(store, ctx, phone, code)
 
 	return status, phone
 }
 
 func CreatePhone(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, phone string, code string, userId int64) (int, *models.Phone) {
 
-	status, phone := validatePhone(store, phone, code)
+	status, phone := validatePhone(store, ctx, phone, code)
 
 	if status != enums.Ok {
 		return status, nil
@@ -78,7 +78,7 @@ func getRandomCode() string {
 	return strconv.Itoa(rand.Intn(max-min+1) + min)
 }
 
-func CreatePhoneConfirmation(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, phone string) (int, *models.PhoneConfirmation) {
+func CreatePhoneConfirmation(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, phone string) (int, *models.PhoneConfirmation) {
 
 	phone = getPhone(phone)
 
@@ -87,7 +87,7 @@ func CreatePhoneConfirmation(store infrastructure.StoreInterface, esb infrastruc
 	}
 
 	code := getRandomCode()
-	phoneConfirmation := store.CreatePhoneConfirmationCode(phone, code, time.Minute*15)
+	phoneConfirmation := store.CreatePhoneConfirmationCode(ctx, phone, code, time.Minute*15)
 	go esb.OnPhoneCodeConfirmationCreated(phone, code)
 	return enums.Ok, phoneConfirmation
 }

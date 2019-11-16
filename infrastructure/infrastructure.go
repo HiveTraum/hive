@@ -26,8 +26,8 @@ type StoreInterface interface {
 	CreateOrUpdateUsersViewByRolesID(context context.Context, id []int64) []*inout.GetUserViewResponseV1
 	CreateOrUpdateUsersViewByUserID(context context.Context, id int64) []*inout.GetUserViewResponseV1
 	CreateOrUpdateUsersViewByRoleID(context context.Context, id int64) []*inout.GetUserViewResponseV1
-	GetUserViewFromCache(id int64) *inout.GetUserViewResponseV1
-	CacheUserView(userViews []*inout.GetUserViewResponseV1)
+	GetUserViewFromCache(ctx context.Context, id int64) *inout.GetUserViewResponseV1
+	CacheUserView(ctx context.Context, userViews []*inout.GetUserViewResponseV1)
 
 	// Emails
 
@@ -46,8 +46,8 @@ type StoreInterface interface {
 
 	CreatePhone(ctx context.Context, userId int64, value string) (int, *models.Phone)
 	GetPhone(ctx context.Context, phone string) (int, *models.Phone)
-	CreatePhoneConfirmationCode(phone string, code string, duration time.Duration) *models.PhoneConfirmation
-	GetPhoneConfirmationCode(phone string) string
+	CreatePhoneConfirmationCode(ctx context.Context, phone string, code string, duration time.Duration) *models.PhoneConfirmation
+	GetPhoneConfirmationCode(ctx context.Context, phone string) string
 
 	// Roles
 
@@ -65,6 +65,10 @@ type ESBInterface interface {
 	OnPhoneChanged(userId []int64)
 	OnEmailChanged(userId []int64)
 	OnRoleChanged(roleId []int64)
+}
+
+type ESBDispatcherInterface interface {
+	Send(event inout.Event)
 }
 
 type AppInterface interface {

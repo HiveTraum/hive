@@ -4,6 +4,7 @@ import (
 	"auth/enums"
 	"auth/mocks"
 	"auth/models"
+	"context"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -14,9 +15,10 @@ func TestCreatePhoneConfirmation(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	_, store, esb := mocks.InitMockApp(ctrl)
+	ctx := context.Background()
 	store.
 		EXPECT().
-		CreatePhoneConfirmationCode("+71234567890", gomock.Any(), time.Minute*15).
+		CreatePhoneConfirmationCode(ctx, "+71234567890", gomock.Any(), time.Minute*15).
 		Return(&models.PhoneConfirmation{
 			Created: 0,
 			Expire:  0,
@@ -30,7 +32,7 @@ func TestCreatePhoneConfirmation(t *testing.T) {
 		Times(1)
 
 	phone := "71234567890"
-	status, confirmation := CreatePhoneConfirmation(store, esb, phone)
+	status, confirmation := CreatePhoneConfirmation(store, esb, ctx, phone)
 	require.Equal(t, "+71234567890", confirmation.Phone)
 	require.NotNil(t, confirmation)
 	require.Equal(t, enums.Ok, status)
@@ -40,8 +42,9 @@ func TestCreatePhoneConfirmationWithIncorrectPhone(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	_, store, esb := mocks.InitMockApp(ctrl)
+	ctx := context.Background()
 	phone := "qwerty"
-	status, confirmation := CreatePhoneConfirmation(store, esb, phone)
+	status, confirmation := CreatePhoneConfirmation(store, esb, ctx, phone)
 	require.Nil(t, confirmation)
 	require.Equal(t, enums.IncorrectPhone, status)
 }

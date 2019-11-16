@@ -16,12 +16,12 @@ func (store *DatabaseStore) GetPhone(ctx context.Context, phone string) (int, *m
 	return repositories.GetPhone(store.Db, ctx, phone)
 }
 
-func (store *DatabaseStore) CreatePhoneConfirmationCode(phone string, code string, duration time.Duration) *models.PhoneConfirmation {
-	return repositories.CreatePhoneConfirmationCode(store.Cache, phone, code, duration)
+func (store *DatabaseStore) CreatePhoneConfirmationCode(ctx context.Context, phone string, code string, duration time.Duration) *models.PhoneConfirmation {
+	return repositories.CreatePhoneConfirmationCode(store.Cache, ctx, phone, code, duration)
 }
 
-func (store *DatabaseStore) GetPhoneConfirmationCode(phone string) string {
-	code, err := repositories.GetPhoneConfirmationCode(store.Cache, phone)
+func (store *DatabaseStore) GetPhoneConfirmationCode(ctx context.Context, phone string) string {
+	code, err := repositories.GetPhoneConfirmationCode(store.Cache, ctx, phone)
 
 	if err != nil {
 		sentry.CaptureException(err)

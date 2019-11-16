@@ -7,6 +7,9 @@ import (
 	"auth/views"
 	sentryHttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
+	"github.com/opentracing-contrib/go-gorilla/gorilla"
+	"github.com/opentracing/opentracing-go"
+	jaegerConfig "github.com/uber/jaeger-client-go/config"
 	"log"
 	"net/http"
 )
@@ -18,7 +21,22 @@ type handler struct {
 
 func main() {
 
-	application := app.InitApp()
+	// Tracing
+
+	tracer, closer, err := jaegerConfig.Configuration{
+		ServiceName: "auth",
+		RPCMetrics:  true,
+	}.NewTracer()
+
+	if err != nil {
+		panic(err)
+	}
+
+	opentracing.SetGlobalTracer(tracer)
+
+	// App
+
+	application := app.InitApp(tracer)
 
 	// Handlers
 
@@ -89,7 +107,18 @@ func main() {
 		router.HandleFunc(h.pattern, h.h)
 	}
 
+	// Tracing routes
+
+	_ = router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+		route.Handler(gorilla.Middleware(tracer, route.GetHandler()))
+		return nil
+	})
+
+	// Finish
+
 	http.Handle("/", router)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
+
+	defer closer.Close()
 }

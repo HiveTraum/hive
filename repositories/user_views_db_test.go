@@ -8,7 +8,7 @@ import (
 )
 
 func TestCreateOrUpdateAllUsersViewOnUserCreation(t *testing.T) {
-	pool := config.InitPool()
+	pool := config.InitPool(nil)
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	PurgeUserViews(pool, ctx)
@@ -21,7 +21,7 @@ func TestCreateOrUpdateAllUsersViewOnUserCreation(t *testing.T) {
 }
 
 func TestCreateOrUpdateUsersViewOnUserCreation(t *testing.T) {
-	pool := config.InitPool()
+	pool := config.InitPool(nil)
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	PurgeUserViews(pool, ctx)

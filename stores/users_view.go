@@ -40,10 +40,10 @@ func (store *DatabaseStore) CreateOrUpdateUsersViewByRoleID(context context.Cont
 
 // Cache
 
-func (store *DatabaseStore) GetUserViewFromCache(id int64) *inout.GetUserViewResponseV1 {
-	return repositories.GetUserViewFromCache(store.Cache, id)
+func (store *DatabaseStore) GetUserViewFromCache(ctx context.Context, id int64) *inout.GetUserViewResponseV1 {
+	return repositories.GetUserViewFromCache(store.Cache, ctx, id)
 }
 
-func (store *DatabaseStore) CacheUserView(userViews []*inout.GetUserViewResponseV1) {
-	repositories.CacheUserView(store.Cache, userViews)
+func (store *DatabaseStore) CacheUserView(ctx context.Context, userViews []*inout.GetUserViewResponseV1) {
+	repositories.CacheUserView(store.Cache, ctx, userViews)
 }

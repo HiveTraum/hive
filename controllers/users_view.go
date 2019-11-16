@@ -19,7 +19,7 @@ func CreateOrUpdateUsersViewByRoles(store infrastructure.StoreInterface, esb inf
 }
 
 func GetUserView(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, id int64) *inout.GetUserViewResponseV1 {
-	userView := store.GetUserViewFromCache(id)
+	userView := store.GetUserViewFromCache(ctx, id)
 
 	if userView != nil {
 		return userView
@@ -28,7 +28,7 @@ func GetUserView(store infrastructure.StoreInterface, esb infrastructure.ESBInte
 	userView = store.GetUserView(ctx, id)
 
 	if userView != nil {
-		store.CacheUserView([]*inout.GetUserViewResponseV1{userView})
+		store.CacheUserView(ctx, []*inout.GetUserViewResponseV1{userView})
 	}
 
 	return userView

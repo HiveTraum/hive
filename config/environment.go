@@ -14,6 +14,7 @@ type Environment struct {
 	DatabaseName string `env:"DATABASE_NAME" envDefault:"auth"`
 	RedisUrl     string `env:"REDIS_URL" envDefault:"localhost:6379"`
 	SentryDsn    string `env:"SENTRY_DSN" envDefault:"https://3e6b6318d35a457dbd57b1445919b38d@sentry.io/1797534"`
+	EsbUrl       string `env:"ESB_URL"`
 }
 
 func GetEnvironment() Environment {

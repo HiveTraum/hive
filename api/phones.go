@@ -72,7 +72,7 @@ func createPhoneConfirmationV1(r *functools.Request, app infrastructure.AppInter
 		return http.StatusBadRequest, nil
 	}
 
-	status, phoneConfirmation := controllers.CreatePhoneConfirmation(app.GetStore(), app.GetESB(), body.Phone)
+	status, phoneConfirmation := controllers.CreatePhoneConfirmation(app.GetStore(), app.GetESB(), r.Context(), body.Phone)
 
 	switch status {
 	case enums.Ok:

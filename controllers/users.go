@@ -21,7 +21,7 @@ func CreateUser(store infrastructure.StoreInterface, esb infrastructure.ESBInter
 	}
 
 	if len(body.Phone) > 0 {
-		phoneStatus, phone := validatePhone(store, body.Phone, body.PhoneCode)
+		phoneStatus, phone := validatePhone(store, ctx, body.Phone, body.PhoneCode)
 		if phoneStatus != enums.Ok {
 			return phoneStatus, nil
 		}

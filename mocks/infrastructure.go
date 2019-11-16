@@ -180,29 +180,29 @@ func (mr *MockStoreInterfaceMockRecorder) CreateOrUpdateUsersViewByRoleID(contex
 }
 
 // GetUserViewFromCache mocks base method
-func (m *MockStoreInterface) GetUserViewFromCache(id int64) *inout.GetUserViewResponseV1 {
+func (m *MockStoreInterface) GetUserViewFromCache(ctx context.Context, id int64) *inout.GetUserViewResponseV1 {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserViewFromCache", id)
+	ret := m.ctrl.Call(m, "GetUserViewFromCache", ctx, id)
 	ret0, _ := ret[0].(*inout.GetUserViewResponseV1)
 	return ret0
 }
 
 // GetUserViewFromCache indicates an expected call of GetUserViewFromCache
-func (mr *MockStoreInterfaceMockRecorder) GetUserViewFromCache(id interface{}) *gomock.Call {
+func (mr *MockStoreInterfaceMockRecorder) GetUserViewFromCache(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserViewFromCache", reflect.TypeOf((*MockStoreInterface)(nil).GetUserViewFromCache), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserViewFromCache", reflect.TypeOf((*MockStoreInterface)(nil).GetUserViewFromCache), ctx, id)
 }
 
 // CacheUserView mocks base method
-func (m *MockStoreInterface) CacheUserView(userViews []*inout.GetUserViewResponseV1) {
+func (m *MockStoreInterface) CacheUserView(ctx context.Context, userViews []*inout.GetUserViewResponseV1) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "CacheUserView", userViews)
+	m.ctrl.Call(m, "CacheUserView", ctx, userViews)
 }
 
 // CacheUserView indicates an expected call of CacheUserView
-func (mr *MockStoreInterfaceMockRecorder) CacheUserView(userViews interface{}) *gomock.Call {
+func (mr *MockStoreInterfaceMockRecorder) CacheUserView(ctx, userViews interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheUserView", reflect.TypeOf((*MockStoreInterface)(nil).CacheUserView), userViews)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheUserView", reflect.TypeOf((*MockStoreInterface)(nil).CacheUserView), ctx, userViews)
 }
 
 // CreateEmail mocks base method
@@ -338,31 +338,31 @@ func (mr *MockStoreInterfaceMockRecorder) GetPhone(ctx, phone interface{}) *gomo
 }
 
 // CreatePhoneConfirmationCode mocks base method
-func (m *MockStoreInterface) CreatePhoneConfirmationCode(phone, code string, duration time.Duration) *models.PhoneConfirmation {
+func (m *MockStoreInterface) CreatePhoneConfirmationCode(ctx context.Context, phone, code string, duration time.Duration) *models.PhoneConfirmation {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreatePhoneConfirmationCode", phone, code, duration)
+	ret := m.ctrl.Call(m, "CreatePhoneConfirmationCode", ctx, phone, code, duration)
 	ret0, _ := ret[0].(*models.PhoneConfirmation)
 	return ret0
 }
 
 // CreatePhoneConfirmationCode indicates an expected call of CreatePhoneConfirmationCode
-func (mr *MockStoreInterfaceMockRecorder) CreatePhoneConfirmationCode(phone, code, duration interface{}) *gomock.Call {
+func (mr *MockStoreInterfaceMockRecorder) CreatePhoneConfirmationCode(ctx, phone, code, duration interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePhoneConfirmationCode", reflect.TypeOf((*MockStoreInterface)(nil).CreatePhoneConfirmationCode), phone, code, duration)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePhoneConfirmationCode", reflect.TypeOf((*MockStoreInterface)(nil).CreatePhoneConfirmationCode), ctx, phone, code, duration)
 }
 
 // GetPhoneConfirmationCode mocks base method
-func (m *MockStoreInterface) GetPhoneConfirmationCode(phone string) string {
+func (m *MockStoreInterface) GetPhoneConfirmationCode(ctx context.Context, phone string) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPhoneConfirmationCode", phone)
+	ret := m.ctrl.Call(m, "GetPhoneConfirmationCode", ctx, phone)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
 // GetPhoneConfirmationCode indicates an expected call of GetPhoneConfirmationCode
-func (mr *MockStoreInterfaceMockRecorder) GetPhoneConfirmationCode(phone interface{}) *gomock.Call {
+func (mr *MockStoreInterfaceMockRecorder) GetPhoneConfirmationCode(ctx, phone interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPhoneConfirmationCode", reflect.TypeOf((*MockStoreInterface)(nil).GetPhoneConfirmationCode), phone)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPhoneConfirmationCode", reflect.TypeOf((*MockStoreInterface)(nil).GetPhoneConfirmationCode), ctx, phone)
 }
 
 // CreateRole mocks base method
@@ -524,6 +524,41 @@ func (m *MockESBInterface) OnRoleChanged(roleId []int64) {
 func (mr *MockESBInterfaceMockRecorder) OnRoleChanged(roleId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OnRoleChanged", reflect.TypeOf((*MockESBInterface)(nil).OnRoleChanged), roleId)
+}
+
+// MockESBDispatcherInterface is a mock of ESBDispatcherInterface interface
+type MockESBDispatcherInterface struct {
+	ctrl     *gomock.Controller
+	recorder *MockESBDispatcherInterfaceMockRecorder
+}
+
+// MockESBDispatcherInterfaceMockRecorder is the mock recorder for MockESBDispatcherInterface
+type MockESBDispatcherInterfaceMockRecorder struct {
+	mock *MockESBDispatcherInterface
+}
+
+// NewMockESBDispatcherInterface creates a new mock instance
+func NewMockESBDispatcherInterface(ctrl *gomock.Controller) *MockESBDispatcherInterface {
+	mock := &MockESBDispatcherInterface{ctrl: ctrl}
+	mock.recorder = &MockESBDispatcherInterfaceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockESBDispatcherInterface) EXPECT() *MockESBDispatcherInterfaceMockRecorder {
+	return m.recorder
+}
+
+// Send mocks base method
+func (m *MockESBDispatcherInterface) Send(event inout.Event) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Send", event)
+}
+
+// Send indicates an expected call of Send
+func (mr *MockESBDispatcherInterfaceMockRecorder) Send(event interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockESBDispatcherInterface)(nil).Send), event)
 }
 
 // MockAppInterface is a mock of AppInterface interface
