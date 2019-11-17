@@ -18,21 +18,25 @@ type ESB struct {
 func (esb *ESB) onUserChanged(userId []int64) {
 	ctx := context.Background()
 	CreateOrUpdateUsersView(esb.Store, esb, ctx, userId)
+	ctx.Done()
 }
 
 func (esb *ESB) onPhoneChanged(userId []int64) {
 	ctx := context.Background()
 	CreateOrUpdateUsersView(esb.Store, esb, ctx, userId)
+	ctx.Done()
 }
 
 func (esb *ESB) onEmailChanged(userId []int64) {
 	ctx := context.Background()
 	CreateOrUpdateUsersView(esb.Store, esb, ctx, userId)
+	ctx.Done()
 }
 
 func (esb *ESB) onRoleChanged(roleId []int64) {
 	ctx := context.Background()
 	CreateOrUpdateUsersViewByRoles(esb.Store, esb, ctx, roleId)
+	ctx.Done()
 }
 
 func (esb *ESB) onUsersViewChanged(usersView []*inout.GetUserViewResponseV1) {
@@ -113,7 +117,7 @@ func (esb *ESB) OnPhoneCodeConfirmationCreated(phone string, code string) {
 }
 
 func (esb *ESB) OnUsersViewChanged(usersView []*inout.GetUserViewResponseV1) {
-	go esb.OnUsersViewChanged(usersView)
+	go esb.onUsersViewChanged(usersView)
 }
 
 func (esb *ESB) OnPasswordChanged(userId int64) {

@@ -32,7 +32,7 @@ type StoreInterface interface {
 	// Emails
 
 	CreateEmail(ctx context.Context, userId int64, value string) (int, *models.Email)
-	GetEmail(ctx context.Context, phone string) (int, *models.Email)
+	GetEmail(ctx context.Context, email string) (int, *models.Email)
 	CreateEmailConfirmationCode(email string, code string, duration time.Duration) *models.EmailConfirmation
 	GetEmailConfirmationCode(email string) string
 

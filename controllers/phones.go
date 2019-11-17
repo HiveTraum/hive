@@ -67,7 +67,7 @@ func CreatePhone(store infrastructure.StoreInterface, esb infrastructure.ESBInte
 	}
 
 	status, phoneObject := store.CreatePhone(ctx, userId, phone)
-	go esb.OnPhoneChanged(identifiers)
+	esb.OnPhoneChanged(identifiers)
 	return status, phoneObject
 }
 
@@ -88,6 +88,6 @@ func CreatePhoneConfirmation(store infrastructure.StoreInterface, esb infrastruc
 
 	code := getRandomCode()
 	phoneConfirmation := store.CreatePhoneConfirmationCode(ctx, phone, code, time.Minute*15)
-	go esb.OnPhoneCodeConfirmationCreated(phone, code)
+	esb.OnPhoneCodeConfirmationCreated(phone, code)
 	return enums.Ok, phoneConfirmation
 }

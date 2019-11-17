@@ -65,7 +65,7 @@ func CreateEmail(store infrastructure.StoreInterface, esb infrastructure.ESBInte
 	}
 
 	status, phoneObject := store.CreateEmail(ctx, userId, email)
-	go esb.OnEmailChanged(identifiers)
+	esb.OnEmailChanged(identifiers)
 	return status, phoneObject
 }
 
@@ -79,6 +79,6 @@ func CreateEmailConfirmation(store infrastructure.StoreInterface, esb infrastruc
 
 	code := getRandomStringCode()
 	emailConfirmation := store.CreateEmailConfirmationCode(email, code, time.Minute*15)
-	go esb.OnEmailCodeConfirmationCreated(email, code)
+	esb.OnEmailCodeConfirmationCreated(email, code)
 	return enums.Ok, emailConfirmation
 }

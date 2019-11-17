@@ -17,6 +17,7 @@ import (
 type handler struct {
 	pattern string
 	h       http.HandlerFunc
+	methods []string
 }
 
 func main() {
@@ -60,27 +61,27 @@ func main() {
 	// Middleware
 
 	// Methods Middleware
-	CR := middlewares.IsMethodAllowedMiddleware([]string{http.MethodGet, http.MethodPost})
-	R := middlewares.IsMethodAllowedMiddleware([]string{http.MethodGet})
-	C := middlewares.IsMethodAllowedMiddleware([]string{http.MethodPost})
+	CR := []string{http.MethodGet, http.MethodPost}
+	R := []string{http.MethodGet}
+	C := []string{http.MethodPost}
 
 	handlers := []handler{
-		{pattern: "/views/v1/users", h: R(usersView),},
-		{pattern: "/views/v1/users/{id:[0-9]+}", h: R(userView),},
+		{pattern: "/views/v1/users", h: usersView, methods: R},
+		{pattern: "/views/v1/users/{id:[0-9]+}", h: userView, methods: R},
 
-		{pattern: "/api/v1/users", h: CR(usersAPI),},
-		{pattern: "/api/v1/users/{id:[0-9]+}", h: R(userAPI),},
+		{pattern: "/api/v1/users", h: usersAPI, methods: CR},
+		{pattern: "/api/v1/users/{id:[0-9]+}", h: userAPI, methods: R},
 
-		{pattern: "/api/v1/passwords", h: C(passwordsAPI),},
+		{pattern: "/api/v1/passwords", h: passwordsAPI, methods: C},
 
-		{pattern: "/api/v1/roles", h: CR(rolesAPI),},
-		{pattern: "/api/v1/roles/{id:[0-9]+}", h: R(roleAPI),},
+		{pattern: "/api/v1/roles", h: rolesAPI, methods: CR},
+		{pattern: "/api/v1/roles/{id:[0-9]+}", h: roleAPI, methods: R},
 
-		{pattern: "/api/v1/phoneConfirmations", h: C(phoneConfirmationsAPI),},
-		{pattern: "/api/v1/phones", h: C(phonesAPI),},
+		{pattern: "/api/v1/phoneConfirmations", h: phoneConfirmationsAPI, methods: C},
+		{pattern: "/api/v1/phones", h: phonesAPI, methods: C},
 
-		{pattern: "/api/v1/emailConfirmations", h: C(emailConfirmationsAPI),},
-		{pattern: "/api/v1/emails", h: C(emailsAPI),},
+		{pattern: "/api/v1/emailConfirmations", h: emailConfirmationsAPI, methods: C},
+		{pattern: "/api/v1/emails", h: emailsAPI, methods: C},
 	}
 
 	// Content Type Middleware
@@ -104,7 +105,7 @@ func main() {
 	router := mux.NewRouter().StrictSlash(false)
 
 	for _, h := range handlers {
-		router.HandleFunc(h.pattern, h.h)
+		router.HandleFunc(h.pattern, h.h).Methods(h.methods...)
 	}
 
 	// Tracing routes
@@ -118,7 +119,7 @@ func main() {
 
 	http.Handle("/", router)
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
-
 	defer closer.Close()
+
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

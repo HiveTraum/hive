@@ -15,6 +15,19 @@ type PGXOpenTracingLogger struct {
 	tracer opentracing.Tracer
 }
 
+func formatQueryToMessage(query string) string {
+	var message string
+
+	if len(query) > 80 {
+		message = query[:80]
+	} else {
+		message = query
+	}
+
+	replacer := strings.NewReplacer("\n", " ", "\t", " ", "   ", " ", "  ", " ")
+	return replacer.Replace(message)
+}
+
 func (logger *PGXOpenTracingLogger) Log(ctx context.Context, level pgx.LogLevel, msg string, data map[string]interface{}) {
 	possibleQuery := data["sql"]
 	possibleRowCount := data["rowCount"]
@@ -30,23 +43,13 @@ func (logger *PGXOpenTracingLogger) Log(ctx context.Context, level pgx.LogLevel,
 		return
 	}
 
-	var message string
-
-	if len(query) > 80 {
-		message = query[:80]
-	} else {
-		message = query
-	}
-
-	message = strings.ReplaceAll(message, "\n", " ")
-	message = strings.ReplaceAll(message, "\t", " ")
-	message = strings.ReplaceAll(message, "   ", " ")
-	message = strings.ReplaceAll(message, "  ", " ")
-
+	message := formatQueryToMessage(query)
 	startTime := opentracing.StartTime(time.Now().Add(duration * -1))
 	span, ctx := opentracing.StartSpanFromContext(ctx, message, startTime)
 
-	fieldsCount := len(args) + 3
+	constantFieldsCount := 3
+
+	fieldsCount := len(args) + constantFieldsCount
 
 	logs := make([]log.Field, fieldsCount)
 
@@ -54,7 +57,7 @@ func (logger *PGXOpenTracingLogger) Log(ctx context.Context, level pgx.LogLevel,
 	logs[1] = log.Int("rows", rowCount)
 	logs[2] = log.Int64("duration", duration.Microseconds())
 
-	i := 3
+	i := constantFieldsCount
 
 	for k, v := range args {
 

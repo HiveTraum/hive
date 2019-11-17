@@ -10,7 +10,7 @@ import (
 
 func CreateUser(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, body *inout.CreateUserRequestV1) (int, *models.User) {
 
-	var identifiers []int64
+	var identifiers []models.UserID
 
 	if body.Password == "" {
 		return enums.PasswordRequired, nil
@@ -29,7 +29,7 @@ func CreateUser(store infrastructure.StoreInterface, esb infrastructure.ESBInter
 		body.Phone = phone
 		_, oldPhone := store.GetPhone(ctx, phone)
 		if oldPhone != nil {
-			identifiers = append(identifiers, oldPhone.Id)
+			identifiers = append(identifiers, oldPhone.UserId)
 		}
 	}
 
@@ -42,7 +42,7 @@ func CreateUser(store infrastructure.StoreInterface, esb infrastructure.ESBInter
 		body.Email = email
 		_, oldEmail := store.GetEmail(ctx, email)
 		if oldEmail != nil {
-			identifiers = append(identifiers, oldEmail.Id)
+			identifiers = append(identifiers, oldEmail.UserId)
 		}
 	}
 

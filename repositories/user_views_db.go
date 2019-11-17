@@ -57,6 +57,7 @@ func updateUsersViewSQL() string {
 										nuv.roles = cuv.roles AND
 										nuv.emails = cuv.emails
 		WHERE cuv.id IS NULL
+		ORDER BY id
 		ON CONFLICT (id) DO UPDATE SET created=excluded.created,
 									   phones=excluded.phones,
 									   roles=excluded.roles,

@@ -221,18 +221,18 @@ func (mr *MockStoreInterfaceMockRecorder) CreateEmail(ctx, userId, value interfa
 }
 
 // GetEmail mocks base method
-func (m *MockStoreInterface) GetEmail(ctx context.Context, phone string) (int, *models.Email) {
+func (m *MockStoreInterface) GetEmail(ctx context.Context, email string) (int, *models.Email) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetEmail", ctx, phone)
+	ret := m.ctrl.Call(m, "GetEmail", ctx, email)
 	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(*models.Email)
 	return ret0, ret1
 }
 
 // GetEmail indicates an expected call of GetEmail
-func (mr *MockStoreInterfaceMockRecorder) GetEmail(ctx, phone interface{}) *gomock.Call {
+func (mr *MockStoreInterfaceMockRecorder) GetEmail(ctx, email interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEmail", reflect.TypeOf((*MockStoreInterface)(nil).GetEmail), ctx, phone)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEmail", reflect.TypeOf((*MockStoreInterface)(nil).GetEmail), ctx, email)
 }
 
 // CreateEmailConfirmationCode mocks base method
