@@ -24,3 +24,7 @@ func PurgeUsers(pool *pgxpool.Pool, ctx context.Context) {
 func PurgePhones(pool *pgxpool.Pool, ctx context.Context) {
 	PurgeTable(pool, ctx, "phones")
 }
+
+func PurgeRoles(pool *pgxpool.Pool, ctx context.Context) {
+	PurgeTable(pool, ctx, "roles")
+}

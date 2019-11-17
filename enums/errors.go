@@ -27,4 +27,9 @@ const (
 
 	PasswordRequired
 	IncorrectPassword
+
+	// Roles
+
+	RoleAlreadyExist
+	RoleNotFound
 )

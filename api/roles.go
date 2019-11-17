@@ -3,6 +3,7 @@ package api
 import (
 	"auth/app"
 	"auth/controllers"
+	"auth/enums"
 	"auth/functools"
 	"auth/infrastructure"
 	"auth/inout"
@@ -13,7 +14,6 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 func GetRolesV1Query(r *http.Request) repositories.GetRolesQuery {
@@ -27,13 +27,12 @@ func GetRolesV1Query(r *http.Request) repositories.GetRolesQuery {
 		limit = DefaultLimit
 	}
 
-	identifiersQuery := r.URL.Query().Get("id")
+	identifiersQuery := r.URL.Query()["id"]
 	var identifiers []int64
 
-	if identifiersQuery != "" {
-		identifiersQueryStr := strings.SplitN(identifiersQuery, ",", -1)
-		identifiersQueryInt := make([]int64, len(identifiersQueryStr))
-		for i, q := range identifiersQueryStr {
+	if len(identifiersQuery) > 0 {
+		identifiersQueryInt := make([]int64, len(identifiersQuery))
+		for i, q := range identifiersQuery {
 			idQueryInt, _ := strconv.Atoi(q)
 			identifiersQueryInt[i] = int64(idQueryInt)
 		}
@@ -45,16 +44,23 @@ func GetRolesV1Query(r *http.Request) repositories.GetRolesQuery {
 }
 
 func getRoleV1(r *functools.Request, app *app.App, id int64) (int, *inout.GetRoleResponseV1) {
-	role := app.Store.GetRole(r.Context(), id)
+	status, role := app.Store.GetRole(r.Context(), id)
 
-	if role == nil {
+	switch status {
+	case enums.Ok:
+		return http.StatusOK, &inout.GetRoleResponseV1{
+			Id:      role.Id,
+			Created: role.Created,
+			Title:   role.Title,
+		}
+	case enums.RoleNotFound:
 		return http.StatusNotFound, nil
-	}
-
-	return http.StatusOK, &inout.GetRoleResponseV1{
-		Id:      role.Id,
-		Created: role.Created,
-		Title:   role.Title,
+	default:
+		return http.StatusOK, &inout.GetRoleResponseV1{
+			Id:      role.Id,
+			Created: role.Created,
+			Title:   role.Title,
+		}
 	}
 }
 
@@ -75,7 +81,7 @@ func getRolesV1(r *functools.Request, app *app.App) (int, *inout.ListRoleRespons
 	return http.StatusOK, &inout.ListRoleResponseV1{Data: rolesData}
 }
 
-func createRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.GetRoleResponseV1) {
+func createRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
 
 	body := inout.CreateRoleRequestV1{}
 
@@ -85,16 +91,25 @@ func createRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, *
 		return http.StatusBadRequest, nil
 	}
 
-	role := controllers.CreateRole(app.GetStore(), app.GetESB(), r.Context(), body.Title)
+	status, role := controllers.CreateRole(app.GetStore(), app.GetESB(), r.Context(), body.Title)
 
-	if role == nil {
-		return http.StatusInternalServerError, nil
-	}
-
-	return http.StatusCreated, &inout.GetRoleResponseV1{
-		Id:      role.Id,
-		Created: role.Created,
-		Title:   role.Title,
+	switch status {
+	case enums.Ok:
+		return http.StatusCreated, &inout.GetRoleResponseV1{
+			Id:      role.Id,
+			Created: role.Created,
+			Title:   role.Title,
+		}
+	case enums.RoleAlreadyExist:
+		return http.StatusBadRequest, &inout.CreateRoleBadRequestV1{
+			Title: []string{"Роль с таким названием уже существует"},
+		}
+	default:
+		return http.StatusCreated, &inout.GetRoleResponseV1{
+			Id:      role.Id,
+			Created: role.Created,
+			Title:   role.Title,
+		}
 	}
 }
 

@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"auth/enums"
+	"auth/functools"
 	"auth/inout"
 	"context"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"github.com/go-redis/redis/v7"
 	"github.com/golang/protobuf/proto"
 	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/log"
 	"time"
 )
 
@@ -24,6 +26,7 @@ func GetUserViewFromCache(cache *redis.Client, ctx context.Context, id int64) *i
 
 	value, err := cache.Get(key).Bytes()
 	if err != nil {
+		span.LogFields(log.Error(err))
 		sentry.CaptureException(err)
 		return nil
 	}
@@ -33,6 +36,7 @@ func GetUserViewFromCache(cache *redis.Client, ctx context.Context, id int64) *i
 	err = proto.Unmarshal(value, &userView)
 
 	if err != nil {
+		span.LogFields(log.Error(err))
 		sentry.CaptureException(err)
 		return nil
 	}
@@ -50,22 +54,28 @@ func CacheUserView(cache *redis.Client, ctx context.Context, userViews []*inout.
 		return
 	}
 
+	identifiers := make([]int64, len(userViews))
+
 	pipeline := cache.TxPipeline()
-	for _, uv := range userViews {
+	for i, uv := range userViews {
 		data, err := proto.Marshal(uv)
 		if err != nil {
+			span.LogFields(log.Error(err))
 			sentry.CaptureException(err)
 			continue
 		}
 
+		identifiers[i] = uv.Id
 		pipeline.Set(getUserKey(uv.Id), data, time.Hour*48)
 	}
 
 	_, err := pipeline.Exec()
 
 	if err != nil {
+		span.LogFields(log.Error(err))
 		sentry.CaptureException(err)
 	}
 
+	span.LogFields(log.String("user_id", functools.Int64SliceToString(identifiers, ", ")))
 	span.Finish()
 }

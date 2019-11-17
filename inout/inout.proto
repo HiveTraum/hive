@@ -7,6 +7,10 @@ message CreateRoleRequestV1 {
     string title = 1;
 }
 
+message CreateRoleBadRequestV1 {
+    repeated string title = 1;
+}
+
 message GetRoleResponseV1 {
     int64 id = 1;
     int64 created = 2;

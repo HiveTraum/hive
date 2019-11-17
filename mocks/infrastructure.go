@@ -366,11 +366,12 @@ func (mr *MockStoreInterfaceMockRecorder) GetPhoneConfirmationCode(ctx, phone in
 }
 
 // CreateRole mocks base method
-func (m *MockStoreInterface) CreateRole(context context.Context, title string) *models.Role {
+func (m *MockStoreInterface) CreateRole(context context.Context, title string) (int, *models.Role) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateRole", context, title)
-	ret0, _ := ret[0].(*models.Role)
-	return ret0
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(*models.Role)
+	return ret0, ret1
 }
 
 // CreateRole indicates an expected call of CreateRole
@@ -380,11 +381,12 @@ func (mr *MockStoreInterfaceMockRecorder) CreateRole(context, title interface{})
 }
 
 // GetRole mocks base method
-func (m *MockStoreInterface) GetRole(context context.Context, id int64) *models.Role {
+func (m *MockStoreInterface) GetRole(context context.Context, id int64) (int, *models.Role) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRole", context, id)
-	ret0, _ := ret[0].(*models.Role)
-	return ret0
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(*models.Role)
+	return ret0, ret1
 }
 
 // GetRole indicates an expected call of GetRole

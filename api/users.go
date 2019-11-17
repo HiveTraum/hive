@@ -13,7 +13,6 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
@@ -100,13 +99,12 @@ func GetUsersV1Query(r *http.Request) repositories.GetUsersQuery {
 		limit = DefaultLimit
 	}
 
-	identifiersQuery := r.URL.Query().Get("id")
+	identifiersQuery := r.URL.Query()["id"]
 	var identifiers []int64
 
-	if identifiersQuery != "" {
-		identifiersQueryStr := strings.SplitN(identifiersQuery, ",", -1)
-		identifiersQueryInt := make([]int64, len(identifiersQueryStr))
-		for i, q := range identifiersQueryStr {
+	if len(identifiersQuery) > 0 {
+		identifiersQueryInt := make([]int64, len(identifiersQuery))
+		for i, q := range identifiersQuery {
 			idQueryInt, _ := strconv.Atoi(q)
 			identifiersQueryInt[i] = int64(idQueryInt)
 		}

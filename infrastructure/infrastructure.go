@@ -51,8 +51,8 @@ type StoreInterface interface {
 
 	// Roles
 
-	CreateRole(context context.Context, title string) *models.Role
-	GetRole(context context.Context, id int64) *models.Role
+	CreateRole(context context.Context, title string) (int, *models.Role)
+	GetRole(context context.Context, id int64) (int, *models.Role)
 	GetRoles(context context.Context, query repositories.GetRolesQuery) []*models.Role
 }
 

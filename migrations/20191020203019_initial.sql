@@ -37,7 +37,7 @@ CREATE TABLE roles
 (
     id      BIGSERIAL PRIMARY KEY,
     created BIGINT DEFAULT extract(epoch from now()) * 1000,
-    title   VARCHAR(255)
+    title   VARCHAR(255) UNIQUE
 );
 
 CREATE TABLE user_roles

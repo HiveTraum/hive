@@ -1,9 +1,12 @@
 package controllers
 
 import (
+	"auth/functools"
 	"auth/infrastructure"
 	"auth/inout"
 	"context"
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/log"
 )
 
 const SENDER = "auth"
@@ -17,37 +20,55 @@ type ESB struct {
 
 func (esb *ESB) onUserChanged(userId []int64) {
 	ctx := context.Background()
+	span, ctx := opentracing.StartSpanFromContext(ctx, "OnUserChanged")
 	CreateOrUpdateUsersView(esb.Store, esb, ctx, userId)
+	span.LogFields(log.String("user_id", functools.Int64SliceToString(userId, ", ")))
+	span.Finish()
 	ctx.Done()
 }
 
 func (esb *ESB) onPhoneChanged(userId []int64) {
 	ctx := context.Background()
+	span, ctx := opentracing.StartSpanFromContext(ctx, "OnPhoneChanged")
 	CreateOrUpdateUsersView(esb.Store, esb, ctx, userId)
+	span.LogFields(log.String("user_id", functools.Int64SliceToString(userId, ", ")))
+	span.Finish()
 	ctx.Done()
 }
 
 func (esb *ESB) onEmailChanged(userId []int64) {
 	ctx := context.Background()
+	span, ctx := opentracing.StartSpanFromContext(ctx, "OnEmailChanged")
 	CreateOrUpdateUsersView(esb.Store, esb, ctx, userId)
+	span.LogFields(log.String("user_id", functools.Int64SliceToString(userId, ", ")))
+	span.Finish()
 	ctx.Done()
 }
 
 func (esb *ESB) onRoleChanged(roleId []int64) {
 	ctx := context.Background()
+	span, ctx := opentracing.StartSpanFromContext(ctx, "OnRoleChanged")
 	CreateOrUpdateUsersViewByRoles(esb.Store, esb, ctx, roleId)
+	span.LogFields(log.String("role_id", functools.Int64SliceToString(roleId, ", ")))
+	span.Finish()
 	ctx.Done()
 }
 
 func (esb *ESB) onUsersViewChanged(usersView []*inout.GetUserViewResponseV1) {
+	ctx := context.Background()
+	span, ctx := opentracing.StartSpanFromContext(ctx, "OnUserViewChanged")
 	identifiers := make([]int64, len(usersView))
 
 	for i, u := range usersView {
 		identifiers[i] = u.Id
 	}
 
+	esb.Store.CacheUserView(ctx, usersView)
 	event := esb.getUserViewChangedEvent(identifiers)
 	esb.Dispatcher.Send(event)
+	span.LogFields(log.String("user_id", functools.Int64SliceToString(identifiers, ", ")))
+	span.Finish()
+	ctx.Done()
 }
 
 func (esb *ESB) onPhoneCodeConfirmationCreated(phone string, code string) {

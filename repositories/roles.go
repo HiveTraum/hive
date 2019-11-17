@@ -1,12 +1,16 @@
 package repositories
 
 import (
+	"auth/enums"
 	"auth/functools"
 	"auth/models"
 	"context"
+	"errors"
 	"github.com/getsentry/sentry-go"
+	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"math"
+	"strings"
 )
 
 func getRolesSQL() string {
@@ -22,16 +26,28 @@ func createRoleSQL() string {
 	return "INSERT INTO roles (title) VALUES ($1) RETURNING id, created, title;"
 }
 
-func scanRole(row pgx.Row) *models.Role {
+func unwrapRoleScanError(err error) int {
+	var e *pgconn.PgError
+	if errors.As(err, &e) && strings.Contains(e.Message, "unique constraint \"roles_title_key\"") {
+		return enums.RoleAlreadyExist
+	} else if strings.Contains(err.Error(), "no rows") {
+		return enums.RoleNotFound
+	}
+
+	sentry.CaptureException(err)
+	return enums.NotOk
+}
+
+func scanRole(row pgx.Row) (int, *models.Role) {
 	role := &models.Role{}
 
 	err := row.Scan(&role.Id, &role.Created, &role.Title)
 	if err != nil {
 		sentry.CaptureException(err)
-		return nil
+		return unwrapRoleScanError(err), nil
 	}
 
-	return role
+	return enums.Ok, role
 }
 
 func scanRoles(rows pgx.Rows, limit int) []*models.Role {
@@ -40,7 +56,8 @@ func scanRoles(rows pgx.Rows, limit int) []*models.Role {
 	var i int32
 
 	for rows.Next() {
-		roles[i] = scanRole(rows)
+		_, role := scanRole(rows)
+		roles[i] = role
 		i++
 	}
 
@@ -74,13 +91,13 @@ func convertGetRolesQueryToRaw(query GetRolesQuery) getRolesRawQuery {
 	}
 }
 
-func CreateRole(db DB, context context.Context, title string) *models.Role {
+func CreateRole(db DB, context context.Context, title string) (int, *models.Role) {
 	sql := createRoleSQL()
 	row := db.QueryRow(context, sql, title)
 	return scanRole(row)
 }
 
-func GetRole(db DB, context context.Context, id int64) *models.Role {
+func GetRole(db DB, context context.Context, id int64) (int, *models.Role) {
 	sql := getRolesSQL()
 	row := db.QueryRow(context, sql, functools.Int64ListToPGArray([]int64{id}), 1)
 	return scanRole(row)

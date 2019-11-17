@@ -13,19 +13,17 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 func getUsersViewV1Query(r *http.Request) repositories.GetUsersViewQuery {
 	usersQuery := api.GetUsersV1Query(r)
 
-	rolesQuery := r.URL.Query().Get("roles")
+	rolesQuery := r.URL.Query()["role_id"]
 	var roles []int64
 
-	if rolesQuery != "" {
-		identifiersQueryStr := strings.SplitN(rolesQuery, ",", -1)
-		identifiersQueryInt := make([]int64, len(identifiersQueryStr))
-		for i, q := range identifiersQueryStr {
+	if len(rolesQuery) > 0 {
+		identifiersQueryInt := make([]int64, len(rolesQuery))
+		for i, q := range rolesQuery {
 			idQueryInt, _ := strconv.Atoi(q)
 			identifiersQueryInt[i] = int64(idQueryInt)
 		}
