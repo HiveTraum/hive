@@ -11,7 +11,20 @@ func (store *DatabaseStore) GetUsersView(ctx context.Context, query repositories
 }
 
 func (store *DatabaseStore) GetUserView(ctx context.Context, id int64) *inout.GetUserViewResponseV1 {
-	return repositories.GetUserView(store.Db, ctx, id)
+
+	userView := repositories.GetUserViewFromCache(store.Cache, ctx, id)
+
+	if userView != nil {
+		return userView
+	}
+
+	userView = repositories.GetUserView(store.Db, ctx, id)
+
+	if userView != nil {
+		repositories.CacheUserView(store.Cache, ctx, []*inout.GetUserViewResponseV1{userView})
+	}
+
+	return userView
 }
 
 func (store *DatabaseStore) CreateOrUpdateUsersView(ctx context.Context, query repositories.CreateOrUpdateUsersViewQuery) []*inout.GetUserViewResponseV1 {

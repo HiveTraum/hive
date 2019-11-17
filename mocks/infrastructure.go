@@ -179,20 +179,6 @@ func (mr *MockStoreInterfaceMockRecorder) CreateOrUpdateUsersViewByRoleID(contex
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdateUsersViewByRoleID", reflect.TypeOf((*MockStoreInterface)(nil).CreateOrUpdateUsersViewByRoleID), context, id)
 }
 
-// GetUserViewFromCache mocks base method
-func (m *MockStoreInterface) GetUserViewFromCache(ctx context.Context, id int64) *inout.GetUserViewResponseV1 {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserViewFromCache", ctx, id)
-	ret0, _ := ret[0].(*inout.GetUserViewResponseV1)
-	return ret0
-}
-
-// GetUserViewFromCache indicates an expected call of GetUserViewFromCache
-func (mr *MockStoreInterfaceMockRecorder) GetUserViewFromCache(ctx, id interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserViewFromCache", reflect.TypeOf((*MockStoreInterface)(nil).GetUserViewFromCache), ctx, id)
-}
-
 // CacheUserView mocks base method
 func (m *MockStoreInterface) CacheUserView(ctx context.Context, userViews []*inout.GetUserViewResponseV1) {
 	m.ctrl.T.Helper()
@@ -407,6 +393,35 @@ func (m *MockStoreInterface) GetRoles(context context.Context, query repositorie
 func (mr *MockStoreInterfaceMockRecorder) GetRoles(context, query interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoles", reflect.TypeOf((*MockStoreInterface)(nil).GetRoles), context, query)
+}
+
+// CreateUserRole mocks base method
+func (m *MockStoreInterface) CreateUserRole(ctx context.Context, userId, roleId int64) (int, *models.UserRole) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateUserRole", ctx, userId, roleId)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(*models.UserRole)
+	return ret0, ret1
+}
+
+// CreateUserRole indicates an expected call of CreateUserRole
+func (mr *MockStoreInterfaceMockRecorder) CreateUserRole(ctx, userId, roleId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserRole", reflect.TypeOf((*MockStoreInterface)(nil).CreateUserRole), ctx, userId, roleId)
+}
+
+// GetUserRoles mocks base method
+func (m *MockStoreInterface) GetUserRoles(ctx context.Context, query repositories.GetUserRoleQuery) []*models.UserRole {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserRoles", ctx, query)
+	ret0, _ := ret[0].([]*models.UserRole)
+	return ret0
+}
+
+// GetUserRoles indicates an expected call of GetUserRoles
+func (mr *MockStoreInterfaceMockRecorder) GetUserRoles(ctx, query interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserRoles", reflect.TypeOf((*MockStoreInterface)(nil).GetUserRoles), ctx, query)
 }
 
 // MockESBInterface is a mock of ESBInterface interface

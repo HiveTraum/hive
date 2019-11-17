@@ -9,6 +9,8 @@ import (
 )
 
 type StoreInterface interface {
+	// Store can be used to combine multiple physical storage elements, like postgres, redis, elasticSearch and etc...
+
 	// All store methods
 
 	// Users
@@ -26,7 +28,6 @@ type StoreInterface interface {
 	CreateOrUpdateUsersViewByRolesID(context context.Context, id []int64) []*inout.GetUserViewResponseV1
 	CreateOrUpdateUsersViewByUserID(context context.Context, id int64) []*inout.GetUserViewResponseV1
 	CreateOrUpdateUsersViewByRoleID(context context.Context, id int64) []*inout.GetUserViewResponseV1
-	GetUserViewFromCache(ctx context.Context, id int64) *inout.GetUserViewResponseV1
 	CacheUserView(ctx context.Context, userViews []*inout.GetUserViewResponseV1)
 
 	// Emails
@@ -54,6 +55,11 @@ type StoreInterface interface {
 	CreateRole(context context.Context, title string) (int, *models.Role)
 	GetRole(context context.Context, id int64) (int, *models.Role)
 	GetRoles(context context.Context, query repositories.GetRolesQuery) []*models.Role
+
+	// User Roles
+
+	CreateUserRole(ctx context.Context, userId int64, roleId int64) (int, *models.UserRole)
+	GetUserRoles(ctx context.Context, query repositories.GetUserRoleQuery) []*models.UserRole
 }
 
 type ESBInterface interface {

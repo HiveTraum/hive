@@ -52,6 +52,8 @@ func main() {
 	rolesAPI := middlewares.ResponseControllerMiddleware(api.RolesAPIV1(application))
 	roleAPI := middlewares.ResponseControllerMiddleware(api.RoleAPIV1(application))
 
+	userRolesAPI := middlewares.ResponseControllerMiddleware(api.UserRolesAPIV1(application))
+
 	phoneConfirmationsAPI := middlewares.ResponseControllerMiddleware(api.PhoneConfirmationsAPIV1(application))
 	phonesAPI := middlewares.ResponseControllerMiddleware(api.PhonesAPIV1(application))
 
@@ -76,6 +78,8 @@ func main() {
 
 		{pattern: "/api/v1/roles", h: rolesAPI, methods: CR},
 		{pattern: "/api/v1/roles/{id:[0-9]+}", h: roleAPI, methods: R},
+
+		{pattern: "/api/v1/user_roles", h: userRolesAPI, methods: CR},
 
 		{pattern: "/api/v1/phoneConfirmations", h: phoneConfirmationsAPI, methods: C},
 		{pattern: "/api/v1/phones", h: phonesAPI, methods: C},

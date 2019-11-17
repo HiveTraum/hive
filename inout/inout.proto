@@ -29,8 +29,8 @@ message CreateUserRoleRequestV1 {
 }
 
 message CreateUserRoleBadRequestV1 {
-    int64 user_id = 1;
-    int64 role_id = 2;
+    repeated string user_id = 1;
+    repeated string role_id = 2;
     repeated string errors = 3;
 }
 
@@ -40,6 +40,16 @@ message CreateUserRolesRequestV1 {
 
 message CreateUserRolesBadRequestV1 {
     repeated CreateUserRoleBadRequestV1 errors = 1;
+}
+
+message GetUserRoleResponseV1 {
+    int64 created = 2;
+    int64 user_id = 3;
+    int64 role_id = 4;
+}
+
+message ListUserRolesResponseV1 {
+    repeated GetUserRoleResponseV1 data = 1;
 }
 
 // Emails API

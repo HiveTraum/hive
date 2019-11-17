@@ -2,7 +2,6 @@ package views
 
 import (
 	"auth/api"
-	"auth/controllers"
 	"auth/functools"
 	"auth/infrastructure"
 	"auth/inout"
@@ -46,7 +45,7 @@ func getUsersViewV1(r *functools.Request, app infrastructure.AppInterface) (int,
 
 func getUserViewV1(r *functools.Request, app infrastructure.AppInterface, id int64) (int, *inout.GetUserViewResponseV1) {
 
-	userView := controllers.GetUserView(app.GetStore(), app.GetESB(), r.Context(), id)
+	userView := app.GetStore().GetUserView(r.Context(), id)
 
 	if userView == nil {
 		return http.StatusNotFound, nil

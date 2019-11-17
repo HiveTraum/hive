@@ -32,4 +32,9 @@ const (
 
 	RoleAlreadyExist
 	RoleNotFound
+
+	// User Roles
+
+	UserRoleAlreadyExist
+	UserRoleNotFound
 )

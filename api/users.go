@@ -100,19 +100,11 @@ func GetUsersV1Query(r *http.Request) repositories.GetUsersQuery {
 	}
 
 	identifiersQuery := r.URL.Query()["id"]
-	var identifiers []int64
 
-	if len(identifiersQuery) > 0 {
-		identifiersQueryInt := make([]int64, len(identifiersQuery))
-		for i, q := range identifiersQuery {
-			idQueryInt, _ := strconv.Atoi(q)
-			identifiersQueryInt[i] = int64(idQueryInt)
-		}
-
-		identifiers = identifiersQueryInt
+	return repositories.GetUsersQuery{
+		Limit: limit,
+		Id:    functools.StringsSliceToInt64String(identifiersQuery),
 	}
-
-	return repositories.GetUsersQuery{Limit: limit, Id: identifiers}
 }
 
 func getUsersV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.ListUserResponseV1) {

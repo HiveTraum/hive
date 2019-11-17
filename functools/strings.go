@@ -2,6 +2,7 @@ package functools
 
 import (
 	"math/rand"
+	"strconv"
 	"time"
 	"unsafe"
 )
@@ -40,4 +41,15 @@ func GetRandomString(n int) string {
 	}
 
 	return *(*string)(unsafe.Pointer(&b))
+}
+
+func StringsSliceToInt64String(slice []string) []int64 {
+
+	elements := make([]int64, len(slice))
+	for i, q := range slice {
+		integer, _ := strconv.Atoi(q)
+		elements[i] = int64(integer)
+	}
+
+	return elements
 }
