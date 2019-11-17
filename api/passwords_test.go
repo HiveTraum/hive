@@ -21,14 +21,21 @@ func TestCreatePasswordWithoutUserV1(t *testing.T) {
 	body := "{\"user_id\": 1, \"value\": \"hello\"}"
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, _ := mocks.InitMockApp(ctrl)
+	app, store, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
+
+	passwordProcessor.
+		EXPECT().
+		Encode("hello").
+		Return("olleh")
+
 	store.
 		EXPECT().
-		CreatePassword(gomock.Any(), int64(1), gomock.Any()).
+		CreatePassword(gomock.Any(), int64(1), "olleh").
 		Times(1).
 		Return(enums.UserNotFound, nil)
+
 	r.Header.Add("Content-Type", "application/json")
 	status, message := createPasswordV1(&functools.Request{Request: r}, app)
 	require.Equal(t, status, http.StatusBadRequest)
@@ -42,11 +49,17 @@ func TestCreatePasswordWithUserV1(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, esb := mocks.InitMockApp(ctrl)
+	app, store, esb, passwordProcessor := mocks.InitMockApp(ctrl)
 	ctx := context.Background()
+
+	passwordProcessor.
+		EXPECT().
+		Encode("hello").
+		Return("olleh")
+
 	store.
 		EXPECT().
-		CreatePassword(ctx, int64(2), gomock.Any()).
+		CreatePassword(ctx, int64(2), "olleh").
 		Return(enums.Ok, &models.Password{
 			Id:      1,
 			Created: 0,
@@ -74,11 +87,20 @@ func TestCreatePasswordWithTooLongValueV1(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, esb := mocks.InitMockApp(ctrl)
+	app, store, esb, passwordProcessor := mocks.InitMockApp(ctrl)
 	ctx := context.Background()
+
+	passwordProcessor.
+		EXPECT().
+		Encode("hellohellohellohellohellohellohellohellohellohellohell"+
+		"ohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohe"+
+		"llohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello"+
+		"hellohellohellohellohellohello").
+		Return("olleh")
+
 	store.
 		EXPECT().
-		CreatePassword(ctx, int64(3), gomock.Any()).
+		CreatePassword(ctx, int64(3), "olleh").
 		Return(enums.Ok, &models.Password{
 			Id:      1,
 			Created: 0,

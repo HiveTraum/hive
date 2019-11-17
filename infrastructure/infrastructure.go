@@ -71,7 +71,12 @@ type ESBDispatcherInterface interface {
 	Send(event inout.Event)
 }
 
+type PasswordProcessorInterface interface {
+	Encode(string) string
+}
+
 type AppInterface interface {
 	GetStore() StoreInterface
 	GetESB() ESBInterface
+	GetPasswordProcessor() PasswordProcessorInterface
 }

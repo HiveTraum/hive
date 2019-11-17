@@ -19,7 +19,7 @@ func TestCreateUserEmptyBody(t *testing.T) {
 	body := "{}"
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, _ := mocks.InitMockApp(ctrl)
+	app, store, _, _ := mocks.InitMockApp(ctrl)
 
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
 
@@ -41,13 +41,13 @@ func TestCreateUserWithOnlyPassword(t *testing.T) {
 	body := "{\"password\": \"hello\"}"
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, _ := mocks.InitMockApp(ctrl)
+	app, store, _, _ := mocks.InitMockApp(ctrl)
 
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
 
 	store.
 		EXPECT().
-		CreateUser(r.Context(), gomock.Any()).
+		CreateUser(r.Context(), "olleh").
 		Times(0)
 
 	r.Header.Add("Content-Type", "application/json")
@@ -63,13 +63,19 @@ func TestCreateUserWithOnlyEmail(t *testing.T) {
 	body := "{\"password\": \"hello\", \"email\": \"mail@mail.com\"}"
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, _ := mocks.InitMockApp(ctrl)
 
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
 
+	app, store, _, passwordProcessor := mocks.InitMockApp(ctrl)
+
+	passwordProcessor.
+		EXPECT().
+		Encode("hello").
+		Return("olleh")
+
 	store.
 		EXPECT().
-		CreateUser(r.Context(), gomock.Any()).
+		CreateUser(r.Context(), "olleh").
 		Times(0)
 
 	store.
@@ -91,9 +97,15 @@ func TestCreateUserWithEmailAndEmailCode(t *testing.T) {
 	body := "{\"password\": \"hello\", \"email\": \"mail@mail.com\", \"emailCode\": \"123456\"}"
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, _ := mocks.InitMockApp(ctrl)
 
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
+
+	app, store, _, passwordProcessor := mocks.InitMockApp(ctrl)
+
+	passwordProcessor.
+		EXPECT().
+		Encode("hello").
+		Return("olleh")
 
 	store.
 		EXPECT().
@@ -119,9 +131,15 @@ func TestCreateUserWithEmailAndEmailCodeAfterIncorrectEmailConfirmationCodeRecei
 	body := "{\"password\": \"hello\", \"email\": \"mail@mail.com\", \"emailCode\": \"123456\"}"
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, _ := mocks.InitMockApp(ctrl)
 
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
+
+	app, store, _, passwordProcessor := mocks.InitMockApp(ctrl)
+
+	passwordProcessor.
+		EXPECT().
+		Encode("hello").
+		Return("olleh")
 
 	store.
 		EXPECT().
@@ -147,9 +165,15 @@ func TestSuccessfulCreateUserWithEmail(t *testing.T) {
 	body := "{\"password\": \"hello\", \"email\": \"mail@mail.com\", \"emailCode\": \"123456\"}"
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, esb := mocks.InitMockApp(ctrl)
 
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
+
+	app, store, esb, passwordProcessor := mocks.InitMockApp(ctrl)
+
+	passwordProcessor.
+		EXPECT().
+		Encode("hello").
+		Return("olleh")
 
 	store.
 		EXPECT().
@@ -171,7 +195,7 @@ func TestSuccessfulCreateUserWithEmail(t *testing.T) {
 	store.
 		EXPECT().
 		CreateUser(gomock.Any(), &inout.CreateUserRequestV1{
-			Password:  "hello",
+			Password:  "olleh",
 			Email:     "mail@mail.com",
 			EmailCode: "123456",
 		}).

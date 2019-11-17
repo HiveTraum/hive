@@ -22,7 +22,7 @@ func createPasswordV1(r *functools.Request, app infrastructure.AppInterface) (in
 		return http.StatusBadRequest, nil
 	}
 
-	status, password := controllers.CreatePassword(app.GetStore(), app.GetESB(), r.Context(), body.UserId, body.Value)
+	status, password := controllers.CreatePassword(app.GetStore(), app.GetESB(), app.GetPasswordProcessor(), r.Context(), body.UserId, body.Value)
 
 	switch status {
 	case enums.Ok:

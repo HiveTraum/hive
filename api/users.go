@@ -24,7 +24,7 @@ func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 		return http.StatusBadRequest, nil
 	}
 
-	status, user := controllers.CreateUser(app.GetStore(), app.GetESB(), r.Context(), body)
+	status, user := controllers.CreateUser(app.GetStore(), app.GetESB(), app.GetPasswordProcessor(), r.Context(), body)
 
 	switch status {
 	case enums.Ok:

@@ -21,6 +21,27 @@ message ListRoleResponseV1 {
     repeated GetRoleResponseV1 data = 1;
 }
 
+// User Roles API
+
+message CreateUserRoleRequestV1 {
+    int64 user_id = 1;
+    int64 role_id = 2;
+}
+
+message CreateUserRoleBadRequestV1 {
+    int64 user_id = 1;
+    int64 role_id = 2;
+    repeated string errors = 3;
+}
+
+message CreateUserRolesRequestV1 {
+    repeated CreateUserRoleRequestV1 user_roles = 1;
+}
+
+message CreateUserRolesBadRequestV1 {
+    repeated CreateUserRoleBadRequestV1 errors = 1;
+}
+
 // Emails API
 
 message CreateEmailRequestV1 {

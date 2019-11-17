@@ -8,7 +8,12 @@ import (
 	"context"
 )
 
-func CreateUser(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, body *inout.CreateUserRequestV1) (int, *models.User) {
+func CreateUser(
+	store infrastructure.StoreInterface,
+	esb infrastructure.ESBInterface,
+	passwordProcessor infrastructure.PasswordProcessorInterface,
+	ctx context.Context,
+	body *inout.CreateUserRequestV1) (int, *models.User) {
 
 	var identifiers []models.UserID
 
@@ -18,6 +23,11 @@ func CreateUser(store infrastructure.StoreInterface, esb infrastructure.ESBInter
 
 	if body.Email == "" && body.Phone == "" {
 		return enums.MinimumOneFieldRequired, nil
+	}
+
+	body.Password = passwordProcessor.Encode(body.Password)
+	if body.Password == "" {
+		return enums.IncorrectPassword, nil
 	}
 
 	if len(body.Phone) > 0 {

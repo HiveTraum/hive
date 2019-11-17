@@ -6,8 +6,9 @@ import (
 )
 
 type MockApp struct {
-	Store infrastructure.StoreInterface
-	ESB   infrastructure.ESBInterface
+	Store             infrastructure.StoreInterface
+	ESB               infrastructure.ESBInterface
+	PasswordProcessor infrastructure.PasswordProcessorInterface
 }
 
 func (app *MockApp) GetStore() infrastructure.StoreInterface {
@@ -18,8 +19,13 @@ func (app *MockApp) GetESB() infrastructure.ESBInterface {
 	return app.ESB
 }
 
-func InitMockApp(ctrl *gomock.Controller) (*MockApp, *MockStoreInterface, *MockESBInterface) {
+func (app *MockApp) GetPasswordProcessor() infrastructure.PasswordProcessorInterface {
+	return app.PasswordProcessor
+}
+
+func InitMockApp(ctrl *gomock.Controller) (*MockApp, *MockStoreInterface, *MockESBInterface, *MockPasswordProcessorInterface) {
 	store := NewMockStoreInterface(ctrl)
 	esb := NewMockESBInterface(ctrl)
-	return &MockApp{ESB: esb, Store: store}, store, esb
+	passwordProcessor := NewMockPasswordProcessorInterface(ctrl)
+	return &MockApp{ESB: esb, Store: store, PasswordProcessor: passwordProcessor}, store, esb, passwordProcessor
 }

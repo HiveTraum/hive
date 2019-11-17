@@ -563,6 +563,43 @@ func (mr *MockESBDispatcherInterfaceMockRecorder) Send(event interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockESBDispatcherInterface)(nil).Send), event)
 }
 
+// MockPasswordProcessorInterface is a mock of PasswordProcessorInterface interface
+type MockPasswordProcessorInterface struct {
+	ctrl     *gomock.Controller
+	recorder *MockPasswordProcessorInterfaceMockRecorder
+}
+
+// MockPasswordProcessorInterfaceMockRecorder is the mock recorder for MockPasswordProcessorInterface
+type MockPasswordProcessorInterfaceMockRecorder struct {
+	mock *MockPasswordProcessorInterface
+}
+
+// NewMockPasswordProcessorInterface creates a new mock instance
+func NewMockPasswordProcessorInterface(ctrl *gomock.Controller) *MockPasswordProcessorInterface {
+	mock := &MockPasswordProcessorInterface{ctrl: ctrl}
+	mock.recorder = &MockPasswordProcessorInterfaceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockPasswordProcessorInterface) EXPECT() *MockPasswordProcessorInterfaceMockRecorder {
+	return m.recorder
+}
+
+// Encode mocks base method
+func (m *MockPasswordProcessorInterface) Encode(arg0 string) string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Encode", arg0)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// Encode indicates an expected call of Encode
+func (mr *MockPasswordProcessorInterfaceMockRecorder) Encode(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Encode", reflect.TypeOf((*MockPasswordProcessorInterface)(nil).Encode), arg0)
+}
+
 // MockAppInterface is a mock of AppInterface interface
 type MockAppInterface struct {
 	ctrl     *gomock.Controller
@@ -612,4 +649,18 @@ func (m *MockAppInterface) GetESB() infrastructure.ESBInterface {
 func (mr *MockAppInterfaceMockRecorder) GetESB() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetESB", reflect.TypeOf((*MockAppInterface)(nil).GetESB))
+}
+
+// GetPasswordProcessor mocks base method
+func (m *MockAppInterface) GetPasswordProcessor() infrastructure.PasswordProcessorInterface {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPasswordProcessor")
+	ret0, _ := ret[0].(infrastructure.PasswordProcessorInterface)
+	return ret0
+}
+
+// GetPasswordProcessor indicates an expected call of GetPasswordProcessor
+func (mr *MockAppInterfaceMockRecorder) GetPasswordProcessor() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPasswordProcessor", reflect.TypeOf((*MockAppInterface)(nil).GetPasswordProcessor))
 }
