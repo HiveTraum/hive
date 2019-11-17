@@ -72,7 +72,7 @@ type ESBDispatcherInterface interface {
 }
 
 type PasswordProcessorInterface interface {
-	Encode(string) string
+	Encode(context.Context, string) string
 }
 
 type AppInterface interface {

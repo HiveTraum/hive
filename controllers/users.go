@@ -25,7 +25,7 @@ func CreateUser(
 		return enums.MinimumOneFieldRequired, nil
 	}
 
-	body.Password = passwordProcessor.Encode(body.Password)
+	body.Password = passwordProcessor.Encode(ctx, body.Password)
 	if body.Password == "" {
 		return enums.IncorrectPassword, nil
 	}

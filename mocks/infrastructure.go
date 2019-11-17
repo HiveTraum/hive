@@ -587,17 +587,17 @@ func (m *MockPasswordProcessorInterface) EXPECT() *MockPasswordProcessorInterfac
 }
 
 // Encode mocks base method
-func (m *MockPasswordProcessorInterface) Encode(arg0 string) string {
+func (m *MockPasswordProcessorInterface) Encode(arg0 context.Context, arg1 string) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Encode", arg0)
+	ret := m.ctrl.Call(m, "Encode", arg0, arg1)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
 // Encode indicates an expected call of Encode
-func (mr *MockPasswordProcessorInterfaceMockRecorder) Encode(arg0 interface{}) *gomock.Call {
+func (mr *MockPasswordProcessorInterfaceMockRecorder) Encode(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Encode", reflect.TypeOf((*MockPasswordProcessorInterface)(nil).Encode), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Encode", reflect.TypeOf((*MockPasswordProcessorInterface)(nil).Encode), arg0, arg1)
 }
 
 // MockAppInterface is a mock of AppInterface interface

@@ -14,8 +14,8 @@ func CreatePassword(
 	ctx context.Context,
 	userId int64,
 	value string) (int, *models.Password) {
-
-	value = passwordProcessor.Encode(value)
+		
+	value = passwordProcessor.Encode(ctx, value)
 	if value == "" {
 		return enums.IncorrectPassword, nil
 	}

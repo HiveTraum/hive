@@ -27,7 +27,7 @@ func TestCreatePasswordWithoutUserV1(t *testing.T) {
 
 	passwordProcessor.
 		EXPECT().
-		Encode("hello").
+		Encode(gomock.Any(), "hello").
 		Return("olleh")
 
 	store.
@@ -54,7 +54,7 @@ func TestCreatePasswordWithUserV1(t *testing.T) {
 
 	passwordProcessor.
 		EXPECT().
-		Encode("hello").
+		Encode(gomock.Any(), "hello").
 		Return("olleh")
 
 	store.
@@ -92,10 +92,10 @@ func TestCreatePasswordWithTooLongValueV1(t *testing.T) {
 
 	passwordProcessor.
 		EXPECT().
-		Encode("hellohellohellohellohellohellohellohellohellohellohell"+
-		"ohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohe"+
-		"llohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello"+
-		"hellohellohellohellohellohello").
+		Encode(gomock.Any(), "hellohellohellohellohellohellohellohellohellohellohell"+
+			"ohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohe"+
+			"llohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello"+
+			"hellohellohellohellohellohello").
 		Return("olleh")
 
 	store.
