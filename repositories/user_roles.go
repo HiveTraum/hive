@@ -16,17 +16,23 @@ func createUserRoleSQL() string {
 	return `
 		INSERT INTO user_roles(user_id, role_id) 
 		VALUES ($1, $2) 
-		RETURNING created, user_id, role_id;
+		RETURNING id, created, user_id, role_id;
 		`
 }
 
 func getUserRolesSQL() string {
 	return `
-		SELECT created, user_id, role_id 
+		SELECT id, created, user_id, role_id 
 		FROM user_roles
 		WHERE (array_length($1::integer[], 1) IS NULL OR user_id = ANY ($1::bigint[])) AND 
 		      (array_length($2::integer[], 1) IS NULL OR role_id = ANY ($2::bigint[])) 
 		LIMIT $3;
+		`
+}
+
+func deleteUserRoleSQL() string {
+	return `
+		DELETE FROM user_roles WHERE id = $1 RETURNING id, created, user_id, role_id;
 		`
 }
 
@@ -41,6 +47,8 @@ func unwrapUserRoleScanError(err error) int {
 		} else if strings.Contains(e.Message, "violates unique constraint \"user_roles_pkey\"") {
 			return enums.UserRoleAlreadyExist
 		}
+	} else if strings.Contains(err.Error(), "no rows in result") {
+		return enums.UserRoleNotFound
 	}
 
 	sentry.CaptureException(err)
@@ -50,7 +58,7 @@ func unwrapUserRoleScanError(err error) int {
 func scanUserRole(row pgx.Row) (int, *models.UserRole) {
 	ur := &models.UserRole{}
 
-	err := row.Scan(&ur.Created, &ur.UserId, &ur.RoleId)
+	err := row.Scan(&ur.Id, &ur.Created, &ur.UserId, &ur.RoleId)
 	if err != nil {
 		sentry.CaptureException(err)
 		return unwrapUserRoleScanError(err), nil
@@ -111,4 +119,10 @@ func GetUserRoles(db DB, ctx context.Context, query GetUserRoleQuery) []*models.
 	}
 
 	return scanUserRoles(rows, rawQuery.Limit)
+}
+
+func DeleteUserRole(db DB, ctx context.Context, id int64) (int, *models.UserRole) {
+	sql := deleteUserRoleSQL()
+	row := db.QueryRow(ctx, sql, id)
+	return scanUserRole(row)
 }

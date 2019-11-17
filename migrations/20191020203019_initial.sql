@@ -42,10 +42,10 @@ CREATE TABLE roles
 
 CREATE TABLE user_roles
 (
+    id      BIGSERIAL PRIMARY KEY,
     created BIGINT DEFAULT extract(epoch from now()) * 1000,
     user_id BIGINT,
     role_id BIGINT,
-    PRIMARY KEY (user_id, role_id),
     FOREIGN KEY (user_id) REFERENCES users,
     FOREIGN KEY (role_id) REFERENCES roles
 );
@@ -57,8 +57,11 @@ CREATE TABLE users_view
     updated BIGINT,
     phones  TEXT[],
     roles   TEXT[],
-    emails  TEXT[]
+    emails  TEXT[],
+    role_id BIGINT[]
 );
+
+CREATE INDEX user_views_role_id_idx on users_view USING GIN (role_id);
 -- +goose StatementEnd
 
 -- +goose Down

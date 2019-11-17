@@ -424,6 +424,21 @@ func (mr *MockStoreInterfaceMockRecorder) GetUserRoles(ctx, query interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserRoles", reflect.TypeOf((*MockStoreInterface)(nil).GetUserRoles), ctx, query)
 }
 
+// DeleteUserRole mocks base method
+func (m *MockStoreInterface) DeleteUserRole(ctx context.Context, id int64) (int, *models.UserRole) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteUserRole", ctx, id)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(*models.UserRole)
+	return ret0, ret1
+}
+
+// DeleteUserRole indicates an expected call of DeleteUserRole
+func (mr *MockStoreInterfaceMockRecorder) DeleteUserRole(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserRole", reflect.TypeOf((*MockStoreInterface)(nil).DeleteUserRole), ctx, id)
+}
+
 // MockESBInterface is a mock of ESBInterface interface
 type MockESBInterface struct {
 	ctrl     *gomock.Controller

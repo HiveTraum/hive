@@ -8,24 +8,17 @@ import (
 	"auth/inout"
 	"auth/middlewares"
 	"auth/repositories"
+	"github.com/getsentry/sentry-go"
 	"github.com/golang/protobuf/proto"
+	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
 )
 
-func GetUserRolesV1Query(r *http.Request) repositories.GetUserRoleQuery {
-	limitQuery := r.URL.Query().Get("limit")
-	if limitQuery == "" {
-		limitQuery = string(DefaultLimit)
-	}
-
-	limit, err := strconv.Atoi(limitQuery)
-	if err != nil {
-		limit = DefaultLimit
-	}
+func GetUserRolesV1Query(r *functools.Request) repositories.GetUserRoleQuery {
 
 	return repositories.GetUserRoleQuery{
-		Limit:  limit,
+		Limit:  r.GetLimit(),
 		UserId: functools.StringsSliceToInt64String(r.URL.Query()["users"]),
 		RoleId: functools.StringsSliceToInt64String(r.URL.Query()["roles"]),
 	}
@@ -33,12 +26,13 @@ func GetUserRolesV1Query(r *http.Request) repositories.GetUserRoleQuery {
 
 func getUserRolesV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.ListUserRolesResponseV1) {
 
-	query := GetUserRolesV1Query(r.Request)
+	query := GetUserRolesV1Query(r)
 	userRoles := app.GetStore().GetUserRoles(r.Context(), query)
 	usersData := make([]*inout.GetUserRoleResponseV1, len(userRoles))
 
 	for i, userRole := range userRoles {
 		usersData[i] = &inout.GetUserRoleResponseV1{
+			Id:      userRole.Id,
 			Created: userRole.Created,
 			UserId:  userRole.UserId,
 			RoleId:  userRole.RoleId,
@@ -63,6 +57,7 @@ func createUserRoleV1(r *functools.Request, app infrastructure.AppInterface) (in
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.GetUserRoleResponseV1{
+			Id:      userRole.Id,
 			Created: userRole.Created,
 			UserId:  userRole.UserId,
 			RoleId:  userRole.RoleId,
@@ -81,10 +76,25 @@ func createUserRoleV1(r *functools.Request, app infrastructure.AppInterface) (in
 		}
 	default:
 		return http.StatusCreated, &inout.GetUserRoleResponseV1{
+			Id:      userRole.Id,
 			Created: userRole.Created,
 			UserId:  userRole.UserId,
 			RoleId:  userRole.RoleId,
 		}
+	}
+}
+
+func deleteUserRoleV1(r *functools.Request, app infrastructure.AppInterface, id int64) (int, proto.Message) {
+
+	status, _ := controllers.DeleteUserRole(app.GetStore(), app.GetESB(), r.Context(), id)
+
+	switch status {
+	case enums.Ok:
+		return http.StatusNoContent, nil
+	case enums.UserRoleNotFound:
+		return http.StatusNoContent, nil
+	default:
+		return http.StatusNoContent, nil
 	}
 }
 
@@ -96,5 +106,21 @@ func UserRolesAPIV1(app infrastructure.AppInterface) middlewares.ResponseControl
 		default:
 			return getUserRolesV1(r, app)
 		}
+	}
+}
+
+func UserRoleAPIV1(app infrastructure.AppInterface) middlewares.ResponseControllerHandler {
+	return func(r *functools.Request) (int, proto.Message) {
+		vars := mux.Vars(r.Request)
+		id, err := strconv.ParseInt(vars["id"], 10, 64)
+
+		if err != nil {
+			// Сознательно отправляем отчет об ошибке, т.к. в vars["id"] не должны попасть не числовые значения.
+			// Если такое произошло - что то пошло не так
+			sentry.CaptureException(err)
+			return http.StatusBadRequest, nil
+		}
+
+		return deleteUserRoleV1(r, app, id)
 	}
 }

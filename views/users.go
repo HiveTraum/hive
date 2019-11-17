@@ -14,31 +14,17 @@ import (
 	"strconv"
 )
 
-func getUsersViewV1Query(r *http.Request) repositories.GetUsersViewQuery {
+func getUsersViewV1Query(r *functools.Request) repositories.GetUsersViewQuery {
 	usersQuery := api.GetUsersV1Query(r)
-
-	rolesQuery := r.URL.Query()["role_id"]
-	var roles []int64
-
-	if len(rolesQuery) > 0 {
-		identifiersQueryInt := make([]int64, len(rolesQuery))
-		for i, q := range rolesQuery {
-			idQueryInt, _ := strconv.Atoi(q)
-			identifiersQueryInt[i] = int64(idQueryInt)
-		}
-
-		roles = identifiersQueryInt
-	}
 
 	return repositories.GetUsersViewQuery{
 		GetUsersQuery: usersQuery,
-		Roles:         roles,
+		Roles:         functools.StringsSliceToInt64String(r.URL.Query()["roles"]),
 	}
 }
 
 func getUsersViewV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.ListUserViewResponseV1) {
-
-	query := getUsersViewV1Query(r.Request)
+	query := getUsersViewV1Query(r)
 	users := app.GetStore().GetUsersView(r.Context(), query)
 	return http.StatusOK, &inout.ListUserViewResponseV1{Data: users}
 }

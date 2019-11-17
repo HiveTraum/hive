@@ -13,3 +13,7 @@ func (store *DatabaseStore) CreateUserRole(ctx context.Context, userId int64, ro
 func (store *DatabaseStore) GetUserRoles(ctx context.Context, query repositories.GetUserRoleQuery) []*models.UserRole {
 	return repositories.GetUserRoles(store.Db, ctx, query)
 }
+
+func (store *DatabaseStore) DeleteUserRole(ctx context.Context, id int64) (int, *models.UserRole) {
+	return repositories.DeleteUserRole(store.Db, ctx, id)
+}

@@ -6,6 +6,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 type Request struct {
@@ -61,4 +62,20 @@ func (request *Request) ParseBody(message proto.Message) error {
 	}
 
 	return err
+}
+
+const DefaultLimit = 100
+
+func (request *Request) GetLimit() int {
+	limitQuery := request.URL.Query().Get("limit")
+	if limitQuery == "" {
+		limitQuery = string(DefaultLimit)
+	}
+
+	limit, err := strconv.Atoi(limitQuery)
+	if err != nil {
+		limit = DefaultLimit
+	}
+
+	return limit
 }

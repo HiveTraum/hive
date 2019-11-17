@@ -53,6 +53,7 @@ func main() {
 	roleAPI := middlewares.ResponseControllerMiddleware(api.RoleAPIV1(application))
 
 	userRolesAPI := middlewares.ResponseControllerMiddleware(api.UserRolesAPIV1(application))
+	userRoleAPI := middlewares.ResponseControllerMiddleware(api.UserRoleAPIV1(application))
 
 	phoneConfirmationsAPI := middlewares.ResponseControllerMiddleware(api.PhoneConfirmationsAPIV1(application))
 	phonesAPI := middlewares.ResponseControllerMiddleware(api.PhonesAPIV1(application))
@@ -66,6 +67,7 @@ func main() {
 	CR := []string{http.MethodGet, http.MethodPost}
 	R := []string{http.MethodGet}
 	C := []string{http.MethodPost}
+	D := []string{http.MethodDelete}
 
 	handlers := []handler{
 		{pattern: "/views/v1/users", h: usersView, methods: R},
@@ -80,6 +82,7 @@ func main() {
 		{pattern: "/api/v1/roles/{id:[0-9]+}", h: roleAPI, methods: R},
 
 		{pattern: "/api/v1/user_roles", h: userRolesAPI, methods: CR},
+		{pattern: "/api/v1/user_roles/{id:[0-9]+}", h: userRoleAPI, methods: D},
 
 		{pattern: "/api/v1/phoneConfirmations", h: phoneConfirmationsAPI, methods: C},
 		{pattern: "/api/v1/phones", h: phonesAPI, methods: C},

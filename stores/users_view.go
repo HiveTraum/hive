@@ -21,7 +21,7 @@ func (store *DatabaseStore) GetUserView(ctx context.Context, id int64) *inout.Ge
 	userView = repositories.GetUserView(store.Db, ctx, id)
 
 	if userView != nil {
-		repositories.CacheUserView(store.Cache, ctx, []*inout.GetUserViewResponseV1{userView})
+		store.CacheUserView(ctx, []*inout.GetUserViewResponseV1{userView})
 	}
 
 	return userView

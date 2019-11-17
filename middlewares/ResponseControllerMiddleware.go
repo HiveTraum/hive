@@ -6,7 +6,6 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/protobuf/proto"
 	"net/http"
-	"reflect"
 )
 
 type ResponseControllerHandler func(*functools.Request) (int, proto.Message)
@@ -24,20 +23,22 @@ func ResponseControllerMiddleware(next ResponseControllerHandler) http.HandlerFu
 
 		var bytes []byte
 
-		if !reflect.ValueOf(data).IsNil() {
+		if data != nil {
 			if request.IsProto() {
 				bytes, err = proto.Marshal(data)
 			} else {
 				bytes, err = json.Marshal(data)
 			}
-		}
 
-		if err != nil {
-			sentry.CaptureException(err)
-			w.WriteHeader(http.StatusInternalServerError)
+			if err != nil {
+				sentry.CaptureException(err)
+				w.WriteHeader(http.StatusInternalServerError)
+			} else {
+				w.WriteHeader(status)
+				_, _ = w.Write(bytes)
+			}
 		} else {
 			w.WriteHeader(status)
-			_, _ = w.Write(bytes)
 		}
 	}
 }

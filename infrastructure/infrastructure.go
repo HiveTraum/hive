@@ -60,6 +60,7 @@ type StoreInterface interface {
 
 	CreateUserRole(ctx context.Context, userId int64, roleId int64) (int, *models.UserRole)
 	GetUserRoles(ctx context.Context, query repositories.GetUserRoleQuery) []*models.UserRole
+	DeleteUserRole(ctx context.Context, id int64) (int, *models.UserRole)
 }
 
 type ESBInterface interface {

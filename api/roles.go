@@ -16,31 +16,11 @@ import (
 	"strconv"
 )
 
-func GetRolesV1Query(r *http.Request) repositories.GetRolesQuery {
-	limitQuery := r.URL.Query().Get("limit")
-	if limitQuery == "" {
-		limitQuery = string(DefaultLimit)
+func GetRolesV1Query(r *functools.Request) repositories.GetRolesQuery {
+	return repositories.GetRolesQuery{
+		Limit: r.GetLimit(), Identifiers:
+		functools.StringsSliceToInt64String(r.URL.Query()["id"]),
 	}
-
-	limit, err := strconv.Atoi(limitQuery)
-	if err != nil {
-		limit = DefaultLimit
-	}
-
-	identifiersQuery := r.URL.Query()["id"]
-	var identifiers []int64
-
-	if len(identifiersQuery) > 0 {
-		identifiersQueryInt := make([]int64, len(identifiersQuery))
-		for i, q := range identifiersQuery {
-			idQueryInt, _ := strconv.Atoi(q)
-			identifiersQueryInt[i] = int64(idQueryInt)
-		}
-
-		identifiers = identifiersQueryInt
-	}
-
-	return repositories.GetRolesQuery{Limit: limit, Identifiers: identifiers}
 }
 
 func getRoleV1(r *functools.Request, app *app.App, id int64) (int, *inout.GetRoleResponseV1) {
@@ -66,7 +46,7 @@ func getRoleV1(r *functools.Request, app *app.App, id int64) (int, *inout.GetRol
 
 func getRolesV1(r *functools.Request, app *app.App) (int, *inout.ListRoleResponseV1) {
 
-	query := GetRolesV1Query(r.Request)
+	query := GetRolesV1Query(r)
 	roles := app.Store.GetRoles(r.Context(), query)
 	rolesData := make([]*inout.GetRoleResponseV1, len(roles))
 

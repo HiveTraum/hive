@@ -86,30 +86,17 @@ func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 	}
 }
 
-const DefaultLimit = 100
-
-func GetUsersV1Query(r *http.Request) repositories.GetUsersQuery {
-	limitQuery := r.URL.Query().Get("limit")
-	if limitQuery == "" {
-		limitQuery = string(DefaultLimit)
-	}
-
-	limit, err := strconv.Atoi(limitQuery)
-	if err != nil {
-		limit = DefaultLimit
-	}
-
-	identifiersQuery := r.URL.Query()["id"]
+func GetUsersV1Query(r *functools.Request) repositories.GetUsersQuery {
 
 	return repositories.GetUsersQuery{
-		Limit: limit,
-		Id:    functools.StringsSliceToInt64String(identifiersQuery),
+		Limit: r.GetLimit(),
+		Id:    functools.StringsSliceToInt64String(r.URL.Query()["id"]),
 	}
 }
 
 func getUsersV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.ListUserResponseV1) {
 
-	query := GetUsersV1Query(r.Request)
+	query := GetUsersV1Query(r)
 	users := app.GetStore().GetUsers(r.Context(), query)
 	usersData := make([]*inout.GetUserResponseV1, len(users))
 
