@@ -62,6 +62,11 @@ CREATE TABLE users_view
 );
 
 CREATE INDEX user_views_role_id_idx on users_view USING GIN (role_id);
+CREATE INDEX ON phones(user_id);
+CREATE INDEX ON emails(user_id);
+CREATE INDEX ON user_roles(role_id);
+CREATE INDEX ON user_roles(user_id);
+CREATE INDEX ON passwords(user_id);
 -- +goose StatementEnd
 
 -- +goose Down

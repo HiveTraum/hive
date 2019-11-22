@@ -64,10 +64,10 @@ func main() {
 	// Middleware
 
 	// Methods Middleware
-	CR := []string{http.MethodGet, http.MethodPost}
-	R := []string{http.MethodGet}
-	C := []string{http.MethodPost}
-	D := []string{http.MethodDelete}
+	CR := []string{http.MethodGet, http.MethodPost, http.MethodOptions}
+	R := []string{http.MethodGet, http.MethodOptions}
+	C := []string{http.MethodPost, http.MethodOptions}
+	D := []string{http.MethodDelete, http.MethodOptions}
 
 	handlers := []handler{
 		{pattern: "/views/v1/users", h: usersView, methods: R},
