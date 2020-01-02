@@ -1,9 +1,11 @@
 package models
 
+type PhoneID int64
+
 type Phone struct {
-	Id      int64
+	Id      PhoneID
 	Created int64
-	UserId  int64
+	UserId  UserID
 	Value   string
 }
 

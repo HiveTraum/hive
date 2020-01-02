@@ -47,7 +47,7 @@ func scanPhone(row pgx.Row) (int, *models.Phone) {
 	return enums.Ok, phone
 }
 
-func CreatePhone(db DB, ctx context.Context, userId int64, value string) (int, *models.Phone) {
+func CreatePhone(db DB, ctx context.Context, userId models.UserID, value string) (int, *models.Phone) {
 	sql := createPhoneSQL()
 	row := db.QueryRow(ctx, sql, userId, value)
 	return scanPhone(row)

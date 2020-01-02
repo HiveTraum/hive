@@ -1,8 +1,10 @@
 package models
 
+type UserRoleID int64
+
 type UserRole struct {
-	Id      int64
+	Id      UserRoleID
 	Created int64
-	UserId  int64
-	RoleId  int64
+	UserId  UserID
+	RoleId  RoleID
 }

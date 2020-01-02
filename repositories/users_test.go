@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"auth/models"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -10,7 +11,7 @@ func TestGetRawQueryWithModifiedLimit(t *testing.T) {
 
 	q := GetUsersQuery{
 		Limit:       100,
-		Id: []int64{1, 2, 3, 4, 5, 5},
+		Id: []models.UserID{1, 2, 3, 4, 5, 5},
 	}
 
 	rw := convertGetUsersQueryToRaw(q)
@@ -23,7 +24,7 @@ func TestGetRawQueryLimitWithEmptyId(t *testing.T) {
 
 	q := GetUsersQuery{
 		Limit:       100,
-		Id: []int64{},
+		Id: []models.UserID{},
 	}
 
 	rw := convertGetUsersQueryToRaw(q)
@@ -36,7 +37,7 @@ func TestGetRawQueryWithLimitLessThenId(t *testing.T) {
 
 	q := GetUsersQuery{
 		Limit:       3,
-		Id: []int64{1, 2, 3, 4, 5, 5},
+		Id: []models.UserID{1, 2, 3, 4, 5, 5},
 	}
 
 	rw := convertGetUsersQueryToRaw(q)
@@ -48,7 +49,7 @@ func TestGetRawQueryWithEmptyId(t *testing.T) {
 	t.Parallel()
 
 	q := GetUsersQuery{
-		Id: []int64{},
+		Id: []models.UserID{},
 	}
 
 	rw := convertGetUsersQueryToRaw(q)
@@ -60,7 +61,7 @@ func TestGetRawQueryWithId(t *testing.T) {
 	t.Parallel()
 
 	q := GetUsersQuery{
-		Id: []int64{1, 2, 3, 4, 5},
+		Id: []models.UserID{1, 2, 3, 4, 5},
 	}
 
 	rw := convertGetUsersQueryToRaw(q)

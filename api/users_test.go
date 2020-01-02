@@ -207,7 +207,7 @@ func TestSuccessfulCreateUserWithEmail(t *testing.T) {
 
 	esb.
 		EXPECT().
-		OnUserChanged([]int64{1}).
+		OnUserChanged([]models.UserID{1}).
 		Times(1)
 
 	r.Header.Add("Content-Type", "application/json")

@@ -1,11 +1,11 @@
 package models
 
-type EmailID = int64
+type EmailID int64
 
 type Email struct {
 	Id      EmailID
 	Created int64
-	UserId  int64
+	UserId  UserID
 	Value   string
 }
 

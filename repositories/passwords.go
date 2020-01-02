@@ -69,13 +69,13 @@ func scanPasswords(rows pgx.Rows, limit int) []*models.Password {
 	return passwords[0:i]
 }
 
-func CreatePassword(db DB, ctx context.Context, userId int64, value string) (int, *models.Password) {
+func CreatePassword(db DB, ctx context.Context, userId models.UserID, value string) (int, *models.Password) {
 	sql := createPasswordSQL()
 	row := db.QueryRow(ctx, sql, userId, value)
 	return scanPassword(row)
 }
 
-func GetPasswords(db DB, ctx context.Context, userId int64) []*models.Password {
+func GetPasswords(db DB, ctx context.Context, userId models.UserID) []*models.Password {
 	sql := getPasswordSQL()
 	limit := 10
 	rows, err := db.Query(ctx, sql, userId, limit)
@@ -87,7 +87,7 @@ func GetPasswords(db DB, ctx context.Context, userId int64) []*models.Password {
 	return scanPasswords(rows, limit)
 }
 
-func GetLatestPassword(db DB, ctx context.Context, userId int64) (int, *models.Password) {
+func GetLatestPassword(db DB, ctx context.Context, userId models.UserID) (int, *models.Password) {
 	sql := getLatestPasswordSQL()
 	row := db.QueryRow(ctx, sql, userId)
 	return scanPassword(row)

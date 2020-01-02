@@ -3,6 +3,7 @@ package repositories
 import (
 	"auth/functools"
 	"auth/models"
+	"auth/modelsFunctools"
 	"context"
 	"github.com/getsentry/sentry-go"
 	"github.com/jackc/pgx/v4"
@@ -51,7 +52,7 @@ func scanUsers(rows pgx.Rows, limit int) []*models.User {
 
 type GetUsersQuery struct {
 	Limit int
-	Id    []int64
+	Id    []models.UserID
 }
 
 type getUsersRawQuery struct {
@@ -68,9 +69,14 @@ func convertGetUsersQueryToRaw(query GetUsersQuery) getUsersRawQuery {
 			float64(len(query.Id))))
 	}
 
+	int64list := make([]int64, len(query.Id))
+	for i, v := range query.Id {
+		int64list[i] = int64(v)
+	}
+
 	return getUsersRawQuery{
 		Limit: limit,
-		Id:    functools.Int64ListToPGArray(query.Id),
+		Id:    functools.Int64ListToPGArray(int64list),
 	}
 }
 
@@ -80,9 +86,9 @@ func CreateUser(db DB, ctx context.Context) *models.User {
 	return scanUser(row)
 }
 
-func GetUser(db DB, context context.Context, id int64) *models.User {
+func GetUser(db DB, context context.Context, id models.UserID) *models.User {
 	sql := getUsersSQL()
-	row := db.QueryRow(context, sql, functools.Int64ListToPGArray([]int64{id}), 1)
+	row := db.QueryRow(context, sql, modelsFunctools.UserIDListToPGArray([]models.UserID{id}), 1)
 	return scanUser(row)
 }
 

@@ -12,7 +12,7 @@ func CreatePassword(
 	esb infrastructure.ESBInterface,
 	passwordProcessor infrastructure.PasswordProcessorInterface,
 	ctx context.Context,
-	userId int64,
+	userId models.UserID,
 	value string) (int, *models.Password) {
 		
 	value = passwordProcessor.Encode(ctx, value)

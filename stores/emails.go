@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func (store *DatabaseStore) CreateEmail(ctx context.Context, userId int64, value string) (int, *models.Email) {
+func (store *DatabaseStore) CreateEmail(ctx context.Context, userId models.UserID, value string) (int, *models.Email) {
 	return repositories.CreateEmail(store.Db, ctx, userId, value)
 }
 

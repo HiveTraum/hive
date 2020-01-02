@@ -7,6 +7,7 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
+	"auth/models"
 	"auth/repositories"
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/protobuf/proto"
@@ -32,10 +33,10 @@ func getUserRolesV1(r *functools.Request, app infrastructure.AppInterface) (int,
 
 	for i, userRole := range userRoles {
 		usersData[i] = &inout.GetUserRoleResponseV1{
-			Id:      userRole.Id,
+			Id:      int64(userRole.Id),
 			Created: userRole.Created,
-			UserId:  userRole.UserId,
-			RoleId:  userRole.RoleId,
+			UserId:  int64(userRole.UserId),
+			RoleId:  int64(userRole.RoleId),
 		}
 	}
 
@@ -52,15 +53,15 @@ func createUserRoleV1(r *functools.Request, app infrastructure.AppInterface) (in
 		return http.StatusBadRequest, nil
 	}
 
-	status, userRole := controllers.CreateUserRole(app.GetStore(), app.GetESB(), r.Context(), body.UserId, body.RoleId)
+	status, userRole := controllers.CreateUserRole(app.GetStore(), app.GetESB(), r.Context(), models.UserID(body.UserId), models.RoleID(body.RoleId))
 
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.GetUserRoleResponseV1{
-			Id:      userRole.Id,
+			Id:      int64(userRole.Id),
 			Created: userRole.Created,
-			UserId:  userRole.UserId,
-			RoleId:  userRole.RoleId,
+			UserId:  int64(userRole.UserId),
+			RoleId:  int64(userRole.RoleId),
 		}
 	case enums.RoleNotFound:
 		return http.StatusBadRequest, &inout.CreateUserRoleBadRequestV1{
@@ -76,15 +77,15 @@ func createUserRoleV1(r *functools.Request, app infrastructure.AppInterface) (in
 		}
 	default:
 		return http.StatusCreated, &inout.GetUserRoleResponseV1{
-			Id:      userRole.Id,
+			Id:      int64(userRole.Id),
 			Created: userRole.Created,
-			UserId:  userRole.UserId,
-			RoleId:  userRole.RoleId,
+			UserId:  int64(userRole.UserId),
+			RoleId:  int64(userRole.RoleId),
 		}
 	}
 }
 
-func deleteUserRoleV1(r *functools.Request, app infrastructure.AppInterface, id int64) (int, proto.Message) {
+func deleteUserRoleV1(r *functools.Request, app infrastructure.AppInterface, id models.UserRoleID) (int, proto.Message) {
 
 	status, _ := controllers.DeleteUserRole(app.GetStore(), app.GetESB(), r.Context(), id)
 
@@ -121,6 +122,6 @@ func UserRoleAPIV1(app infrastructure.AppInterface) middlewares.ResponseControll
 			return http.StatusBadRequest, nil
 		}
 
-		return deleteUserRoleV1(r, app, id)
+		return deleteUserRoleV1(r, app, models.UserRoleID(id))
 	}
 }

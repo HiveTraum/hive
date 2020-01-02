@@ -1,8 +1,9 @@
 package repositories
 
 import (
-	"auth/functools"
 	"auth/inout"
+	"auth/models"
+	"auth/modelsFunctools"
 	"context"
 	"github.com/getsentry/sentry-go"
 	"github.com/jackc/pgx/v4"
@@ -10,7 +11,7 @@ import (
 
 type GetUsersViewQuery struct {
 	GetUsersQuery
-	Roles []int64
+	Roles []models.RoleID
 }
 
 type CreateOrUpdateUsersViewQuery = GetUsersViewQuery
@@ -103,7 +104,7 @@ func scanUsersView(rows pgx.Rows, limit int) []*inout.GetUserViewResponseV1 {
 	}
 
 	rows.Close()
-	return users[0:i]
+	return users[:i]
 }
 
 func convertGetUsersViewQueryToRaw(query GetUsersViewQuery) getUsersViewRawQuery {
@@ -112,7 +113,7 @@ func convertGetUsersViewQueryToRaw(query GetUsersViewQuery) getUsersViewRawQuery
 
 	return getUsersViewRawQuery{
 		getUsersRawQuery: userRawQuery,
-		Roles:            functools.Int64ListToPGArray(query.Roles),
+		Roles:            modelsFunctools.RoleIDListToPGArray(query.Roles),
 	}
 }
 
@@ -122,7 +123,7 @@ func convertCreateOrUpdateUsersViewQueryToRaw(query CreateOrUpdateUsersViewQuery
 
 	return createOrUpdateUsersViewRawQuery{
 		getUsersRawQuery: userRawQuery,
-		Roles:            functools.Int64ListToPGArray(query.Roles),
+		Roles:            modelsFunctools.RoleIDListToPGArray(query.Roles),
 	}
 }
 
@@ -139,9 +140,9 @@ func GetUsersView(db DB, context context.Context, query GetUsersViewQuery) []*in
 	return scanUsersView(rows, rawQuery.Limit)
 }
 
-func GetUserView(db DB, context context.Context, id int64) *inout.GetUserViewResponseV1 {
+func GetUserView(db DB, context context.Context, id models.UserID) *inout.GetUserViewResponseV1 {
 	sql := getUsersViewSQL()
-	row := db.QueryRow(context, sql, functools.Int64ListToPGArray([]int64{id}), "{}", 1)
+	row := db.QueryRow(context, sql, modelsFunctools.UserIDListToPGArray([]models.UserID{id}), "{}", 1)
 	userView := scanUserView(row)
 	return userView
 }

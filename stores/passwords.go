@@ -6,14 +6,14 @@ import (
 	"context"
 )
 
-func (store *DatabaseStore) CreatePassword(ctx context.Context, userId int64, value string) (int, *models.Password) {
+func (store *DatabaseStore) CreatePassword(ctx context.Context, userId models.UserID, value string) (int, *models.Password) {
 	return repositories.CreatePassword(store.Db, ctx, userId, value)
 }
 
-func (store *DatabaseStore) GetPasswords(ctx context.Context, userId int64) []*models.Password {
+func (store *DatabaseStore) GetPasswords(ctx context.Context, userId models.UserID) []*models.Password {
 	return repositories.GetPasswords(store.Db, ctx, userId)
 }
 
-func (store *DatabaseStore) GetLatestPassword(ctx context.Context, userId int64) (int, *models.Password) {
+func (store *DatabaseStore) GetLatestPassword(ctx context.Context, userId models.UserID) (int, *models.Password) {
 	return repositories.GetLatestPassword(store.Db, ctx, userId)
 }

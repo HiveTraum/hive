@@ -2,8 +2,9 @@ package repositories
 
 import (
 	"auth/enums"
-	"auth/functools"
 	"auth/inout"
+	"auth/models"
+	"auth/modelsFunctools"
 	"context"
 	"fmt"
 	"github.com/getsentry/sentry-go"
@@ -14,11 +15,11 @@ import (
 	"time"
 )
 
-func getUserKey(id int64) string {
+func getUserKey(id models.UserID) string {
 	return fmt.Sprintf("%s:%d", enums.UserView, id)
 }
 
-func GetUserViewFromCache(cache *redis.Client, ctx context.Context, id int64) *inout.GetUserViewResponseV1 {
+func GetUserViewFromCache(cache *redis.Client, ctx context.Context, id models.UserID) *inout.GetUserViewResponseV1 {
 
 	span, ctx := opentracing.StartSpanFromContext(ctx, "Get user view from cache")
 
@@ -54,7 +55,7 @@ func CacheUserView(cache *redis.Client, ctx context.Context, userViews []*inout.
 		return
 	}
 
-	identifiers := make([]int64, len(userViews))
+	identifiers := make([]models.UserID, len(userViews))
 
 	pipeline := cache.TxPipeline()
 	for i, uv := range userViews {
@@ -65,8 +66,10 @@ func CacheUserView(cache *redis.Client, ctx context.Context, userViews []*inout.
 			continue
 		}
 
-		identifiers[i] = uv.Id
-		pipeline.Set(getUserKey(uv.Id), data, time.Hour*48)
+		userID := models.UserID(uv.Id)
+
+		identifiers[i] = userID
+		pipeline.Set(getUserKey(userID), data, time.Hour*48)
 	}
 
 	_, err := pipeline.Exec()
@@ -76,6 +79,6 @@ func CacheUserView(cache *redis.Client, ctx context.Context, userViews []*inout.
 		sentry.CaptureException(err)
 	}
 
-	span.LogFields(log.String("user_id", functools.Int64SliceToString(identifiers, ", ")))
+	span.LogFields(log.String("user_id", modelsFunctools.UserIDListToString(identifiers, ", ")))
 	span.Finish()
 }

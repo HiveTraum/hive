@@ -16,6 +16,7 @@ const (
 	IncorrectPhoneCode
 	IncorrectPhone
 	PhoneNotFound
+	PhoneAlreadyExist
 
 	// Emails
 

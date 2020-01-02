@@ -10,7 +10,7 @@ func (store *DatabaseStore) CreateRole(ctx context.Context, title string) (int, 
 	return repositories.CreateRole(store.Db, ctx, title)
 }
 
-func (store *DatabaseStore) GetRole(ctx context.Context, id int64) (int, *models.Role) {
+func (store *DatabaseStore) GetRole(ctx context.Context, id models.RoleID) (int, *models.Role) {
 	return repositories.GetRole(store.Db, ctx, id)
 }
 

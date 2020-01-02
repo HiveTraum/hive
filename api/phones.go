@@ -8,6 +8,7 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
+	"auth/models"
 	"github.com/golang/protobuf/proto"
 	"net/http"
 )
@@ -20,14 +21,14 @@ func createPhoneV1(r *functools.Request, app infrastructure.AppInterface) (int, 
 		return http.StatusBadRequest, nil
 	}
 
-	status, phone := controllers.CreatePhone(app.GetStore(), app.GetESB(), r.Context(), body.Phone, body.Code, body.UserId)
+	status, phone := controllers.CreatePhone(app.GetStore(), app.GetESB(), r.Context(), body.Phone, body.Code, models.UserID(body.UserId))
 
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.CreatePhoneResponseV1{
-			Id:      phone.Id,
+			Id:      int64(phone.Id),
 			Created: phone.Created,
-			UserId:  phone.UserId,
+			UserId:  int64(phone.UserId),
 			Phone:   phone.Value,
 		}
 	case enums.IncorrectPhoneCode:
@@ -48,9 +49,9 @@ func createPhoneV1(r *functools.Request, app infrastructure.AppInterface) (int, 
 		}
 	default:
 		return http.StatusCreated, &inout.CreatePhoneResponseV1{
-			Id:      phone.Id,
+			Id:      int64(phone.Id),
 			Created: phone.Created,
-			UserId:  phone.UserId,
+			UserId:  int64(phone.UserId),
 			Phone:   phone.Value,
 		}
 	}

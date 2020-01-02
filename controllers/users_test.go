@@ -76,7 +76,7 @@ func TestCreateUser(t *testing.T) {
 
 	esb.
 		EXPECT().
-		OnUserChanged([]int64{2, 4, 5}).
+		OnUserChanged([]models.UserID{2, 4, 5}).
 		Times(1)
 
 	body.Phone = "71234567890"

@@ -7,6 +7,8 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
+	"auth/models"
+	"auth/modelsFunctools"
 	"auth/repositories"
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/protobuf/proto"
@@ -29,7 +31,7 @@ func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.GetUserResponseV1{
-			Id:      user.Id,
+			Id:      int64(user.Id),
 			Created: user.Created,
 		}
 	case enums.MinimumOneFieldRequired:
@@ -80,7 +82,7 @@ func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 
 	default:
 		return http.StatusCreated, &inout.GetUserResponseV1{
-			Id:      user.Id,
+			Id:      int64(user.Id),
 			Created: user.Created,
 		}
 	}
@@ -90,7 +92,7 @@ func GetUsersV1Query(r *functools.Request) repositories.GetUsersQuery {
 
 	return repositories.GetUsersQuery{
 		Limit: r.GetLimit(),
-		Id:    functools.StringsSliceToInt64String(r.URL.Query()["id"]),
+		Id:    modelsFunctools.StringsSliceToUserIDSlice(r.URL.Query()["id"]),
 	}
 }
 
@@ -102,7 +104,7 @@ func getUsersV1(r *functools.Request, app infrastructure.AppInterface) (int, *in
 
 	for i, user := range users {
 		usersData[i] = &inout.GetUserResponseV1{
-			Id:      user.Id,
+			Id:      int64(user.Id),
 			Created: user.Created,
 		}
 	}
@@ -110,7 +112,7 @@ func getUsersV1(r *functools.Request, app infrastructure.AppInterface) (int, *in
 	return http.StatusOK, &inout.ListUserResponseV1{Data: usersData}
 }
 
-func getUserV1(r *functools.Request, app infrastructure.AppInterface, id int64) (int, *inout.GetUserResponseV1) {
+func getUserV1(r *functools.Request, app infrastructure.AppInterface, id models.UserID) (int, *inout.GetUserResponseV1) {
 	user := app.GetStore().GetUser(r.Context(), id)
 
 	if user == nil {
@@ -118,7 +120,7 @@ func getUserV1(r *functools.Request, app infrastructure.AppInterface, id int64) 
 	}
 
 	return http.StatusOK, &inout.GetUserResponseV1{
-		Id:      user.Id,
+		Id:      int64(user.Id),
 		Created: user.Created,
 	}
 }
@@ -146,6 +148,6 @@ func UserAPIV1(app infrastructure.AppInterface) middlewares.ResponseControllerHa
 			return http.StatusBadRequest, nil
 		}
 
-		return getUserV1(request, app, id)
+		return getUserV1(request, app, models.UserID(id))
 	}
 }

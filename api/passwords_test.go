@@ -32,7 +32,7 @@ func TestCreatePasswordWithoutUserV1(t *testing.T) {
 
 	store.
 		EXPECT().
-		CreatePassword(gomock.Any(), int64(1), "olleh").
+		CreatePassword(gomock.Any(), models.UserID(1), "olleh").
 		Times(1).
 		Return(enums.UserNotFound, nil)
 
@@ -59,7 +59,7 @@ func TestCreatePasswordWithUserV1(t *testing.T) {
 
 	store.
 		EXPECT().
-		CreatePassword(ctx, int64(2), "olleh").
+		CreatePassword(ctx, models.UserID(2), "olleh").
 		Return(enums.Ok, &models.Password{
 			Id:      1,
 			Created: 0,
@@ -70,7 +70,7 @@ func TestCreatePasswordWithUserV1(t *testing.T) {
 
 	esb.
 		EXPECT().
-		OnPasswordChanged(int64(2)).
+		OnPasswordChanged(models.UserID(2)).
 		Times(1)
 
 	body := fmt.Sprintf("{\"user_id\": %d, \"value\": \"hello\"}", 2)
@@ -100,7 +100,7 @@ func TestCreatePasswordWithTooLongValueV1(t *testing.T) {
 
 	store.
 		EXPECT().
-		CreatePassword(ctx, int64(3), "olleh").
+		CreatePassword(ctx, models.UserID(3), "olleh").
 		Return(enums.Ok, &models.Password{
 			Id:      1,
 			Created: 0,
@@ -111,7 +111,7 @@ func TestCreatePasswordWithTooLongValueV1(t *testing.T) {
 
 	esb.
 		EXPECT().
-		OnPasswordChanged(int64(3)).
+		OnPasswordChanged(models.UserID(3)).
 		Times(1)
 
 	body := fmt.Sprintf("{\"user_id\": %d, \"value\": \"hellohellohellohellohellohellohellohellohellohellohell"+

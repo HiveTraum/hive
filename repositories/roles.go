@@ -97,9 +97,10 @@ func CreateRole(db DB, context context.Context, title string) (int, *models.Role
 	return scanRole(row)
 }
 
-func GetRole(db DB, context context.Context, id int64) (int, *models.Role) {
+func GetRole(db DB, context context.Context, id models.RoleID) (int, *models.Role) {
+
 	sql := getRolesSQL()
-	row := db.QueryRow(context, sql, functools.Int64ListToPGArray([]int64{id}), 1)
+	row := db.QueryRow(context, sql, functools.Int64ListToPGArray([]int64{int64(id)}), 1)
 	return scanRole(row)
 }
 

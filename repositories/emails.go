@@ -54,7 +54,7 @@ func getEmailConfirmationCodeKey(email string) string {
 	return fmt.Sprintf("%s:%s", enums.EmailConfirmationCode, email)
 }
 
-func CreateEmail(db DB, ctx context.Context, userId int64, value string) (int, *models.Email) {
+func CreateEmail(db DB, ctx context.Context, userId models.UserID, value string) (int, *models.Email) {
 	sql := createEmailSQL()
 	row := db.QueryRow(ctx, sql, userId, value)
 	return scanEmail(row)

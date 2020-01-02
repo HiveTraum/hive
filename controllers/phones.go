@@ -50,7 +50,7 @@ func validatePhone(store infrastructure.StoreInterface, ctx context.Context, pho
 	return status, phone
 }
 
-func CreatePhone(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, phone string, code string, userId int64) (int, *models.Phone) {
+func CreatePhone(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, phone string, code string, userId models.UserID) (int, *models.Phone) {
 
 	status, phone := validatePhone(store, ctx, phone, code)
 
@@ -60,7 +60,7 @@ func CreatePhone(store infrastructure.StoreInterface, esb infrastructure.ESBInte
 
 	_, oldPhone := store.GetPhone(ctx, phone)
 
-	identifiers := []int64{userId}
+	identifiers := []models.UserID{userId}
 
 	if oldPhone != nil {
 		identifiers = append(identifiers, oldPhone.UserId)

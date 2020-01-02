@@ -6,6 +6,8 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
+	"auth/models"
+	"auth/modelsFunctools"
 	"auth/repositories"
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/protobuf/proto"
@@ -19,7 +21,7 @@ func getUsersViewV1Query(r *functools.Request) repositories.GetUsersViewQuery {
 
 	return repositories.GetUsersViewQuery{
 		GetUsersQuery: usersQuery,
-		Roles:         functools.StringsSliceToInt64String(r.URL.Query()["roles"]),
+		Roles:         modelsFunctools.StringsSliceToRoleIDSlice(r.URL.Query()["roles"]),
 	}
 }
 
@@ -29,7 +31,7 @@ func getUsersViewV1(r *functools.Request, app infrastructure.AppInterface) (int,
 	return http.StatusOK, &inout.ListUserViewResponseV1{Data: users}
 }
 
-func getUserViewV1(r *functools.Request, app infrastructure.AppInterface, id int64) (int, *inout.GetUserViewResponseV1) {
+func getUserViewV1(r *functools.Request, app infrastructure.AppInterface, id models.UserID) (int, *inout.GetUserViewResponseV1) {
 
 	userView := app.GetStore().GetUserView(r.Context(), id)
 
@@ -58,6 +60,6 @@ func UserViewV1(app infrastructure.AppInterface) middlewares.ResponseControllerH
 			return http.StatusBadRequest, nil
 		}
 
-		return getUserViewV1(request, app, id)
+		return getUserViewV1(request, app, models.UserID(id))
 	}
 }

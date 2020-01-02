@@ -24,7 +24,7 @@ func TestCreatePassword(t *testing.T) {
 
 	store.
 		EXPECT().
-		CreatePassword(ctx, int64(10), gomock.Not("hello")).
+		CreatePassword(ctx, models.UserID(10), gomock.Not("hello")).
 		Return(enums.Ok, &models.Password{
 			Id:      1,
 			Created: 0,
@@ -34,7 +34,7 @@ func TestCreatePassword(t *testing.T) {
 
 	esb.
 		EXPECT().
-		OnPasswordChanged(int64(10)).
+		OnPasswordChanged(models.UserID(10)).
 		Times(1)
 
 	status, password := CreatePassword(store, esb, app.GetPasswordProcessor(), ctx, 10, "hello")

@@ -1,8 +1,10 @@
 package models
 
+type PasswordID int64
+
 type Password struct {
-	Id      int64
+	Id      PasswordID
 	Created int64
-	UserId  int64
+	UserId  UserID
 	Value   string
 }

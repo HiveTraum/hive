@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func (store *DatabaseStore) CreatePhone(ctx context.Context, userId int64, value string) (int, *models.Phone) {
+func (store *DatabaseStore) CreatePhone(ctx context.Context, userId models.UserID, value string) (int, *models.Phone) {
 	return repositories.CreatePhone(store.Db, ctx, userId, value)
 }
 

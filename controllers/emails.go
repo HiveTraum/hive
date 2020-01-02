@@ -48,7 +48,7 @@ func validateEmail(store infrastructure.StoreInterface, email string, code strin
 	return status, email
 }
 
-func CreateEmail(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, email string, code string, userId int64) (int, *models.Email) {
+func CreateEmail(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, email string, code string, userId models.UserID) (int, *models.Email) {
 
 	status, email := validateEmail(store, email, code)
 
@@ -58,7 +58,7 @@ func CreateEmail(store infrastructure.StoreInterface, esb infrastructure.ESBInte
 
 	_, oldEmail := store.GetEmail(ctx, email)
 
-	identifiers := []int64{userId}
+	identifiers := []models.UserID{userId}
 
 	if oldEmail != nil {
 		identifiers = append(identifiers, oldEmail.UserId)

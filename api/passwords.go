@@ -8,6 +8,7 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
+	"auth/models"
 	"github.com/golang/protobuf/proto"
 	"net/http"
 )
@@ -22,14 +23,14 @@ func createPasswordV1(r *functools.Request, app infrastructure.AppInterface) (in
 		return http.StatusBadRequest, nil
 	}
 
-	status, password := controllers.CreatePassword(app.GetStore(), app.GetESB(), app.GetPasswordProcessor(), r.Context(), body.UserId, body.Value)
+	status, password := controllers.CreatePassword(app.GetStore(), app.GetESB(), app.GetPasswordProcessor(), r.Context(), models.UserID(body.UserId), body.Value)
 
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.CreatePasswordResponseV1{
-			Id:      password.Id,
+			Id:      int64(password.Id),
 			Created: password.Created,
-			UserId:  password.UserId,
+			UserId:  int64(password.UserId),
 		}
 	case enums.UserNotFound:
 		return http.StatusBadRequest, &inout.CreatePasswordBadRequestResponseV1{
@@ -41,9 +42,9 @@ func createPasswordV1(r *functools.Request, app infrastructure.AppInterface) (in
 		}
 	default:
 		return http.StatusCreated, &inout.CreatePasswordResponseV1{
-			Id:      password.Id,
+			Id:      int64(password.Id),
 			Created: password.Created,
-			UserId:  password.UserId,
+			UserId:  int64(password.UserId),
 		}
 	}
 }

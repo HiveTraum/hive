@@ -11,7 +11,7 @@ func CreateRole(store infrastructure.StoreInterface, esb infrastructure.ESBInter
 	status, role := store.CreateRole(ctx, title)
 
 	if status == enums.Ok {
-		esb.OnRoleChanged([]int64{role.Id})
+		esb.OnRoleChanged([]models.RoleID{role.Id})
 	}
 
 	return status, role

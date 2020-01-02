@@ -1,7 +1,9 @@
 package models
 
+type RoleID int64
+
 type Role struct {
-	Id      int64
+	Id      RoleID
 	Created int64
 	Title   string
 }

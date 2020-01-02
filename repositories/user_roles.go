@@ -103,7 +103,7 @@ func convertGetUserRoleQueryToRaw(query GetUserRoleQuery) getUserRoleRawQuery {
 	}
 }
 
-func CreateUserRole(db DB, ctx context.Context, userId int64, roleId int64) (int, *models.UserRole) {
+func CreateUserRole(db DB, ctx context.Context, userId models.UserID, roleId models.RoleID) (int, *models.UserRole) {
 	sql := createUserRoleSQL()
 	row := db.QueryRow(ctx, sql, userId, roleId)
 	return scanUserRole(row)
@@ -121,7 +121,7 @@ func GetUserRoles(db DB, ctx context.Context, query GetUserRoleQuery) []*models.
 	return scanUserRoles(rows, rawQuery.Limit)
 }
 
-func DeleteUserRole(db DB, ctx context.Context, id int64) (int, *models.UserRole) {
+func DeleteUserRole(db DB, ctx context.Context, id models.UserRoleID) (int, *models.UserRole) {
 	sql := deleteUserRoleSQL()
 	row := db.QueryRow(ctx, sql, id)
 	return scanUserRole(row)
