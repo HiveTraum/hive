@@ -61,12 +61,26 @@ CREATE TABLE users_view
     role_id BIGINT[]
 );
 
+CREATE TABLE sessions
+(
+    id            BIGSERIAL PRIMARY KEY,
+    user_id       uuid REFERENCES users (id),
+    refresh_token uuid                     NOT NULL,
+    user_agent    character varying(200)   NOT NULL,
+    fingerprint   character varying(200)   NOT NULL,
+    ip            character varying(15)    NOT NULL,
+    expires_in    bigint                   NOT NULL,
+    created_at    timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at    timestamp with time zone NOT NULL DEFAULT now()
+);
+
 CREATE INDEX user_views_role_id_idx on users_view USING GIN (role_id);
-CREATE INDEX ON phones(user_id);
-CREATE INDEX ON emails(user_id);
-CREATE INDEX ON user_roles(role_id);
-CREATE INDEX ON user_roles(user_id);
-CREATE INDEX ON passwords(user_id);
+CREATE INDEX user_views_phones_idx on users_view USING GIN (phones);
+CREATE INDEX ON phones (user_id);
+CREATE INDEX ON emails (user_id);
+CREATE INDEX ON user_roles (role_id);
+CREATE INDEX ON user_roles (user_id);
+CREATE INDEX ON passwords (user_id);
 -- +goose StatementEnd
 
 -- +goose Down

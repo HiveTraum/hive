@@ -26,6 +26,17 @@ func Max(list []int) int {
 	return max
 }
 
+func Min(list []int) int {
+	min := list[0]
+	for _, e := range list {
+		if e < min {
+			min = e
+		}
+	}
+
+	return min
+}
+
 func Int64SliceToString(slice []int64, delimiter string) string {
 	return strings.Trim(strings.Replace(fmt.Sprint(slice), " ", delimiter, -1), "[]")
 }

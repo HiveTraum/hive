@@ -69,7 +69,7 @@ const DefaultLimit = 100
 func (request *Request) GetLimit() int {
 	limitQuery := request.URL.Query().Get("limit")
 	if limitQuery == "" {
-		limitQuery = string(DefaultLimit)
+		return DefaultLimit
 	}
 
 	limit, err := strconv.Atoi(limitQuery)

@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"auth/functools"
 	"auth/models"
 	"auth/modelsFunctools"
 	"context"
@@ -69,14 +68,9 @@ func convertGetUsersQueryToRaw(query GetUsersQuery) getUsersRawQuery {
 			float64(len(query.Id))))
 	}
 
-	int64list := make([]int64, len(query.Id))
-	for i, v := range query.Id {
-		int64list[i] = int64(v)
-	}
-
 	return getUsersRawQuery{
 		Limit: limit,
-		Id:    functools.Int64ListToPGArray(int64list),
+		Id:    modelsFunctools.UserIDListToPGArray(query.Id),
 	}
 }
 
@@ -96,7 +90,6 @@ func GetUsers(db DB, context context.Context, query GetUsersQuery) []*models.Use
 
 	sql := getUsersSQL()
 	rawQuery := convertGetUsersQueryToRaw(query)
-
 	rows, err := db.Query(context, sql, rawQuery.Id, rawQuery.Limit)
 	if err != nil {
 		sentry.CaptureException(err)

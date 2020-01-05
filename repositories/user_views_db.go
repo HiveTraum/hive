@@ -1,27 +1,45 @@
 package repositories
 
 import (
+	"auth/functools"
 	"auth/inout"
 	"auth/models"
 	"auth/modelsFunctools"
 	"context"
 	"github.com/getsentry/sentry-go"
 	"github.com/jackc/pgx/v4"
+	"math"
 )
 
 type GetUsersViewQuery struct {
-	GetUsersQuery
+	Limit      int
+	Id         []models.UserID
+	Roles      []models.RoleID
+	Phones     []string
+	PhoneCodes []string
+	Emails     []string
+	EmailCodes []string
+}
+
+type CreateOrUpdateUsersViewQuery struct {
+	Limit int
+	Id    []models.UserID
 	Roles []models.RoleID
 }
 
-type CreateOrUpdateUsersViewQuery = GetUsersViewQuery
-
 type getUsersViewRawQuery struct {
-	getUsersRawQuery
-	Roles string
+	Limit  int
+	Id     string
+	Roles  string
+	Emails string
+	Phones string
 }
 
-type createOrUpdateUsersViewRawQuery = getUsersViewRawQuery
+type createOrUpdateUsersViewRawQuery struct {
+	Limit int
+	Id    string
+	Roles string
+}
 
 // SQL
 
@@ -30,8 +48,10 @@ func getUsersViewSQL() string {
 		SELECT id, created, roles, phones, emails
 		FROM users_view u
 		WHERE (array_length($1::integer[], 1) IS NULL OR id = ANY ($1::bigint[])) AND 
-		      (array_length($2::integer[], 1) IS NULL OR ($2::bigint[]) && role_id)
-		LIMIT $3;
+		      (array_length($2::integer[], 1) IS NULL OR ($2::bigint[]) && role_id) AND
+		      (array_length($3::text[], 1) IS NULL OR ($3::text[]) && phones) AND
+		      (array_length($4::text[], 1) IS NULL OR ($4::text[]) && emails)
+		LIMIT $5;
 		`
 }
 
@@ -109,21 +129,37 @@ func scanUsersView(rows pgx.Rows, limit int) []*inout.GetUserViewResponseV1 {
 
 func convertGetUsersViewQueryToRaw(query GetUsersViewQuery) getUsersViewRawQuery {
 
-	userRawQuery := convertGetUsersQueryToRaw(query.GetUsersQuery)
+	maxQueryLength := functools.Max([]int{len(query.Id), len(query.Emails), len(query.Phones)})
+
+	limit := query.Limit
+	if len(query.Id) > 0 {
+		limit = int(math.Min(
+			float64(query.Limit),
+			float64(maxQueryLength)))
+	}
 
 	return getUsersViewRawQuery{
-		getUsersRawQuery: userRawQuery,
-		Roles:            modelsFunctools.RoleIDListToPGArray(query.Roles),
+		Limit:  limit,
+		Id:     modelsFunctools.UserIDListToPGArray(query.Id),
+		Roles:  modelsFunctools.RoleIDListToPGArray(query.Roles),
+		Phones: functools.StringsToPGArray(query.Phones),
+		Emails: functools.StringsToPGArray(query.Emails),
 	}
 }
 
 func convertCreateOrUpdateUsersViewQueryToRaw(query CreateOrUpdateUsersViewQuery) createOrUpdateUsersViewRawQuery {
 
-	userRawQuery := convertGetUsersQueryToRaw(query.GetUsersQuery)
+	limit := query.Limit
+	if len(query.Id) > 0 {
+		limit = int(math.Min(
+			float64(query.Limit),
+			float64(len(query.Id))))
+	}
 
 	return createOrUpdateUsersViewRawQuery{
-		getUsersRawQuery: userRawQuery,
-		Roles:            modelsFunctools.RoleIDListToPGArray(query.Roles),
+		Id:    modelsFunctools.UserIDListToPGArray(query.Id),
+		Limit: limit,
+		Roles: modelsFunctools.RoleIDListToPGArray(query.Roles),
 	}
 }
 
@@ -131,7 +167,7 @@ func GetUsersView(db DB, context context.Context, query GetUsersViewQuery) []*in
 	sql := getUsersViewSQL()
 	rawQuery := convertGetUsersViewQueryToRaw(query)
 
-	rows, err := db.Query(context, sql, rawQuery.Id, rawQuery.Roles, rawQuery.Limit)
+	rows, err := db.Query(context, sql, rawQuery.Id, rawQuery.Roles, rawQuery.Phones, rawQuery.Emails, rawQuery.Limit)
 	if err != nil {
 		sentry.CaptureException(err)
 		return nil
@@ -142,7 +178,7 @@ func GetUsersView(db DB, context context.Context, query GetUsersViewQuery) []*in
 
 func GetUserView(db DB, context context.Context, id models.UserID) *inout.GetUserViewResponseV1 {
 	sql := getUsersViewSQL()
-	row := db.QueryRow(context, sql, modelsFunctools.UserIDListToPGArray([]models.UserID{id}), "{}", 1)
+	row := db.QueryRow(context, sql, modelsFunctools.UserIDListToPGArray([]models.UserID{id}), "{}", "{}", 1)
 	userView := scanUserView(row)
 	return userView
 }

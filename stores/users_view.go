@@ -33,14 +33,12 @@ func (store *DatabaseStore) CreateOrUpdateUsersView(ctx context.Context, query r
 }
 
 func (store *DatabaseStore) CreateOrUpdateUsersViewByUsersID(context context.Context, id []models.UserID) []*inout.GetUserViewResponseV1 {
-	return store.CreateOrUpdateUsersView(context, repositories.CreateOrUpdateUsersViewQuery{
-		GetUsersQuery: repositories.GetUsersQuery{Id: id,},
-	})
+	return store.CreateOrUpdateUsersView(context, repositories.CreateOrUpdateUsersViewQuery{Id: id,})
 }
 
 func (store *DatabaseStore) CreateOrUpdateUsersViewByRolesID(context context.Context, id []models.RoleID) []*inout.GetUserViewResponseV1 {
 	return store.CreateOrUpdateUsersView(context, repositories.CreateOrUpdateUsersViewQuery{
-		GetUsersQuery: repositories.GetUsersQuery{Limit: 0, Id: nil,}, Roles: id,
+		Limit: 0, Id: nil, Roles: id,
 	})
 }
 

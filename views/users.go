@@ -1,7 +1,6 @@
 package views
 
 import (
-	"auth/api"
 	"auth/functools"
 	"auth/infrastructure"
 	"auth/inout"
@@ -17,11 +16,13 @@ import (
 )
 
 func getUsersViewV1Query(r *functools.Request) repositories.GetUsersViewQuery {
-	usersQuery := api.GetUsersV1Query(r)
-
+	query := r.URL.Query()
 	return repositories.GetUsersViewQuery{
-		GetUsersQuery: usersQuery,
-		Roles:         modelsFunctools.StringsSliceToRoleIDSlice(r.URL.Query()["roles"]),
+		Limit:  r.GetLimit(),
+		Id:     modelsFunctools.StringsSliceToUserIDSlice(query["id"]),
+		Roles:  modelsFunctools.StringsSliceToRoleIDSlice(query["roles"]),
+		Phones: query["phones"],
+		Emails: query["emails"],
 	}
 }
 
