@@ -15,9 +15,9 @@ import (
 	"strconv"
 )
 
-func getUsersViewV1Query(r *functools.Request) repositories.GetUsersViewQuery {
+func getUsersViewV1Query(r *functools.Request) repositories.GetUsersViewStoreQuery {
 	query := r.URL.Query()
-	return repositories.GetUsersViewQuery{
+	return repositories.GetUsersViewStoreQuery{
 		Limit:  r.GetLimit(),
 		Id:     modelsFunctools.StringsSliceToUserIDSlice(query["id"]),
 		Roles:  modelsFunctools.StringsSliceToRoleIDSlice(query["roles"]),

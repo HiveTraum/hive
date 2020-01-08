@@ -7,7 +7,7 @@ import (
 	"context"
 )
 
-func (store *DatabaseStore) GetUsersView(ctx context.Context, query repositories.GetUsersViewQuery) []*inout.GetUserViewResponseV1 {
+func (store *DatabaseStore) GetUsersView(ctx context.Context, query repositories.GetUsersViewStoreQuery) []*inout.GetUserViewResponseV1 {
 	return repositories.GetUsersView(store.Db, ctx, query)
 }
 
@@ -28,16 +28,16 @@ func (store *DatabaseStore) GetUserView(ctx context.Context, id models.UserID) *
 	return userView
 }
 
-func (store *DatabaseStore) CreateOrUpdateUsersView(ctx context.Context, query repositories.CreateOrUpdateUsersViewQuery) []*inout.GetUserViewResponseV1 {
+func (store *DatabaseStore) CreateOrUpdateUsersView(ctx context.Context, query repositories.CreateOrUpdateUsersViewStoreQuery) []*inout.GetUserViewResponseV1 {
 	return repositories.CreateOrUpdateUsersView(store.Db, ctx, query)
 }
 
 func (store *DatabaseStore) CreateOrUpdateUsersViewByUsersID(context context.Context, id []models.UserID) []*inout.GetUserViewResponseV1 {
-	return store.CreateOrUpdateUsersView(context, repositories.CreateOrUpdateUsersViewQuery{Id: id,})
+	return store.CreateOrUpdateUsersView(context, repositories.CreateOrUpdateUsersViewStoreQuery{Id: id,})
 }
 
 func (store *DatabaseStore) CreateOrUpdateUsersViewByRolesID(context context.Context, id []models.RoleID) []*inout.GetUserViewResponseV1 {
-	return store.CreateOrUpdateUsersView(context, repositories.CreateOrUpdateUsersViewQuery{
+	return store.CreateOrUpdateUsersView(context, repositories.CreateOrUpdateUsersViewStoreQuery{
 		Limit: 0, Id: nil, Roles: id,
 	})
 }

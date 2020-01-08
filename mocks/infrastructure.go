@@ -82,7 +82,7 @@ func (mr *MockStoreInterfaceMockRecorder) GetUsers(context, query interface{}) *
 }
 
 // GetUsersView mocks base method
-func (m *MockStoreInterface) GetUsersView(context context.Context, query repositories.GetUsersViewQuery) []*inout.GetUserViewResponseV1 {
+func (m *MockStoreInterface) GetUsersView(context context.Context, query repositories.GetUsersViewStoreQuery) []*inout.GetUserViewResponseV1 {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUsersView", context, query)
 	ret0, _ := ret[0].([]*inout.GetUserViewResponseV1)
@@ -110,7 +110,7 @@ func (mr *MockStoreInterfaceMockRecorder) GetUserView(context, id interface{}) *
 }
 
 // CreateOrUpdateUsersView mocks base method
-func (m *MockStoreInterface) CreateOrUpdateUsersView(context context.Context, query repositories.CreateOrUpdateUsersViewQuery) []*inout.GetUserViewResponseV1 {
+func (m *MockStoreInterface) CreateOrUpdateUsersView(context context.Context, query repositories.CreateOrUpdateUsersViewStoreQuery) []*inout.GetUserViewResponseV1 {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrUpdateUsersView", context, query)
 	ret0, _ := ret[0].([]*inout.GetUserViewResponseV1)
@@ -593,7 +593,7 @@ func (mr *MockESBDispatcherInterfaceMockRecorder) Send(event interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockESBDispatcherInterface)(nil).Send), event)
 }
 
-// MockPasswordProcessorInterface is a mock of PasswordProcessorInterface interface
+// MockPasswordProcessorInterface is a mock of LoginControllerInterface interface
 type MockPasswordProcessorInterface struct {
 	ctrl     *gomock.Controller
 	recorder *MockPasswordProcessorInterfaceMockRecorder
@@ -616,18 +616,18 @@ func (m *MockPasswordProcessorInterface) EXPECT() *MockPasswordProcessorInterfac
 	return m.recorder
 }
 
-// Encode mocks base method
+// EncodePassword mocks base method
 func (m *MockPasswordProcessorInterface) Encode(arg0 context.Context, arg1 string) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Encode", arg0, arg1)
+	ret := m.ctrl.Call(m, "EncodePassword", arg0, arg1)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
-// Encode indicates an expected call of Encode
+// EncodePassword indicates an expected call of EncodePassword
 func (mr *MockPasswordProcessorInterfaceMockRecorder) Encode(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Encode", reflect.TypeOf((*MockPasswordProcessorInterface)(nil).Encode), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncodePassword", reflect.TypeOf((*MockPasswordProcessorInterface)(nil).Encode), arg0, arg1)
 }
 
 // MockAppInterface is a mock of AppInterface interface
@@ -681,16 +681,16 @@ func (mr *MockAppInterfaceMockRecorder) GetESB() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetESB", reflect.TypeOf((*MockAppInterface)(nil).GetESB))
 }
 
-// GetPasswordProcessor mocks base method
-func (m *MockAppInterface) GetPasswordProcessor() infrastructure.PasswordProcessorInterface {
+// GetLoginController mocks base method
+func (m *MockAppInterface) GetLoginController() infrastructure.LoginControllerInterface {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPasswordProcessor")
-	ret0, _ := ret[0].(infrastructure.PasswordProcessorInterface)
+	ret := m.ctrl.Call(m, "GetLoginController")
+	ret0, _ := ret[0].(infrastructure.LoginControllerInterface)
 	return ret0
 }
 
-// GetPasswordProcessor indicates an expected call of GetPasswordProcessor
+// GetLoginController indicates an expected call of GetLoginController
 func (mr *MockAppInterfaceMockRecorder) GetPasswordProcessor() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPasswordProcessor", reflect.TypeOf((*MockAppInterface)(nil).GetPasswordProcessor))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLoginController", reflect.TypeOf((*MockAppInterface)(nil).GetLoginController))
 }

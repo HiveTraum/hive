@@ -18,7 +18,7 @@ import (
 
 func TestCreatePasswordWithoutUserV1(t *testing.T) {
 	t.Parallel()
-	body := "{\"user_id\": 1, \"value\": \"hello\"}"
+	body := "{\"userId\": 1, \"value\": \"hello\"}"
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	app, store, _, passwordProcessor := mocks.InitMockApp(ctrl)
@@ -73,7 +73,7 @@ func TestCreatePasswordWithUserV1(t *testing.T) {
 		OnPasswordChanged(models.UserID(2)).
 		Times(1)
 
-	body := fmt.Sprintf("{\"user_id\": %d, \"value\": \"hello\"}", 2)
+	body := fmt.Sprintf("{\"userId\": %d, \"value\": \"hello\"}", 2)
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
 	r.Header.Add("Content-Type", "application/json")
 	status, message := createPasswordV1(&functools.Request{Request: r}, app)
@@ -114,7 +114,7 @@ func TestCreatePasswordWithTooLongValueV1(t *testing.T) {
 		OnPasswordChanged(models.UserID(3)).
 		Times(1)
 
-	body := fmt.Sprintf("{\"user_id\": %d, \"value\": \"hellohellohellohellohellohellohellohellohellohellohell"+
+	body := fmt.Sprintf("{\"userId\": %d, \"value\": \"hellohellohellohellohellohellohellohellohellohellohell"+
 		"ohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohe"+
 		"llohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello"+
 		"hellohellohellohellohellohello\"}", 3)

@@ -21,9 +21,9 @@ type StoreInterface interface {
 
 	// User Views
 
-	GetUsersView(context context.Context, query repositories.GetUsersViewQuery) []*inout.GetUserViewResponseV1
+	GetUsersView(context context.Context, query repositories.GetUsersViewStoreQuery) []*inout.GetUserViewResponseV1
 	GetUserView(context context.Context, id models.UserID) *inout.GetUserViewResponseV1
-	CreateOrUpdateUsersView(context context.Context, query repositories.CreateOrUpdateUsersViewQuery) []*inout.GetUserViewResponseV1
+	CreateOrUpdateUsersView(context context.Context, query repositories.CreateOrUpdateUsersViewStoreQuery) []*inout.GetUserViewResponseV1
 	CreateOrUpdateUsersViewByUsersID(context context.Context, id []models.UserID) []*inout.GetUserViewResponseV1
 	CreateOrUpdateUsersViewByRolesID(context context.Context, id []models.RoleID) []*inout.GetUserViewResponseV1
 	CreateOrUpdateUsersViewByUserID(context context.Context, id models.UserID) []*inout.GetUserViewResponseV1
@@ -34,8 +34,8 @@ type StoreInterface interface {
 
 	CreateEmail(ctx context.Context, userId models.UserID, value string) (int, *models.Email)
 	GetEmail(ctx context.Context, email string) (int, *models.Email)
-	CreateEmailConfirmationCode(email string, code string, duration time.Duration) *models.EmailConfirmation
-	GetEmailConfirmationCode(email string) string
+	CreateEmailConfirmationCode(ctx context.Context, email string, code string, duration time.Duration) *models.EmailConfirmation
+	GetEmailConfirmationCode(ctx context.Context, email string) string
 
 	// Passwords
 
@@ -61,6 +61,16 @@ type StoreInterface interface {
 	CreateUserRole(ctx context.Context, userId models.UserID, roleId models.RoleID) (int, *models.UserRole)
 	GetUserRoles(ctx context.Context, query repositories.GetUserRoleQuery) []*models.UserRole
 	DeleteUserRole(ctx context.Context, id models.UserRoleID) (int, *models.UserRole)
+
+	// Secrets
+
+	GetSecret(ctx context.Context, id models.SecretID) *models.Secret
+	GetActualSecret(ctx context.Context) *models.Secret
+
+	// Sessions
+
+	CreateSession(ctx context.Context, fingerprint string, userID models.UserID, secretID models.SecretID) (int, *models.Session)
+	GetSession(ctx context.Context, fingerprint string, refreshToken string) *models.Session
 }
 
 type ESBInterface interface {
@@ -78,12 +88,25 @@ type ESBDispatcherInterface interface {
 	Send(event inout.Event)
 }
 
-type PasswordProcessorInterface interface {
-	Encode(context.Context, string) string
+type LoginControllerInterface interface {
+	Login(ctx context.Context, credentials inout.CreateSessionRequestV1) (int, *models.User)
+
+	LoginByTokens(ctx context.Context, refreshToken string, accessToken string, fingerprint string) (int, *models.User)
+	LoginByEmail(ctx context.Context, email string, emailCode string, password string) (int, *models.User)
+	LoginByPhone(ctx context.Context, phone string, phoneCode string, password string) (int, *models.User)
+
+	NormalizePhone(ctx context.Context, phone string) (int, string)
+	NormalizeEmail(ctx context.Context, email string) string
+
+	DecodeAccessToken(ctx context.Context, token string, secret string) (int, *models.AccessTokenPayload)
+	EncodeAccessToken(ctx context.Context, userID models.UserID, roles []string, secret string) string
+
+	EncodePassword(context.Context, string) string
+	VerifyPassword(ctx context.Context, password string, encodedPassword string) bool
 }
 
 type AppInterface interface {
 	GetStore() StoreInterface
 	GetESB() ESBInterface
-	GetPasswordProcessor() PasswordProcessorInterface
+	GetLoginController() LoginControllerInterface
 }

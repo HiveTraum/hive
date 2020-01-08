@@ -24,13 +24,13 @@ message ListRoleResponseV1 {
 // User Roles API
 
 message CreateUserRoleRequestV1 {
-    int64 user_id = 1;
-    int64 role_id = 2;
+    int64 userId = 1;
+    int64 roleId = 2;
 }
 
 message CreateUserRoleBadRequestV1 {
-    repeated string user_id = 1;
-    repeated string role_id = 2;
+    repeated string userId = 1;
+    repeated string roleId = 2;
     repeated string errors = 3;
 }
 
@@ -45,8 +45,8 @@ message CreateUserRolesBadRequestV1 {
 message GetUserRoleResponseV1 {
     int64 id = 1;
     int64 created = 2;
-    int64 user_id = 3;
-    int64 role_id = 4;
+    int64 userId = 3;
+    int64 roleId = 4;
 }
 
 message ListUserRolesResponseV1 {
@@ -58,19 +58,19 @@ message ListUserRolesResponseV1 {
 message CreateEmailRequestV1 {
     string email = 1;
     string code = 2;
-    int64 user_id = 3;
+    int64 userId = 3;
 }
 
 message CreateEmailBadRequestV1 {
     repeated string email = 1;
     repeated string code = 2;
-    repeated string user_id = 3;
+    repeated string userId = 3;
 }
 
 message CreateEmailResponseV1 {
     int64 id = 1;
     int64 created = 2;
-    int64 user_id = 3;
+    int64 userId = 3;
     string email = 4;
 }
 
@@ -95,19 +95,19 @@ message CreateEmailConfirmationResponseV1 {
 message CreatePhoneRequestV1 {
     string phone = 1;
     string code = 2;
-    int64 user_id = 3;
+    int64 userId = 3;
 }
 
 message CreatePhoneBadRequestV1 {
     repeated string phone = 1;
     repeated string code = 2;
-    repeated string user_id = 3;
+    repeated string userId = 3;
 }
 
 message CreatePhoneResponseV1 {
     int64 id = 1;
     int64 created = 2;
-    int64 user_id = 3;
+    int64 userId = 3;
     string phone = 4;
 }
 
@@ -130,19 +130,19 @@ message CreatePhoneConfirmationResponseV1 {
 // Passwords API
 
 message CreatePasswordRequestV1 {
-    int64 user_id = 1;
+    int64 userId = 1;
     string value = 2;
 }
 
 message CreatePasswordBadRequestResponseV1 {
-    repeated string user_id = 1;
+    repeated string userId = 1;
     repeated string value = 2;
 }
 
 message CreatePasswordResponseV1 {
     int64 id = 1;
     int64 created = 2;
-    int64 user_id = 3;
+    int64 userId = 3;
 }
 
 // Users API
@@ -171,6 +171,51 @@ message GetUserResponseV1 {
 
 message ListUserResponseV1 {
     repeated GetUserResponseV1 data = 1;
+}
+
+// Sessions API
+
+message CreateSessionRequestV1 {
+
+    enum CredentialsType {
+        Email = 0;
+        Phone = 1;
+        Token = 2;
+    }
+
+    CredentialsType type = 1;
+    string email = 2;
+    string emailCode = 3;
+    string phone = 4;
+    string phoneCode = 5;
+    string password = 6;
+    string fingerprint = 7;
+    string userAgent = 8;
+    string accessToken = 9;
+    string refreshToken = 10;
+}
+
+message CreateSessionBadRequestResponseV1 {
+    repeated string email = 1;
+    repeated string emailCode = 2;
+    repeated string phone = 3;
+    repeated string phoneCode = 4;
+    repeated string password = 5;
+    repeated string fingerprint = 6;
+    repeated string userAgent = 7;
+}
+
+message CreateSessionResponseV1 {
+    string refreshToken = 1;
+    string accessToken = 2;
+}
+
+// Secrets
+
+message SecretCache {
+    int64 id = 1;
+    int64 created = 2;
+    string value = 3;
 }
 
 // User Views API

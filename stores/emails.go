@@ -16,7 +16,7 @@ func (store *DatabaseStore) GetEmail(ctx context.Context, phone string) (int, *m
 	return repositories.GetEmail(store.Db, ctx, phone)
 }
 
-func (store *DatabaseStore) CreateEmailConfirmationCode(email string, code string, duration time.Duration) *models.EmailConfirmation {
+func (store *DatabaseStore) CreateEmailConfirmationCode(ctx context.Context, email string, code string, duration time.Duration) *models.EmailConfirmation {
 	return repositories.CreateEmailConfirmationCode(store.Cache, email, code, duration)
 }
 

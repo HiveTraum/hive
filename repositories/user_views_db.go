@@ -11,7 +11,7 @@ import (
 	"math"
 )
 
-type GetUsersViewQuery struct {
+type GetUsersViewStoreQuery struct {
 	Limit      int
 	Id         []models.UserID
 	Roles      []models.RoleID
@@ -21,13 +21,13 @@ type GetUsersViewQuery struct {
 	EmailCodes []string
 }
 
-type CreateOrUpdateUsersViewQuery struct {
+type CreateOrUpdateUsersViewStoreQuery struct {
 	Limit int
 	Id    []models.UserID
 	Roles []models.RoleID
 }
 
-type getUsersViewRawQuery struct {
+type getUsersViewRepositoryQuery struct {
 	Limit  int
 	Id     string
 	Roles  string
@@ -35,7 +35,7 @@ type getUsersViewRawQuery struct {
 	Phones string
 }
 
-type createOrUpdateUsersViewRawQuery struct {
+type createOrUpdateUsersViewRepositoryQuery struct {
 	Limit int
 	Id    string
 	Roles string
@@ -127,7 +127,7 @@ func scanUsersView(rows pgx.Rows, limit int) []*inout.GetUserViewResponseV1 {
 	return users[:i]
 }
 
-func convertGetUsersViewQueryToRaw(query GetUsersViewQuery) getUsersViewRawQuery {
+func convertGetUsersViewQueryToRaw(query GetUsersViewStoreQuery) getUsersViewRepositoryQuery {
 
 	maxQueryLength := functools.Max([]int{len(query.Id), len(query.Emails), len(query.Phones)})
 
@@ -138,7 +138,7 @@ func convertGetUsersViewQueryToRaw(query GetUsersViewQuery) getUsersViewRawQuery
 			float64(maxQueryLength)))
 	}
 
-	return getUsersViewRawQuery{
+	return getUsersViewRepositoryQuery{
 		Limit:  limit,
 		Id:     modelsFunctools.UserIDListToPGArray(query.Id),
 		Roles:  modelsFunctools.RoleIDListToPGArray(query.Roles),
@@ -147,7 +147,7 @@ func convertGetUsersViewQueryToRaw(query GetUsersViewQuery) getUsersViewRawQuery
 	}
 }
 
-func convertCreateOrUpdateUsersViewQueryToRaw(query CreateOrUpdateUsersViewQuery) createOrUpdateUsersViewRawQuery {
+func convertCreateOrUpdateUsersViewQueryToRaw(query CreateOrUpdateUsersViewStoreQuery) createOrUpdateUsersViewRepositoryQuery {
 
 	limit := query.Limit
 	if len(query.Id) > 0 {
@@ -156,14 +156,14 @@ func convertCreateOrUpdateUsersViewQueryToRaw(query CreateOrUpdateUsersViewQuery
 			float64(len(query.Id))))
 	}
 
-	return createOrUpdateUsersViewRawQuery{
+	return createOrUpdateUsersViewRepositoryQuery{
 		Id:    modelsFunctools.UserIDListToPGArray(query.Id),
 		Limit: limit,
 		Roles: modelsFunctools.RoleIDListToPGArray(query.Roles),
 	}
 }
 
-func GetUsersView(db DB, context context.Context, query GetUsersViewQuery) []*inout.GetUserViewResponseV1 {
+func GetUsersView(db DB, context context.Context, query GetUsersViewStoreQuery) []*inout.GetUserViewResponseV1 {
 	sql := getUsersViewSQL()
 	rawQuery := convertGetUsersViewQueryToRaw(query)
 
@@ -183,7 +183,7 @@ func GetUserView(db DB, context context.Context, id models.UserID) *inout.GetUse
 	return userView
 }
 
-func CreateOrUpdateUsersView(db DB, context context.Context, query CreateOrUpdateUsersViewQuery) []*inout.GetUserViewResponseV1 {
+func CreateOrUpdateUsersView(db DB, context context.Context, query CreateOrUpdateUsersViewStoreQuery) []*inout.GetUserViewResponseV1 {
 	sql := updateUsersViewSQL()
 	rawQuery := convertCreateOrUpdateUsersViewQueryToRaw(query)
 	rows, err := db.Query(context, sql, rawQuery.Id, rawQuery.Roles)

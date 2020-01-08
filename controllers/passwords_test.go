@@ -37,7 +37,7 @@ func TestCreatePassword(t *testing.T) {
 		OnPasswordChanged(models.UserID(10)).
 		Times(1)
 
-	status, password := CreatePassword(store, esb, app.GetPasswordProcessor(), ctx, 10, "hello")
+	status, password := CreatePassword(store, esb, app.GetLoginController(), ctx, 10, "hello")
 	require.NotEqual(t, "hello", password.Value)
 	require.NotNil(t, password)
 	require.Equal(t, enums.Ok, status)

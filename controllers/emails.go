@@ -26,8 +26,8 @@ func getRandomStringCode() string {
 	return functools.GetRandomString(6)
 }
 
-func checkEmailConfirmationCode(store infrastructure.StoreInterface, email string, code string) int {
-	cachedCode := store.GetEmailConfirmationCode(email)
+func checkEmailConfirmationCode(ctx context.Context, store infrastructure.StoreInterface, email string, code string) int {
+	cachedCode := store.GetEmailConfirmationCode(ctx, email)
 	if cachedCode == "" {
 		return enums.EmailNotFound
 	} else if cachedCode != code {
@@ -37,20 +37,20 @@ func checkEmailConfirmationCode(store infrastructure.StoreInterface, email strin
 	return enums.Ok
 }
 
-func validateEmail(store infrastructure.StoreInterface, email string, code string) (int, string) {
+func validateEmail(ctx context.Context, store infrastructure.StoreInterface, email string, code string) (int, string) {
 	email = getEmail(email)
 
 	if email == "" {
 		return enums.IncorrectEmail, ""
 	}
 
-	status := checkEmailConfirmationCode(store, email, code)
+	status := checkEmailConfirmationCode(ctx, store, email, code)
 	return status, email
 }
 
 func CreateEmail(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, email string, code string, userId models.UserID) (int, *models.Email) {
 
-	status, email := validateEmail(store, email, code)
+	status, email := validateEmail(ctx, store, email, code)
 
 	if status != enums.Ok {
 		return status, nil
@@ -69,7 +69,7 @@ func CreateEmail(store infrastructure.StoreInterface, esb infrastructure.ESBInte
 	return status, phoneObject
 }
 
-func CreateEmailConfirmation(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, email string) (int, *models.EmailConfirmation) {
+func CreateEmailConfirmation(ctx context.Context, store infrastructure.StoreInterface, esb infrastructure.ESBInterface, email string) (int, *models.EmailConfirmation) {
 
 	email = getEmail(email)
 
@@ -78,7 +78,7 @@ func CreateEmailConfirmation(store infrastructure.StoreInterface, esb infrastruc
 	}
 
 	code := getRandomStringCode()
-	emailConfirmation := store.CreateEmailConfirmationCode(email, code, time.Minute*15)
+	emailConfirmation := store.CreateEmailConfirmationCode(ctx, email, code, time.Minute*15)
 	esb.OnEmailCodeConfirmationCreated(email, code)
 	return enums.Ok, emailConfirmation
 }

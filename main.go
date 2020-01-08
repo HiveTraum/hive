@@ -61,6 +61,8 @@ func main() {
 	emailConfirmationsAPI := middlewares.ResponseControllerMiddleware(api.EmailConfirmationsAPIV1(application))
 	emailsAPI := middlewares.ResponseControllerMiddleware(api.EmailsAPIV1(application))
 
+	sessionsAPI := middlewares.ResponseControllerMiddleware(api.SessionsAPIV1(application))
+
 	// Middleware
 
 	// Methods Middleware
@@ -89,6 +91,8 @@ func main() {
 
 		{pattern: "/api/v1/emailConfirmations", h: emailConfirmationsAPI, methods: C},
 		{pattern: "/api/v1/emails", h: emailsAPI, methods: C},
+
+		{pattern: "/api/v1/sessions", h: sessionsAPI, methods: C},
 	}
 
 	// Content Type Middleware

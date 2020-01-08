@@ -10,12 +10,12 @@ import (
 func CreatePassword(
 	store infrastructure.StoreInterface,
 	esb infrastructure.ESBInterface,
-	passwordProcessor infrastructure.PasswordProcessorInterface,
+	passwordProcessor infrastructure.LoginControllerInterface,
 	ctx context.Context,
 	userId models.UserID,
 	value string) (int, *models.Password) {
-		
-	value = passwordProcessor.Encode(ctx, value)
+
+	value = passwordProcessor.EncodePassword(ctx, value)
 	if value == "" {
 		return enums.IncorrectPassword, nil
 	}

@@ -8,7 +8,7 @@ import (
 type MockApp struct {
 	Store             infrastructure.StoreInterface
 	ESB               infrastructure.ESBInterface
-	PasswordProcessor infrastructure.PasswordProcessorInterface
+	PasswordProcessor infrastructure.LoginControllerInterface
 }
 
 func (app *MockApp) GetStore() infrastructure.StoreInterface {
@@ -19,7 +19,7 @@ func (app *MockApp) GetESB() infrastructure.ESBInterface {
 	return app.ESB
 }
 
-func (app *MockApp) GetPasswordProcessor() infrastructure.PasswordProcessorInterface {
+func (app *MockApp) GetLoginController() infrastructure.LoginControllerInterface {
 	return app.PasswordProcessor
 }
 

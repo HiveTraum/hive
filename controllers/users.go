@@ -11,7 +11,7 @@ import (
 func CreateUser(
 	store infrastructure.StoreInterface,
 	esb infrastructure.ESBInterface,
-	passwordProcessor infrastructure.PasswordProcessorInterface,
+	passwordProcessor infrastructure.LoginControllerInterface,
 	ctx context.Context,
 	body *inout.CreateUserRequestV1) (int, *models.User) {
 
@@ -25,7 +25,7 @@ func CreateUser(
 		return enums.MinimumOneFieldRequired, nil
 	}
 
-	body.Password = passwordProcessor.Encode(ctx, body.Password)
+	body.Password = passwordProcessor.EncodePassword(ctx, body.Password)
 	if body.Password == "" {
 		return enums.IncorrectPassword, nil
 	}
@@ -44,7 +44,7 @@ func CreateUser(
 	}
 
 	if len(body.Email) > 0 {
-		emailStatus, email := validateEmail(store, body.Email, body.EmailCode)
+		emailStatus, email := validateEmail(ctx, store, body.Email, body.EmailCode)
 		if emailStatus != enums.Ok {
 			return emailStatus, nil
 		}

@@ -16,13 +16,14 @@ const (
 	IncorrectPhoneCode
 	IncorrectPhone
 	PhoneNotFound
-	PhoneAlreadyExist
+	PhoneConfirmationCodeNotFound
 
 	// Emails
 
 	IncorrectEmailCode
 	IncorrectEmail
 	EmailNotFound
+	EmailConfirmationCodeNotFound
 
 	// Passwords
 
@@ -38,4 +39,20 @@ const (
 
 	UserRoleAlreadyExist
 	UserRoleNotFound
+
+	// Sessions
+
+	SessionNotFound
+
+	// Secrets
+
+	SecretNotFound
+
+	// Tokens
+
+	IncorrectToken
+
+	// Credentials
+
+	CredentialsNotProvided
 )

@@ -61,26 +61,38 @@ CREATE TABLE users_view
     role_id BIGINT[]
 );
 
-CREATE TABLE sessions
+CREATE TABLE secrets
 (
-    id            BIGSERIAL PRIMARY KEY,
-    user_id       uuid REFERENCES users (id),
-    refresh_token uuid                     NOT NULL,
-    user_agent    character varying(200)   NOT NULL,
-    fingerprint   character varying(200)   NOT NULL,
-    ip            character varying(15)    NOT NULL,
-    expires_in    bigint                   NOT NULL,
-    created_at    timestamp with time zone NOT NULL DEFAULT now(),
-    updated_at    timestamp with time zone NOT NULL DEFAULT now()
+    id      BIGINT PRIMARY KEY,
+    created BIGINT DEFAULT extract(epoch from now()) * 1000,
+    value   UUID   DEFAULT uuid_generate_v4()
 );
 
-CREATE INDEX user_views_role_id_idx on users_view USING GIN (role_id);
-CREATE INDEX user_views_phones_idx on users_view USING GIN (phones);
+CREATE TABLE sessions
+(
+    refresh_token UUID   DEFAULT uuid_generate_v4(),
+    fingerprint   VARCHAR(200),
+    user_id       BIGINT,
+    secret_id     BIGINT,
+    created_at    BIGINT DEFAULT extract(epoch from now()) * 1000,
+    expires_in    BIGINT,
+    user_agent    TEXT,
+    FOREIGN KEY (user_id) REFERENCES users,
+    FOREIGN KEY (secret_id) REFERENCES secrets
+);
+
 CREATE INDEX ON phones (user_id);
 CREATE INDEX ON emails (user_id);
 CREATE INDEX ON user_roles (role_id);
 CREATE INDEX ON user_roles (user_id);
 CREATE INDEX ON passwords (user_id);
+CREATE INDEX ON sessions (user_id);
+CREATE INDEX ON sessions (secret_id);
+
+CREATE INDEX user_views_role_id_idx on users_view USING GIN (role_id);
+CREATE INDEX user_views_phones_idx on users_view USING GIN (phones);
+CREATE INDEX sessions_fingerprint_idx on sessions (fingerprint);
+CREATE INDEX sessions_refresh_token_idx on sessions (refresh_token);
 -- +goose StatementEnd
 
 -- +goose Down
