@@ -23,9 +23,9 @@ func (app *MockApp) GetLoginController() infrastructure.LoginControllerInterface
 	return app.PasswordProcessor
 }
 
-func InitMockApp(ctrl *gomock.Controller) (*MockApp, *MockStoreInterface, *MockESBInterface, *MockPasswordProcessorInterface) {
+func InitMockApp(ctrl *gomock.Controller) (*MockApp, *MockStoreInterface, *MockESBInterface, *MockLoginControllerInterface) {
 	store := NewMockStoreInterface(ctrl)
 	esb := NewMockESBInterface(ctrl)
-	passwordProcessor := NewMockPasswordProcessorInterface(ctrl)
+	passwordProcessor := NewMockLoginControllerInterface(ctrl)
 	return &MockApp{ESB: esb, Store: store, PasswordProcessor: passwordProcessor}, store, esb, passwordProcessor
 }

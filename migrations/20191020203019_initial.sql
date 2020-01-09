@@ -74,8 +74,7 @@ CREATE TABLE sessions
     fingerprint   VARCHAR(200),
     user_id       BIGINT,
     secret_id     BIGINT,
-    created_at    BIGINT DEFAULT extract(epoch from now()) * 1000,
-    expires_in    BIGINT,
+    created    BIGINT DEFAULT extract(epoch from now()) * 1000,
     user_agent    TEXT,
     FOREIGN KEY (user_id) REFERENCES users,
     FOREIGN KEY (secret_id) REFERENCES secrets

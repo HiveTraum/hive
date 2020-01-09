@@ -14,12 +14,12 @@ import (
 func TestCreateUser(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
-	_, store, esb, passwordProcessor := mocks.InitMockApp(ctrl)
+	_, store, esb, loginController := mocks.InitMockApp(ctrl)
 	ctx := context.Background()
 
-	passwordProcessor.
+	loginController.
 		EXPECT().
-		Encode(ctx, "hello").
+		EncodePassword(ctx, "hello").
 		Return("olleh")
 
 	store.
@@ -39,7 +39,7 @@ func TestCreateUser(t *testing.T) {
 
 	store.
 		EXPECT().
-		GetEmailConfirmationCode("email@email.com").
+		GetEmailConfirmationCode(ctx,"email@email.com").
 		Return("654321")
 
 	store.
@@ -81,7 +81,7 @@ func TestCreateUser(t *testing.T) {
 
 	body.Phone = "71234567890"
 
-	status, user := CreateUser(store, esb, passwordProcessor, ctx, &body)
+	status, user := CreateUser(store, esb, loginController, ctx, &body)
 
 	require.Equal(t, &models.User{
 		Id:      5,

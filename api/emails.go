@@ -73,7 +73,7 @@ func createEmailConfirmationV1(r *functools.Request, app infrastructure.AppInter
 		return http.StatusBadRequest, nil
 	}
 
-	status, emailConfirmation := controllers.CreateEmailConfirmation(app.GetStore(), app.GetESB(), body.Email)
+	status, emailConfirmation := controllers.CreateEmailConfirmation(r.Context(), app.GetStore(), app.GetESB(), body.Email)
 
 	switch status {
 	case enums.Ok:

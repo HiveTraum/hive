@@ -31,7 +31,7 @@ func (store *DatabaseStore) GetActualSecret(ctx context.Context) *models.Secret 
 	}
 
 	actualSecret = repositories.CreateSecret(store.Db, ctx)
-	repositories.CacheActualSecret(store.Cache, ctx, actualSecret, time.Minute*env.ActualSecretLifetime)
-	repositories.CacheSecret(store.Cache, ctx, actualSecret, time.Hour*env.RefreshTokenLifetime*24)
+	repositories.CacheActualSecret(store.Cache, ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
+	repositories.CacheSecret(store.Cache, ctx, actualSecret, time.Hour*time.Duration(env.RefreshTokenLifetime)*24)
 	return actualSecret
 }

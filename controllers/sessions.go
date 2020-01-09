@@ -20,7 +20,7 @@ func CreateSession(
 	}
 
 	secret := store.GetActualSecret(ctx)
-	status, session := store.CreateSession(ctx, body.Fingerprint, user.Id, secret.Id)
+	status, session := store.CreateSession(ctx, body.Fingerprint, user.Id, secret.Id, body.UserAgent)
 	userView := store.GetUserView(ctx, user.Id)
 	token := loginController.EncodeAccessToken(ctx, user.Id, userView.Roles, secret.Value)
 

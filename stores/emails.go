@@ -16,11 +16,11 @@ func (store *DatabaseStore) GetEmail(ctx context.Context, phone string) (int, *m
 	return repositories.GetEmail(store.Db, ctx, phone)
 }
 
-func (store *DatabaseStore) CreateEmailConfirmationCode(ctx context.Context, email string, code string, duration time.Duration) *models.EmailConfirmation {
+func (store *DatabaseStore) CreateEmailConfirmationCode(_ context.Context, email string, code string, duration time.Duration) *models.EmailConfirmation {
 	return repositories.CreateEmailConfirmationCode(store.Cache, email, code, duration)
 }
 
-func (store *DatabaseStore) GetEmailConfirmationCode(email string) string {
+func (store *DatabaseStore) GetEmailConfirmationCode(_ context.Context, email string) string {
 	code, err := repositories.GetEmailConfirmationCode(store.Cache, email)
 
 	if err != nil {

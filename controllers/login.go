@@ -56,7 +56,7 @@ func (controller *LoginController) VerifyPassword(ctx context.Context, password 
 
 // Input Normalization
 
-func (controller *LoginController) NormalizeEmail(email string) string {
+func (controller *LoginController) NormalizeEmail(_ context.Context, email string) string {
 	err := checkmail.ValidateFormat(email)
 
 	if err != nil {
@@ -67,7 +67,7 @@ func (controller *LoginController) NormalizeEmail(email string) string {
 	return email
 }
 
-func (controller *LoginController) NormalizePhone(phone string) string {
+func (controller *LoginController) NormalizePhone(_ context.Context, phone string) string {
 	num, err := phonenumbers.Parse(phone, "RU")
 
 	if err != nil {
@@ -148,7 +148,7 @@ func (controller *LoginController) LoginByTokens(ctx context.Context, refreshTok
 
 func (controller *LoginController) LoginByEmail(ctx context.Context, emailValue string, emailCode string, passwordValue string) (int, *models.User) {
 
-	emailValue = controller.NormalizeEmail(emailValue)
+	emailValue = controller.NormalizeEmail(ctx, emailValue)
 	if emailValue == "" {
 		return enums.IncorrectEmail, nil
 	}
@@ -179,7 +179,7 @@ func (controller *LoginController) LoginByEmail(ctx context.Context, emailValue 
 }
 
 func (controller *LoginController) LoginByPhone(ctx context.Context, phoneValue string, phoneCode string, passwordValue string) (int, *models.User) {
-	phoneValue = controller.NormalizePhone(phoneValue)
+	phoneValue = controller.NormalizePhone(ctx, phoneValue)
 	if phoneValue == "" {
 		return enums.IncorrectPhone, nil
 	}

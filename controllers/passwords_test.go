@@ -19,7 +19,7 @@ func TestCreatePassword(t *testing.T) {
 
 	passwordProcessor.
 		EXPECT().
-		Encode(ctx, "hello").
+		EncodePassword(ctx, "hello").
 		Return("olleh")
 
 	store.

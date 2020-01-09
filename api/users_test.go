@@ -70,7 +70,7 @@ func TestCreateUserWithOnlyEmail(t *testing.T) {
 
 	passwordProcessor.
 		EXPECT().
-		Encode(gomock.Any(), "hello").
+		EncodePassword(gomock.Any(), "hello").
 		Return("olleh")
 
 	store.
@@ -80,7 +80,7 @@ func TestCreateUserWithOnlyEmail(t *testing.T) {
 
 	store.
 		EXPECT().
-		GetEmailConfirmationCode("mail@mail.com").
+		GetEmailConfirmationCode(r.Context(), "mail@mail.com").
 		Times(1).
 		Return("")
 
@@ -104,7 +104,7 @@ func TestCreateUserWithEmailAndEmailCode(t *testing.T) {
 
 	passwordProcessor.
 		EXPECT().
-		Encode(gomock.Any(), "hello").
+		EncodePassword(gomock.Any(), "hello").
 		Return("olleh")
 
 	store.
@@ -114,7 +114,7 @@ func TestCreateUserWithEmailAndEmailCode(t *testing.T) {
 
 	store.
 		EXPECT().
-		GetEmailConfirmationCode("mail@mail.com").
+		GetEmailConfirmationCode(r.Context(), "mail@mail.com").
 		Times(1).
 		Return("")
 
@@ -138,7 +138,7 @@ func TestCreateUserWithEmailAndEmailCodeAfterIncorrectEmailConfirmationCodeRecei
 
 	passwordProcessor.
 		EXPECT().
-		Encode(gomock.Any(), "hello").
+		EncodePassword(gomock.Any(), "hello").
 		Return("olleh")
 
 	store.
@@ -148,7 +148,7 @@ func TestCreateUserWithEmailAndEmailCodeAfterIncorrectEmailConfirmationCodeRecei
 
 	store.
 		EXPECT().
-		GetEmailConfirmationCode("mail@mail.com").
+		GetEmailConfirmationCode(r.Context(), "mail@mail.com").
 		Times(1).
 		Return("654321")
 
@@ -172,7 +172,7 @@ func TestSuccessfulCreateUserWithEmail(t *testing.T) {
 
 	passwordProcessor.
 		EXPECT().
-		Encode(gomock.Any(), "hello").
+		EncodePassword(gomock.Any(), "hello").
 		Return("olleh")
 
 	store.
@@ -182,7 +182,7 @@ func TestSuccessfulCreateUserWithEmail(t *testing.T) {
 
 	store.
 		EXPECT().
-		GetEmailConfirmationCode("mail@mail.com").
+		GetEmailConfirmationCode(r.Context(), "mail@mail.com").
 		Times(1).
 		Return("123456")
 

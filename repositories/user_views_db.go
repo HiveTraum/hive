@@ -178,7 +178,7 @@ func GetUsersView(db DB, context context.Context, query GetUsersViewStoreQuery) 
 
 func GetUserView(db DB, context context.Context, id models.UserID) *inout.GetUserViewResponseV1 {
 	sql := getUsersViewSQL()
-	row := db.QueryRow(context, sql, modelsFunctools.UserIDListToPGArray([]models.UserID{id}), "{}", "{}", 1)
+	row := db.QueryRow(context, sql, modelsFunctools.UserIDListToPGArray([]models.UserID{id}), "{}", "{}", "{}", 1)
 	userView := scanUserView(row)
 	return userView
 }

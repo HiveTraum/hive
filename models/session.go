@@ -6,6 +6,5 @@ type Session struct {
 	UserID       UserID
 	SecretID     SecretID
 	Created      int64
-	Expires      int64
 	UserAgent    string
 }

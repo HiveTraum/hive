@@ -222,31 +222,31 @@ func (mr *MockStoreInterfaceMockRecorder) GetEmail(ctx, email interface{}) *gomo
 }
 
 // CreateEmailConfirmationCode mocks base method
-func (m *MockStoreInterface) CreateEmailConfirmationCode(email, code string, duration time.Duration) *models.EmailConfirmation {
+func (m *MockStoreInterface) CreateEmailConfirmationCode(ctx context.Context, email, code string, duration time.Duration) *models.EmailConfirmation {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateEmailConfirmationCode", email, code, duration)
+	ret := m.ctrl.Call(m, "CreateEmailConfirmationCode", ctx, email, code, duration)
 	ret0, _ := ret[0].(*models.EmailConfirmation)
 	return ret0
 }
 
 // CreateEmailConfirmationCode indicates an expected call of CreateEmailConfirmationCode
-func (mr *MockStoreInterfaceMockRecorder) CreateEmailConfirmationCode(email, code, duration interface{}) *gomock.Call {
+func (mr *MockStoreInterfaceMockRecorder) CreateEmailConfirmationCode(ctx, email, code, duration interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEmailConfirmationCode", reflect.TypeOf((*MockStoreInterface)(nil).CreateEmailConfirmationCode), email, code, duration)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEmailConfirmationCode", reflect.TypeOf((*MockStoreInterface)(nil).CreateEmailConfirmationCode), ctx, email, code, duration)
 }
 
 // GetEmailConfirmationCode mocks base method
-func (m *MockStoreInterface) GetEmailConfirmationCode(email string) string {
+func (m *MockStoreInterface) GetEmailConfirmationCode(ctx context.Context, email string) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetEmailConfirmationCode", email)
+	ret := m.ctrl.Call(m, "GetEmailConfirmationCode", ctx, email)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
 // GetEmailConfirmationCode indicates an expected call of GetEmailConfirmationCode
-func (mr *MockStoreInterfaceMockRecorder) GetEmailConfirmationCode(email interface{}) *gomock.Call {
+func (mr *MockStoreInterfaceMockRecorder) GetEmailConfirmationCode(ctx, email interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEmailConfirmationCode", reflect.TypeOf((*MockStoreInterface)(nil).GetEmailConfirmationCode), email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEmailConfirmationCode", reflect.TypeOf((*MockStoreInterface)(nil).GetEmailConfirmationCode), ctx, email)
 }
 
 // CreatePassword mocks base method
@@ -439,6 +439,63 @@ func (mr *MockStoreInterfaceMockRecorder) DeleteUserRole(ctx, id interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserRole", reflect.TypeOf((*MockStoreInterface)(nil).DeleteUserRole), ctx, id)
 }
 
+// GetSecret mocks base method
+func (m *MockStoreInterface) GetSecret(ctx context.Context, id models.SecretID) *models.Secret {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSecret", ctx, id)
+	ret0, _ := ret[0].(*models.Secret)
+	return ret0
+}
+
+// GetSecret indicates an expected call of GetSecret
+func (mr *MockStoreInterfaceMockRecorder) GetSecret(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecret", reflect.TypeOf((*MockStoreInterface)(nil).GetSecret), ctx, id)
+}
+
+// GetActualSecret mocks base method
+func (m *MockStoreInterface) GetActualSecret(ctx context.Context) *models.Secret {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetActualSecret", ctx)
+	ret0, _ := ret[0].(*models.Secret)
+	return ret0
+}
+
+// GetActualSecret indicates an expected call of GetActualSecret
+func (mr *MockStoreInterfaceMockRecorder) GetActualSecret(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActualSecret", reflect.TypeOf((*MockStoreInterface)(nil).GetActualSecret), ctx)
+}
+
+// CreateSession mocks base method
+func (m *MockStoreInterface) CreateSession(ctx context.Context, fingerprint string, userID models.UserID, secretID models.SecretID, userAgent string) (int, *models.Session) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateSession", ctx, fingerprint, userID, secretID, userAgent)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(*models.Session)
+	return ret0, ret1
+}
+
+// CreateSession indicates an expected call of CreateSession
+func (mr *MockStoreInterfaceMockRecorder) CreateSession(ctx, fingerprint, userID, secretID, userAgent interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSession", reflect.TypeOf((*MockStoreInterface)(nil).CreateSession), ctx, fingerprint, userID, secretID, userAgent)
+}
+
+// GetSession mocks base method
+func (m *MockStoreInterface) GetSession(ctx context.Context, fingerprint, refreshToken string) *models.Session {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSession", ctx, fingerprint, refreshToken)
+	ret0, _ := ret[0].(*models.Session)
+	return ret0
+}
+
+// GetSession indicates an expected call of GetSession
+func (mr *MockStoreInterfaceMockRecorder) GetSession(ctx, fingerprint, refreshToken interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSession", reflect.TypeOf((*MockStoreInterface)(nil).GetSession), ctx, fingerprint, refreshToken)
+}
+
 // MockESBInterface is a mock of ESBInterface interface
 type MockESBInterface struct {
 	ctrl     *gomock.Controller
@@ -593,31 +650,148 @@ func (mr *MockESBDispatcherInterfaceMockRecorder) Send(event interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockESBDispatcherInterface)(nil).Send), event)
 }
 
-// MockPasswordProcessorInterface is a mock of LoginControllerInterface interface
-type MockPasswordProcessorInterface struct {
+// MockLoginControllerInterface is a mock of LoginControllerInterface interface
+type MockLoginControllerInterface struct {
 	ctrl     *gomock.Controller
-	recorder *MockPasswordProcessorInterfaceMockRecorder
+	recorder *MockLoginControllerInterfaceMockRecorder
 }
 
-// MockPasswordProcessorInterfaceMockRecorder is the mock recorder for MockPasswordProcessorInterface
-type MockPasswordProcessorInterfaceMockRecorder struct {
-	mock *MockPasswordProcessorInterface
+// MockLoginControllerInterfaceMockRecorder is the mock recorder for MockLoginControllerInterface
+type MockLoginControllerInterfaceMockRecorder struct {
+	mock *MockLoginControllerInterface
 }
 
-// NewMockPasswordProcessorInterface creates a new mock instance
-func NewMockPasswordProcessorInterface(ctrl *gomock.Controller) *MockPasswordProcessorInterface {
-	mock := &MockPasswordProcessorInterface{ctrl: ctrl}
-	mock.recorder = &MockPasswordProcessorInterfaceMockRecorder{mock}
+// NewMockLoginControllerInterface creates a new mock instance
+func NewMockLoginControllerInterface(ctrl *gomock.Controller) *MockLoginControllerInterface {
+	mock := &MockLoginControllerInterface{ctrl: ctrl}
+	mock.recorder = &MockLoginControllerInterfaceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockPasswordProcessorInterface) EXPECT() *MockPasswordProcessorInterfaceMockRecorder {
+func (m *MockLoginControllerInterface) EXPECT() *MockLoginControllerInterfaceMockRecorder {
 	return m.recorder
 }
 
+// Login mocks base method
+func (m *MockLoginControllerInterface) Login(ctx context.Context, credentials inout.CreateSessionRequestV1) (int, *models.User) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Login", ctx, credentials)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(*models.User)
+	return ret0, ret1
+}
+
+// Login indicates an expected call of Login
+func (mr *MockLoginControllerInterfaceMockRecorder) Login(ctx, credentials interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*MockLoginControllerInterface)(nil).Login), ctx, credentials)
+}
+
+// LoginByTokens mocks base method
+func (m *MockLoginControllerInterface) LoginByTokens(ctx context.Context, refreshToken, accessToken, fingerprint string) (int, *models.User) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoginByTokens", ctx, refreshToken, accessToken, fingerprint)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(*models.User)
+	return ret0, ret1
+}
+
+// LoginByTokens indicates an expected call of LoginByTokens
+func (mr *MockLoginControllerInterfaceMockRecorder) LoginByTokens(ctx, refreshToken, accessToken, fingerprint interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByTokens", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByTokens), ctx, refreshToken, accessToken, fingerprint)
+}
+
+// LoginByEmail mocks base method
+func (m *MockLoginControllerInterface) LoginByEmail(ctx context.Context, email, emailCode, password string) (int, *models.User) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoginByEmail", ctx, email, emailCode, password)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(*models.User)
+	return ret0, ret1
+}
+
+// LoginByEmail indicates an expected call of LoginByEmail
+func (mr *MockLoginControllerInterfaceMockRecorder) LoginByEmail(ctx, email, emailCode, password interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByEmail", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByEmail), ctx, email, emailCode, password)
+}
+
+// LoginByPhone mocks base method
+func (m *MockLoginControllerInterface) LoginByPhone(ctx context.Context, phone, phoneCode, password string) (int, *models.User) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoginByPhone", ctx, phone, phoneCode, password)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(*models.User)
+	return ret0, ret1
+}
+
+// LoginByPhone indicates an expected call of LoginByPhone
+func (mr *MockLoginControllerInterfaceMockRecorder) LoginByPhone(ctx, phone, phoneCode, password interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByPhone", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByPhone), ctx, phone, phoneCode, password)
+}
+
+// NormalizePhone mocks base method
+func (m *MockLoginControllerInterface) NormalizePhone(ctx context.Context, phone string) string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NormalizePhone", ctx, phone)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// NormalizePhone indicates an expected call of NormalizePhone
+func (mr *MockLoginControllerInterfaceMockRecorder) NormalizePhone(ctx, phone interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NormalizePhone", reflect.TypeOf((*MockLoginControllerInterface)(nil).NormalizePhone), ctx, phone)
+}
+
+// NormalizeEmail mocks base method
+func (m *MockLoginControllerInterface) NormalizeEmail(ctx context.Context, email string) string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NormalizeEmail", ctx, email)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// NormalizeEmail indicates an expected call of NormalizeEmail
+func (mr *MockLoginControllerInterfaceMockRecorder) NormalizeEmail(ctx, email interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NormalizeEmail", reflect.TypeOf((*MockLoginControllerInterface)(nil).NormalizeEmail), ctx, email)
+}
+
+// DecodeAccessToken mocks base method
+func (m *MockLoginControllerInterface) DecodeAccessToken(ctx context.Context, token, secret string) (int, *models.AccessTokenPayload) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DecodeAccessToken", ctx, token, secret)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(*models.AccessTokenPayload)
+	return ret0, ret1
+}
+
+// DecodeAccessToken indicates an expected call of DecodeAccessToken
+func (mr *MockLoginControllerInterfaceMockRecorder) DecodeAccessToken(ctx, token, secret interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecodeAccessToken", reflect.TypeOf((*MockLoginControllerInterface)(nil).DecodeAccessToken), ctx, token, secret)
+}
+
+// EncodeAccessToken mocks base method
+func (m *MockLoginControllerInterface) EncodeAccessToken(ctx context.Context, userID models.UserID, roles []string, secret string) string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EncodeAccessToken", ctx, userID, roles, secret)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// EncodeAccessToken indicates an expected call of EncodeAccessToken
+func (mr *MockLoginControllerInterfaceMockRecorder) EncodeAccessToken(ctx, userID, roles, secret interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncodeAccessToken", reflect.TypeOf((*MockLoginControllerInterface)(nil).EncodeAccessToken), ctx, userID, roles, secret)
+}
+
 // EncodePassword mocks base method
-func (m *MockPasswordProcessorInterface) Encode(arg0 context.Context, arg1 string) string {
+func (m *MockLoginControllerInterface) EncodePassword(arg0 context.Context, arg1 string) string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EncodePassword", arg0, arg1)
 	ret0, _ := ret[0].(string)
@@ -625,9 +799,23 @@ func (m *MockPasswordProcessorInterface) Encode(arg0 context.Context, arg1 strin
 }
 
 // EncodePassword indicates an expected call of EncodePassword
-func (mr *MockPasswordProcessorInterfaceMockRecorder) Encode(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockLoginControllerInterfaceMockRecorder) EncodePassword(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncodePassword", reflect.TypeOf((*MockPasswordProcessorInterface)(nil).Encode), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncodePassword", reflect.TypeOf((*MockLoginControllerInterface)(nil).EncodePassword), arg0, arg1)
+}
+
+// VerifyPassword mocks base method
+func (m *MockLoginControllerInterface) VerifyPassword(ctx context.Context, password, encodedPassword string) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VerifyPassword", ctx, password, encodedPassword)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// VerifyPassword indicates an expected call of VerifyPassword
+func (mr *MockLoginControllerInterfaceMockRecorder) VerifyPassword(ctx, password, encodedPassword interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyPassword", reflect.TypeOf((*MockLoginControllerInterface)(nil).VerifyPassword), ctx, password, encodedPassword)
 }
 
 // MockAppInterface is a mock of AppInterface interface
@@ -690,7 +878,7 @@ func (m *MockAppInterface) GetLoginController() infrastructure.LoginControllerIn
 }
 
 // GetLoginController indicates an expected call of GetLoginController
-func (mr *MockAppInterfaceMockRecorder) GetPasswordProcessor() *gomock.Call {
+func (mr *MockAppInterfaceMockRecorder) GetLoginController() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLoginController", reflect.TypeOf((*MockAppInterface)(nil).GetLoginController))
 }

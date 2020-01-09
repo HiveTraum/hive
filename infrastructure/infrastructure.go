@@ -69,7 +69,7 @@ type StoreInterface interface {
 
 	// Sessions
 
-	CreateSession(ctx context.Context, fingerprint string, userID models.UserID, secretID models.SecretID) (int, *models.Session)
+	CreateSession(ctx context.Context, fingerprint string, userID models.UserID, secretID models.SecretID, userAgent string) (int, *models.Session)
 	GetSession(ctx context.Context, fingerprint string, refreshToken string) *models.Session
 }
 
@@ -95,7 +95,7 @@ type LoginControllerInterface interface {
 	LoginByEmail(ctx context.Context, email string, emailCode string, password string) (int, *models.User)
 	LoginByPhone(ctx context.Context, phone string, phoneCode string, password string) (int, *models.User)
 
-	NormalizePhone(ctx context.Context, phone string) (int, string)
+	NormalizePhone(ctx context.Context, phone string) string
 	NormalizeEmail(ctx context.Context, email string) string
 
 	DecodeAccessToken(ctx context.Context, token string, secret string) (int, *models.AccessTokenPayload)
