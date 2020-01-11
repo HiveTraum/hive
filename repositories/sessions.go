@@ -18,8 +18,8 @@ func getSessionsSQL() string {
 	return `
 			SELECT refresh_token, fingerprint, user_id, secret_id, created, user_agent
 			FROM sessions
-			WHERE refresh_token = $1 AND fingerprint = $2
-			LIMIT $3;
+			WHERE refresh_token = $1 AND fingerprint = $2 AND user_id = $3
+			LIMIT $4;
 			`
 }
 
@@ -41,8 +41,8 @@ func CreateSession(db DB, ctx context.Context, fingerprint string, userID models
 	return enums.Ok, scanSession(row)
 }
 
-func GetSession(db DB, ctx context.Context, fingerprint string, refreshToken string) *models.Session {
+func GetSession(db DB, ctx context.Context, fingerprint string, refreshToken string, userID models.UserID) *models.Session {
 	sql := getSessionsSQL()
-	row := db.QueryRow(ctx, sql, refreshToken, fingerprint, 1)
+	row := db.QueryRow(ctx, sql, refreshToken, fingerprint, userID, 1)
 	return scanSession(row)
 }

@@ -483,17 +483,17 @@ func (mr *MockStoreInterfaceMockRecorder) CreateSession(ctx, fingerprint, userID
 }
 
 // GetSession mocks base method
-func (m *MockStoreInterface) GetSession(ctx context.Context, fingerprint, refreshToken string) *models.Session {
+func (m *MockStoreInterface) GetSession(ctx context.Context, fingerprint, refreshToken string, userID models.UserID) *models.Session {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSession", ctx, fingerprint, refreshToken)
+	ret := m.ctrl.Call(m, "GetSession", ctx, fingerprint, refreshToken, userID)
 	ret0, _ := ret[0].(*models.Session)
 	return ret0
 }
 
 // GetSession indicates an expected call of GetSession
-func (mr *MockStoreInterfaceMockRecorder) GetSession(ctx, fingerprint, refreshToken interface{}) *gomock.Call {
+func (mr *MockStoreInterfaceMockRecorder) GetSession(ctx, fingerprint, refreshToken, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSession", reflect.TypeOf((*MockStoreInterface)(nil).GetSession), ctx, fingerprint, refreshToken)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSession", reflect.TypeOf((*MockStoreInterface)(nil).GetSession), ctx, fingerprint, refreshToken, userID)
 }
 
 // MockESBInterface is a mock of ESBInterface interface

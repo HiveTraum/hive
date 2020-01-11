@@ -86,9 +86,15 @@ func (controller *LoginController) NormalizePhone(_ context.Context, phone strin
 
 func (controller *LoginController) DecodeAccessToken(_ context.Context, tokenValue string, secret string) (int, *models.AccessTokenPayload) {
 
-	token, err := jwt.ParseWithClaims(tokenValue, &models.AccessTokenPayload{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(secret), nil
-	})
+	var keyFunc jwt.Keyfunc
+
+	if secret != "" {
+		keyFunc = func(token *jwt.Token) (interface{}, error) {
+			return []byte(secret), nil
+		}
+	}
+
+	token, err := jwt.ParseWithClaims(tokenValue, &models.AccessTokenPayload{}, keyFunc)
 
 	if err != nil {
 		sentry.CaptureException(err)
@@ -128,7 +134,12 @@ func (controller *LoginController) EncodeAccessToken(_ context.Context, userID m
 
 func (controller *LoginController) LoginByTokens(ctx context.Context, refreshToken string, accessToken string, fingerprint string) (int, *models.User) {
 
-	session := controller.Store.GetSession(ctx, fingerprint, refreshToken)
+	status, unverifiedPayload := controller.DecodeAccessToken(ctx, accessToken, "")
+	if status != enums.Ok {
+		return status, nil
+	}
+
+	session := controller.Store.GetSession(ctx, fingerprint, refreshToken, unverifiedPayload.UserID)
 	if session == nil {
 		return enums.SessionNotFound, nil
 	}

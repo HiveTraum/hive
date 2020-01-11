@@ -70,7 +70,7 @@ type StoreInterface interface {
 	// Sessions
 
 	CreateSession(ctx context.Context, fingerprint string, userID models.UserID, secretID models.SecretID, userAgent string) (int, *models.Session)
-	GetSession(ctx context.Context, fingerprint string, refreshToken string) *models.Session
+	GetSession(ctx context.Context, fingerprint string, refreshToken string, userID models.UserID) *models.Session
 }
 
 type ESBInterface interface {

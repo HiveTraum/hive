@@ -63,7 +63,7 @@ CREATE TABLE users_view
 
 CREATE TABLE secrets
 (
-    id      BIGINT PRIMARY KEY,
+    id      BIGSERIAL PRIMARY KEY,
     created BIGINT DEFAULT extract(epoch from now()) * 1000,
     value   UUID   DEFAULT uuid_generate_v4()
 );
@@ -74,7 +74,7 @@ CREATE TABLE sessions
     fingerprint   VARCHAR(200),
     user_id       BIGINT,
     secret_id     BIGINT,
-    created    BIGINT DEFAULT extract(epoch from now()) * 1000,
+    created       BIGINT DEFAULT extract(epoch from now()) * 1000,
     user_agent    TEXT,
     FOREIGN KEY (user_id) REFERENCES users,
     FOREIGN KEY (secret_id) REFERENCES secrets

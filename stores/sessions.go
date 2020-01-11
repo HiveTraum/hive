@@ -10,6 +10,6 @@ func (store *DatabaseStore) CreateSession(ctx context.Context, fingerprint strin
 	return repositories.CreateSession(store.Db, ctx, fingerprint, userID, secretID, userAgent)
 }
 
-func (store *DatabaseStore) GetSession(ctx context.Context, fingerprint string, refreshToken string) *models.Session {
-	return repositories.GetSession(store.Db, ctx, fingerprint, refreshToken)
+func (store *DatabaseStore) GetSession(ctx context.Context, fingerprint string, refreshToken string, userID models.UserID) *models.Session {
+	return repositories.GetSession(store.Db, ctx, fingerprint, refreshToken, userID)
 }
