@@ -17,19 +17,12 @@ func createPasswordSQL() string {
 			RETURNING id, created, user_id, value;`
 }
 
-func getPasswordSQL() string {
+func getPasswordsSQL() string {
 	return `SELECT id, created, user_id, value 
 			FROM passwords 
 			WHERE user_id = $1 
-			LIMIT $2;`
-}
-
-func getLatestPasswordSQL() string {
-	return `SELECT id, created, user_id, value
-			FROM passwords
-			WHERE user_id = $1
 			ORDER BY id DESC
-			LIMIT 1;`
+			LIMIT $2;`
 }
 
 func unwrapPasswordScanErrors(err error) int {
@@ -76,7 +69,7 @@ func CreatePassword(db DB, ctx context.Context, userId models.UserID, value stri
 }
 
 func GetPasswords(db DB, ctx context.Context, userId models.UserID) []*models.Password {
-	sql := getPasswordSQL()
+	sql := getPasswordsSQL()
 	limit := 10
 	rows, err := db.Query(ctx, sql, userId, limit)
 	if err != nil {
@@ -88,7 +81,7 @@ func GetPasswords(db DB, ctx context.Context, userId models.UserID) []*models.Pa
 }
 
 func GetLatestPassword(db DB, ctx context.Context, userId models.UserID) (int, *models.Password) {
-	sql := getLatestPasswordSQL()
-	row := db.QueryRow(ctx, sql, userId)
+	sql := getPasswordsSQL()
+	row := db.QueryRow(ctx, sql, userId, 1)
 	return scanPassword(row)
 }
