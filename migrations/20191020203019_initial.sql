@@ -92,6 +92,7 @@ CREATE INDEX user_views_role_id_idx on users_view USING GIN (role_id);
 CREATE INDEX user_views_phones_idx on users_view USING GIN (phones);
 CREATE INDEX sessions_fingerprint_idx on sessions (fingerprint);
 CREATE INDEX sessions_refresh_token_idx on sessions (refresh_token);
+CREATE UNIQUE INDEX user_roles_idx ON user_roles (user_id, role_id);
 -- +goose StatementEnd
 
 -- +goose Down

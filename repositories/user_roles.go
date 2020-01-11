@@ -2,8 +2,8 @@ package repositories
 
 import (
 	"auth/enums"
-	"auth/functools"
 	"auth/models"
+	"auth/modelsFunctools"
 	"context"
 	"errors"
 	"github.com/getsentry/sentry-go"
@@ -46,6 +46,8 @@ func unwrapUserRoleScanError(err error) int {
 			return enums.RoleNotFound
 		} else if strings.Contains(e.Message, "violates unique constraint \"user_roles_pkey\"") {
 			return enums.UserRoleAlreadyExist
+		} else if strings.Contains(e.Message, "duplicate key value violates unique constraint \"user_roles_idx\"") {
+			return enums.UserRoleAlreadyExist
 		}
 	} else if strings.Contains(err.Error(), "no rows in result") {
 		return enums.UserRoleNotFound
@@ -84,8 +86,8 @@ func scanUserRoles(rows pgx.Rows, limit int) []*models.UserRole {
 }
 
 type GetUserRoleQuery struct {
-	UserId []int64
-	RoleId []int64
+	UserId []models.UserID
+	RoleId []models.RoleID
 	Limit  int
 }
 
@@ -98,8 +100,8 @@ type getUserRoleRawQuery struct {
 func convertGetUserRoleQueryToRaw(query GetUserRoleQuery) getUserRoleRawQuery {
 	return getUserRoleRawQuery{
 		Limit:  query.Limit,
-		UserId: functools.Int64ListToPGArray(query.UserId),
-		RoleId: functools.Int64ListToPGArray(query.RoleId),
+		UserId: modelsFunctools.UserIDListToPGArray(query.UserId),
+		RoleId: modelsFunctools.RoleIDListToPGArray(query.RoleId),
 	}
 }
 
