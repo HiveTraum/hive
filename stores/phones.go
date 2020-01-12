@@ -4,7 +4,6 @@ import (
 	"auth/models"
 	"auth/repositories"
 	"context"
-	"github.com/getsentry/sentry-go"
 	"time"
 )
 
@@ -21,11 +20,5 @@ func (store *DatabaseStore) CreatePhoneConfirmationCode(ctx context.Context, pho
 }
 
 func (store *DatabaseStore) GetPhoneConfirmationCode(ctx context.Context, phone string) string {
-	code, err := repositories.GetPhoneConfirmationCode(store.Cache, ctx, phone)
-
-	if err != nil {
-		sentry.CaptureException(err)
-	}
-
-	return code
+	return repositories.GetPhoneConfirmationCode(store.Cache, ctx, phone)
 }

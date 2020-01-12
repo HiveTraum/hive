@@ -21,7 +21,9 @@ func createEmailSQL() string {
 }
 
 func getEmailSQL() string {
-	return `SELECT id, created, user_id, value FROM emails WHERE value = $1;`
+	return `SELECT id, created, user_id, value 
+			FROM emails 
+			WHERE value = $1;`
 }
 
 func unwrapEmailScanError(err error) int {
