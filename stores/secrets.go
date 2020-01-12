@@ -5,6 +5,7 @@ import (
 	"auth/models"
 	"auth/repositories"
 	"context"
+	"github.com/getsentry/sentry-go"
 	"time"
 )
 
@@ -16,7 +17,10 @@ func (store *DatabaseStore) GetSecret(ctx context.Context, id models.SecretID) *
 	}
 
 	secret = repositories.GetSecretFromDB(store.Db, ctx, id)
-	repositories.CacheSecret(store.Cache, ctx, secret, time.Hour*48)
+	err := repositories.CacheSecret(store.Cache, ctx, secret, time.Hour*48)
+	if err != nil {
+		sentry.CaptureException(err)
+	}
 	return secret
 }
 
@@ -31,7 +35,13 @@ func (store *DatabaseStore) GetActualSecret(ctx context.Context) *models.Secret 
 	}
 
 	actualSecret = repositories.CreateSecret(store.Db, ctx)
-	repositories.CacheActualSecret(store.Cache, ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
-	repositories.CacheSecret(store.Cache, ctx, actualSecret, time.Hour*time.Duration(env.RefreshTokenLifetime)*24)
+	err := repositories.CacheActualSecret(store.Cache, ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
+	if err != nil {
+		sentry.CaptureException(err)
+	}
+	err = repositories.CacheSecret(store.Cache, ctx, actualSecret, time.Hour*time.Duration(env.RefreshTokenLifetime)*24)
+	if err != nil {
+		sentry.CaptureException(err)
+	}
 	return actualSecret
 }

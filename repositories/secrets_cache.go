@@ -19,7 +19,7 @@ func getSecretKey(id models.SecretID) string {
 	return fmt.Sprintf("%s:%d", enums.Secret, id)
 }
 
-func cacheSecret(cache *redis.Client, span opentracing.Span, secret *models.Secret, key string, timeout time.Duration) {
+func cacheSecret(cache *redis.Client, span opentracing.Span, secret *models.Secret, key string, timeout time.Duration) error {
 	secretCache := &inout.SecretCache{
 		Id:      int64(secret.Id),
 		Created: secret.Created,
@@ -31,10 +31,11 @@ func cacheSecret(cache *redis.Client, span opentracing.Span, secret *models.Secr
 	if err != nil {
 		span.LogFields(log.Error(err))
 		sentry.CaptureException(err)
-		return
+		return nil
 	}
 
-	cache.Set(key, data, timeout)
+	result := cache.Set(key, data, timeout)
+	return result.Err()
 }
 
 func getSecretFromCache(cache *redis.Client, span opentracing.Span, key string) *models.Secret {
@@ -66,18 +67,20 @@ func getSecretFromCache(cache *redis.Client, span opentracing.Span, key string) 
 	}
 }
 
-func CacheActualSecret(cache *redis.Client, ctx context.Context, secret *models.Secret, timeout time.Duration) {
+func CacheActualSecret(cache *redis.Client, ctx context.Context, secret *models.Secret, timeout time.Duration) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "Cache actual secret")
-	cacheSecret(cache, span, secret, enums.ActualSecret, timeout)
+	err := cacheSecret(cache, span, secret, enums.ActualSecret, timeout)
 	span.LogFields(log.String("secret_id", strconv.Itoa(int(secret.Id))))
 	span.Finish()
+	return err
 }
 
-func CacheSecret(cache *redis.Client, ctx context.Context, secret *models.Secret, timeout time.Duration) {
+func CacheSecret(cache *redis.Client, ctx context.Context, secret *models.Secret, timeout time.Duration) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "Cache secret")
-	cacheSecret(cache, span, secret, getSecretKey(secret.Id), timeout)
+	err := cacheSecret(cache, span, secret, getSecretKey(secret.Id), timeout)
 	span.LogFields(log.String("secret_id", strconv.Itoa(int(secret.Id))))
 	span.Finish()
+	return err
 }
 
 func GetActualSecret(cache *redis.Client, ctx context.Context) *models.Secret {
