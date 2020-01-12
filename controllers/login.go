@@ -53,7 +53,6 @@ func (controller *LoginController) VerifyPassword(ctx context.Context, password 
 	}
 
 	return true
-
 }
 
 // Input Normalization
@@ -177,7 +176,12 @@ func (controller *LoginController) LoginByTokens(ctx context.Context, refreshTok
 		return status, nil
 	}
 
-	return enums.Ok, controller.Store.GetUser(ctx, payload.GetUserID())
+	user := controller.Store.GetUser(ctx, payload.GetUserID())
+	if user == nil {
+		return enums.UserNotFound, nil
+	}
+
+	return enums.Ok, user
 }
 
 func (controller *LoginController) LoginByEmail(ctx context.Context, emailValue string, emailCode string, passwordValue string) (int, *models.User) {
@@ -209,7 +213,12 @@ func (controller *LoginController) LoginByEmail(ctx context.Context, emailValue 
 		return enums.IncorrectPassword, nil
 	}
 
-	return enums.Ok, controller.Store.GetUser(ctx, email.UserId)
+	user := controller.Store.GetUser(ctx, email.UserId)
+	if user == nil {
+		return enums.UserNotFound, nil
+	}
+
+	return enums.Ok, user
 }
 
 func (controller *LoginController) LoginByPhone(ctx context.Context, phoneValue string, phoneCode string, passwordValue string) (int, *models.User) {
@@ -240,7 +249,12 @@ func (controller *LoginController) LoginByPhone(ctx context.Context, phoneValue 
 		return enums.IncorrectPassword, nil
 	}
 
-	return enums.Ok, controller.Store.GetUser(ctx, phone.UserId)
+	user := controller.Store.GetUser(ctx, phone.UserId)
+	if user == nil {
+		return enums.UserNotFound, nil
+	}
+
+	return enums.Ok, user
 }
 
 func (controller *LoginController) Login(ctx context.Context, credentials inout.CreateSessionRequestV1) (int, *models.User) {
@@ -259,10 +273,6 @@ func (controller *LoginController) Login(ctx context.Context, credentials inout.
 		break
 	default:
 		return enums.CredentialsNotProvided, nil
-	}
-
-	if user == nil {
-		return enums.UserNotFound, nil
 	}
 
 	return status, user
