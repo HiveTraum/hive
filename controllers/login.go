@@ -202,10 +202,16 @@ func (controller *LoginController) LoginByEmail(ctx context.Context, emailValue 
 	if status != enums.Ok {
 		return status, nil
 	}
+	if email == nil {
+		return enums.EmailNotFound, nil
+	}
 
 	status, password := controller.Store.GetLatestPassword(ctx, email.UserId)
 	if status != enums.Ok {
 		return status, nil
+	}
+	if password == nil {
+		return enums.PasswordNotFound, nil
 	}
 
 	passwordVerified := controller.VerifyPassword(ctx, passwordValue, password.Value)

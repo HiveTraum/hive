@@ -331,3 +331,288 @@ func TestLoginController_LoginByTokensWithoutUser(t *testing.T) {
 	require.Equal(t, enums.UserNotFound, status)
 	require.Nil(t, user)
 }
+
+func TestLoginController_LoginByEmail(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	_, store, _, _ := mocks.InitMockApp(ctrl)
+	controller := LoginController{Store: store}
+
+	password := "123"
+	encodedPassword := controller.EncodePassword(ctx, password)
+	email := "mail@mail.com"
+	emailCode := "1234"
+	userID := models.UserID(1)
+
+	store.
+		EXPECT().
+		GetEmailConfirmationCode(ctx, email).
+		Times(1).
+		Return(emailCode)
+
+	store.
+		EXPECT().
+		GetEmail(ctx, email).
+		Times(1).
+		Return(enums.Ok, &models.Email{
+			Id:      models.EmailID(1),
+			Created: 1,
+			UserId:  userID,
+			Value:   email,
+		})
+
+	store.
+		EXPECT().
+		GetLatestPassword(ctx, userID).
+		Times(1).
+		Return(enums.Ok, &models.Password{
+			Id:      models.PasswordID(1),
+			Created: 1,
+			UserId:  userID,
+			Value:   encodedPassword,
+		})
+
+	store.
+		EXPECT().
+		GetUser(ctx, userID).
+		Times(1).
+		Return(&models.User{
+			Id:      userID,
+			Created: 1,
+		})
+
+	status, user := controller.LoginByEmail(ctx, email, emailCode, password)
+	require.Equal(t, enums.Ok, status)
+	require.NotNil(t, user)
+}
+
+func TestLoginController_LoginByEmailWithIncorrectEmail(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	controller := LoginController{Store: nil}
+
+	password := "123"
+	email := "mail"
+	emailCode := "1234"
+
+	status, user := controller.LoginByEmail(ctx, email, emailCode, password)
+	require.Equal(t, enums.IncorrectEmail, status)
+	require.Nil(t, user)
+}
+
+func TestLoginController_LoginByEmailWithoutEmailConfirmationCode(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	_, store, _, _ := mocks.InitMockApp(ctrl)
+	controller := LoginController{Store: store}
+
+	password := "123"
+	email := "mail@mail.com"
+	emailCode := "1234"
+
+	store.
+		EXPECT().
+		GetEmailConfirmationCode(ctx, email).
+		Times(1).
+		Return("")
+
+	status, user := controller.LoginByEmail(ctx, email, emailCode, password)
+	require.Equal(t, enums.EmailConfirmationCodeNotFound, status)
+	require.Nil(t, user)
+}
+
+func TestLoginController_LoginByEmailWithIncorrectEmailConfirmationCode(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	_, store, _, _ := mocks.InitMockApp(ctrl)
+	controller := LoginController{Store: store}
+
+	password := "123"
+	email := "mail@mail.com"
+
+	store.
+		EXPECT().
+		GetEmailConfirmationCode(ctx, email).
+		Times(1).
+		Return("4321")
+
+	status, user := controller.LoginByEmail(ctx, email, "1234", password)
+	require.Equal(t, enums.IncorrectEmailCode, status)
+	require.Nil(t, user)
+}
+
+func TestLoginController_LoginByEmailWithoutEmail(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	_, store, _, _ := mocks.InitMockApp(ctrl)
+	controller := LoginController{Store: store}
+
+	password := "123"
+	email := "mail@mail.com"
+	emailCode := "1234"
+
+	store.
+		EXPECT().
+		GetEmailConfirmationCode(ctx, email).
+		Times(1).
+		Return(emailCode)
+
+	store.
+		EXPECT().
+		GetEmail(ctx, email).
+		Times(1).
+		Return(enums.Ok, nil)
+
+	status, user := controller.LoginByEmail(ctx, email, emailCode, password)
+	require.Equal(t, enums.EmailNotFound, status)
+	require.Nil(t, user)
+}
+
+func TestLoginController_LoginByEmailWithoutPassword(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	_, store, _, _ := mocks.InitMockApp(ctrl)
+	controller := LoginController{Store: store}
+
+	password := "123"
+	email := "mail@mail.com"
+	emailCode := "1234"
+	userID := models.UserID(1)
+
+	store.
+		EXPECT().
+		GetEmailConfirmationCode(ctx, email).
+		Times(1).
+		Return(emailCode)
+
+	store.
+		EXPECT().
+		GetEmail(ctx, email).
+		Times(1).
+		Return(enums.Ok, &models.Email{
+			Id:      models.EmailID(1),
+			Created: 1,
+			UserId:  userID,
+			Value:   email,
+		})
+
+	store.
+		EXPECT().
+		GetLatestPassword(ctx, userID).
+		Times(1).
+		Return(enums.Ok, nil)
+
+	status, user := controller.LoginByEmail(ctx, email, emailCode, password)
+	require.Equal(t, enums.PasswordNotFound, status)
+	require.Nil(t, user)
+}
+
+func TestLoginController_LoginByEmailWithIncorrectPassword(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	_, store, _, _ := mocks.InitMockApp(ctrl)
+	controller := LoginController{Store: store}
+
+	password := "123"
+	encodedPassword := controller.EncodePassword(ctx, "321")
+	email := "mail@mail.com"
+	emailCode := "1234"
+	userID := models.UserID(1)
+
+	store.
+		EXPECT().
+		GetEmailConfirmationCode(ctx, email).
+		Times(1).
+		Return(emailCode)
+
+	store.
+		EXPECT().
+		GetEmail(ctx, email).
+		Times(1).
+		Return(enums.Ok, &models.Email{
+			Id:      models.EmailID(1),
+			Created: 1,
+			UserId:  userID,
+			Value:   email,
+		})
+
+	store.
+		EXPECT().
+		GetLatestPassword(ctx, userID).
+		Times(1).
+		Return(enums.Ok, &models.Password{
+			Id:      models.PasswordID(1),
+			Created: 1,
+			UserId:  userID,
+			Value:   encodedPassword,
+		})
+
+	status, user := controller.LoginByEmail(ctx, email, emailCode, password)
+	require.Equal(t, enums.IncorrectPassword, status)
+	require.Nil(t, user)
+}
+
+func TestLoginController_LoginByEmailWithoutUser(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	_, store, _, _ := mocks.InitMockApp(ctrl)
+	controller := LoginController{Store: store}
+
+	password := "123"
+	encodedPassword := controller.EncodePassword(ctx, password)
+	email := "mail@mail.com"
+	emailCode := "1234"
+	userID := models.UserID(1)
+
+	store.
+		EXPECT().
+		GetEmailConfirmationCode(ctx, email).
+		Times(1).
+		Return(emailCode)
+
+	store.
+		EXPECT().
+		GetEmail(ctx, email).
+		Times(1).
+		Return(enums.Ok, &models.Email{
+			Id:      models.EmailID(1),
+			Created: 1,
+			UserId:  userID,
+			Value:   email,
+		})
+
+	store.
+		EXPECT().
+		GetLatestPassword(ctx, userID).
+		Times(1).
+		Return(enums.Ok, &models.Password{
+			Id:      models.PasswordID(1),
+			Created: 1,
+			UserId:  userID,
+			Value:   encodedPassword,
+		})
+
+	store.
+		EXPECT().
+		GetUser(ctx, userID).
+		Times(1).
+		Return(nil)
+
+	status, user := controller.LoginByEmail(ctx, email, emailCode, password)
+	require.Equal(t, enums.UserNotFound, status)
+	require.Nil(t, user)
+}

@@ -29,31 +29,32 @@ const (
 
 	PasswordRequired // 12
 	IncorrectPassword // 13
+	PasswordNotFound // 14
 
 	// Roles
 
-	RoleAlreadyExist // 14
-	RoleNotFound // 15
+	RoleAlreadyExist // 15
+	RoleNotFound // 16
 
 	// User Roles
 
-	UserRoleAlreadyExist // 16
-	UserRoleNotFound // 17
+	UserRoleAlreadyExist // 17
+	UserRoleNotFound // 18
 
 	// Sessions
 
-	SessionNotFound // 18
+	SessionNotFound // 19
 
 	// Secrets
 
-	SecretNotFound // 19
+	SecretNotFound // 20
 
 	// Tokens
 
-	IncorrectToken // 20
-	InvalidToken   // 21
+	IncorrectToken // 21
+	InvalidToken   // 22
 
 	// Credentials
 
-	CredentialsNotProvided // 20
+	CredentialsNotProvided // 23
 )
