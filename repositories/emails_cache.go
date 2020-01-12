@@ -15,7 +15,14 @@ func getEmailConfirmationCodeKey(email string) string {
 
 func CreateEmailConfirmationCode(cache *redis.Client, email string, code string, duration time.Duration) *models.EmailConfirmation {
 	key := getEmailConfirmationCodeKey(email)
-	cache.Set(key, code, duration)
+	cmd := cache.Set(key, code, duration)
+	err := cmd.Err()
+
+	if err != nil {
+		sentry.CaptureException(err)
+		return nil
+	}
+
 	created := time.Now()
 	return &models.EmailConfirmation{
 		Created: created.Unix(),
@@ -25,14 +32,17 @@ func CreateEmailConfirmationCode(cache *redis.Client, email string, code string,
 	}
 }
 
-func GetEmailConfirmationCode(cache *redis.Client, email string) (string, error) {
+func GetEmailConfirmationCode(cache *redis.Client, email string) string {
 	key := getEmailConfirmationCodeKey(email)
 	code, err := cache.Get(key).Result()
 
 	if err != nil {
-		sentry.CaptureException(err)
-		return "", err
+		if err != redis.Nil {
+			sentry.CaptureException(err)
+		}
+
+		return ""
 	}
 
-	return code, nil
+	return code
 }

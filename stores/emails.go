@@ -4,7 +4,6 @@ import (
 	"auth/models"
 	"auth/repositories"
 	"context"
-	"github.com/getsentry/sentry-go"
 	"time"
 )
 
@@ -21,11 +20,5 @@ func (store *DatabaseStore) CreateEmailConfirmationCode(_ context.Context, email
 }
 
 func (store *DatabaseStore) GetEmailConfirmationCode(_ context.Context, email string) string {
-	code, err := repositories.GetEmailConfirmationCode(store.Cache, email)
-
-	if err != nil {
-		sentry.CaptureException(err)
-	}
-
-	return code
+	return repositories.GetEmailConfirmationCode(store.Cache, email)
 }
