@@ -4,55 +4,56 @@ const (
 	// Common
 
 	Ok = iota
-	NotOk
-	MinimumOneFieldRequired
+	NotOk // 1
+	MinimumOneFieldRequired // 2
 
 	// Users
 
-	UserNotFound
+	UserNotFound // 3
 
 	// Phones
 
-	IncorrectPhoneCode
-	IncorrectPhone
-	PhoneNotFound
-	PhoneConfirmationCodeNotFound
+	IncorrectPhoneCode // 4
+	IncorrectPhone // 5
+	PhoneNotFound // 6
+	PhoneConfirmationCodeNotFound // 7
 
 	// Emails
 
-	IncorrectEmailCode
-	IncorrectEmail
-	EmailNotFound
-	EmailConfirmationCodeNotFound
+	IncorrectEmailCode // 8
+	IncorrectEmail // 9
+	EmailNotFound // 10
+	EmailConfirmationCodeNotFound // 11
 
 	// Passwords
 
-	PasswordRequired
-	IncorrectPassword
+	PasswordRequired // 12
+	IncorrectPassword // 13
 
 	// Roles
 
-	RoleAlreadyExist
-	RoleNotFound
+	RoleAlreadyExist // 14
+	RoleNotFound // 15
 
 	// User Roles
 
-	UserRoleAlreadyExist
-	UserRoleNotFound
+	UserRoleAlreadyExist // 16
+	UserRoleNotFound // 17
 
 	// Sessions
 
-	SessionNotFound
+	SessionNotFound // 18
 
 	// Secrets
 
-	SecretNotFound
+	SecretNotFound // 19
 
 	// Tokens
 
-	IncorrectToken
+	IncorrectToken // 20
+	InvalidToken   // 21
 
 	// Credentials
 
-	CredentialsNotProvided
+	CredentialsNotProvided // 20
 )

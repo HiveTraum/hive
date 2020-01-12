@@ -8,6 +8,7 @@ import (
 	"auth/inout"
 	"auth/models"
 	"context"
+	"errors"
 	"github.com/badoux/checkmail"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/getsentry/sentry-go"
@@ -15,6 +16,7 @@ import (
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
 	"golang.org/x/crypto/bcrypt"
+	"strings"
 	"time"
 )
 
@@ -84,38 +86,14 @@ func (controller *LoginController) NormalizePhone(_ context.Context, phone strin
 
 // Access Token
 
-func (controller *LoginController) DecodeAccessToken(_ context.Context, tokenValue string, secret string) (int, *models.AccessTokenPayload) {
-
-	var keyFunc jwt.Keyfunc
-
-	if secret != "" {
-		keyFunc = func(token *jwt.Token) (interface{}, error) {
-			return []byte(secret), nil
-		}
-	}
-
-	token, err := jwt.ParseWithClaims(tokenValue, &models.AccessTokenPayload{}, keyFunc)
-
-	if err != nil {
-		sentry.CaptureException(err)
-		return enums.IncorrectToken, nil
-	}
-
-	if claims, ok := token.Claims.(*models.AccessTokenPayload); ok && token.Valid {
-		return enums.Ok, claims
-	} else {
-		return enums.IncorrectToken, nil
-	}
-}
-
-func (controller *LoginController) EncodeAccessToken(_ context.Context, userID models.UserID, roles []string, secret string) string {
+func (controller *LoginController) EncodeAccessToken(_ context.Context, userID models.UserID, roles []string, secret string, expires time.Time) string {
 
 	claims := models.AccessTokenPayload{
 		UserID:  userID,
 		Roles:   roles,
 		IsAdmin: functools.Contains(config.AdminRole, roles),
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
+			ExpiresAt: expires.Unix(),
 			NotBefore: time.Now().Unix(),
 		},
 	}
@@ -130,11 +108,56 @@ func (controller *LoginController) EncodeAccessToken(_ context.Context, userID m
 	return ss
 }
 
+func (controller *LoginController) DecodeAccessTokenWithoutValidation(_ context.Context, tokenValue string) (int, *models.AccessTokenPayload) {
+	parser := jwt.Parser{
+		SkipClaimsValidation: false,
+	}
+
+	token, _, err := parser.ParseUnverified(tokenValue, &models.AccessTokenPayload{})
+
+	if err != nil {
+		sentry.CaptureException(err)
+		return enums.IncorrectToken, nil
+	}
+
+	if claims, ok := token.Claims.(*models.AccessTokenPayload); ok {
+		return enums.Ok, claims
+	} else {
+		return enums.IncorrectToken, nil
+	}
+}
+
+func (controller *LoginController) DecodeAccessToken(_ context.Context, tokenValue string, secret string) (int, *models.AccessTokenPayload) {
+
+	token, err := jwt.ParseWithClaims(tokenValue, &models.AccessTokenPayload{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
+	})
+
+	var e *jwt.ValidationError
+
+	if err != nil {
+		if errors.As(err, &e) && strings.Contains(e.Error(), "expired") {
+			return enums.InvalidToken, nil
+		} else {
+			sentry.CaptureException(err)
+			return enums.IncorrectToken, nil
+		}
+	}
+
+	if !token.Valid {
+		return enums.InvalidToken, nil
+	} else if claims, ok := token.Claims.(*models.AccessTokenPayload); ok {
+		return enums.Ok, claims
+	} else {
+		return enums.IncorrectToken, nil
+	}
+}
+
 // Login
 
 func (controller *LoginController) LoginByTokens(ctx context.Context, refreshToken string, accessToken string, fingerprint string) (int, *models.User) {
 
-	status, unverifiedPayload := controller.DecodeAccessToken(ctx, accessToken, "")
+	status, unverifiedPayload := controller.DecodeAccessTokenWithoutValidation(ctx, accessToken)
 	if status != enums.Ok {
 		return status, nil
 	}

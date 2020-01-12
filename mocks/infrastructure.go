@@ -776,18 +776,33 @@ func (mr *MockLoginControllerInterfaceMockRecorder) DecodeAccessToken(ctx, token
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecodeAccessToken", reflect.TypeOf((*MockLoginControllerInterface)(nil).DecodeAccessToken), ctx, token, secret)
 }
 
-// EncodeAccessToken mocks base method
-func (m *MockLoginControllerInterface) EncodeAccessToken(ctx context.Context, userID models.UserID, roles []string, secret string) string {
+// DecodeAccessTokenWithoutValidation mocks base method
+func (m *MockLoginControllerInterface) DecodeAccessTokenWithoutValidation(ctx context.Context, tokenValue string) (int, *models.AccessTokenPayload) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EncodeAccessToken", ctx, userID, roles, secret)
+	ret := m.ctrl.Call(m, "DecodeAccessTokenWithoutValidation", ctx, tokenValue)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(*models.AccessTokenPayload)
+	return ret0, ret1
+}
+
+// DecodeAccessTokenWithoutValidation indicates an expected call of DecodeAccessTokenWithoutValidation
+func (mr *MockLoginControllerInterfaceMockRecorder) DecodeAccessTokenWithoutValidation(ctx, tokenValue interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecodeAccessTokenWithoutValidation", reflect.TypeOf((*MockLoginControllerInterface)(nil).DecodeAccessTokenWithoutValidation), ctx, tokenValue)
+}
+
+// EncodeAccessToken mocks base method
+func (m *MockLoginControllerInterface) EncodeAccessToken(ctx context.Context, userID models.UserID, roles []string, secret string, expire time.Time) string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EncodeAccessToken", ctx, userID, roles, secret, expire)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
 // EncodeAccessToken indicates an expected call of EncodeAccessToken
-func (mr *MockLoginControllerInterfaceMockRecorder) EncodeAccessToken(ctx, userID, roles, secret interface{}) *gomock.Call {
+func (mr *MockLoginControllerInterfaceMockRecorder) EncodeAccessToken(ctx, userID, roles, secret, expire interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncodeAccessToken", reflect.TypeOf((*MockLoginControllerInterface)(nil).EncodeAccessToken), ctx, userID, roles, secret)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncodeAccessToken", reflect.TypeOf((*MockLoginControllerInterface)(nil).EncodeAccessToken), ctx, userID, roles, secret, expire)
 }
 
 // EncodePassword mocks base method

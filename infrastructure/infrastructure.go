@@ -99,7 +99,8 @@ type LoginControllerInterface interface {
 	NormalizeEmail(ctx context.Context, email string) string
 
 	DecodeAccessToken(ctx context.Context, token string, secret string) (int, *models.AccessTokenPayload)
-	EncodeAccessToken(ctx context.Context, userID models.UserID, roles []string, secret string) string
+	DecodeAccessTokenWithoutValidation(ctx context.Context, tokenValue string) (int, *models.AccessTokenPayload)
+	EncodeAccessToken(ctx context.Context, userID models.UserID, roles []string, secret string, expire time.Time) string
 
 	EncodePassword(context.Context, string) string
 	VerifyPassword(ctx context.Context, password string, encodedPassword string) bool
