@@ -11,6 +11,7 @@ import (
 
 type Request struct {
 	*http.Request
+	Response http.ResponseWriter
 }
 
 const (

@@ -29,6 +29,7 @@ func ResponseControllerMiddleware(next ResponseControllerHandler) http.HandlerFu
 
 		request := &functools.Request{
 			Request: r,
+			Response: w,
 		}
 
 		status, data := next(request)

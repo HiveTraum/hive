@@ -7,4 +7,5 @@ type Session struct {
 	SecretID     SecretID
 	Created      int64
 	UserAgent    string
+	AccessToken  string
 }
