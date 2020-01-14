@@ -175,24 +175,45 @@ message ListUserResponseV1 {
 
 // Sessions API
 
+
 message CreateSessionRequestV1 {
 
-    enum CredentialsType {
-        Email = 0;
-        Phone = 1;
-        Token = 2;
+    string fingerprint = 1;
+    string userAgent = 2;
+
+
+    oneof data {
+        PhoneAndPassword phoneAndPassword = 3;
+        PhoneAndCode phoneAndCode = 4;
+        EmailAndPassword emailAndPassword = 5;
+        EmailAndCode emailAndCode = 6;
+        Tokens tokens = 7;
     }
 
-    CredentialsType type = 1;
-    string email = 2;
-    string emailCode = 3;
-    string phone = 4;
-    string phoneCode = 5;
-    string password = 6;
-    string fingerprint = 7;
-    string userAgent = 8;
-    string accessToken = 9;
-    string refreshToken = 10;
+    message PhoneAndPassword {
+        string phone = 1;
+        string password = 2;
+    }
+
+    message PhoneAndCode {
+        string phone = 1;
+        string code = 2;
+    }
+
+    message EmailAndPassword {
+        string email = 1;
+        string password = 2;
+    }
+
+    message EmailAndCode {
+        string email = 1;
+        string code = 2;
+    }
+
+    message Tokens {
+        string accessToken = 1;
+        string refreshToken = 2;
+    }
 }
 
 message CreateSessionBadRequestResponseV1 {

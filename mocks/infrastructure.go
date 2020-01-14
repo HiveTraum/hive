@@ -703,34 +703,64 @@ func (mr *MockLoginControllerInterfaceMockRecorder) LoginByTokens(ctx, refreshTo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByTokens", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByTokens), ctx, refreshToken, accessToken, fingerprint)
 }
 
-// LoginByEmail mocks base method
-func (m *MockLoginControllerInterface) LoginByEmail(ctx context.Context, email, emailCode, password string) (int, *models.User) {
+// LoginByEmailAndCode mocks base method
+func (m *MockLoginControllerInterface) LoginByEmailAndCode(ctx context.Context, email, emailCode string) (int, *models.User) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LoginByEmail", ctx, email, emailCode, password)
+	ret := m.ctrl.Call(m, "LoginByEmailAndCode", ctx, email, emailCode)
 	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(*models.User)
 	return ret0, ret1
 }
 
-// LoginByEmail indicates an expected call of LoginByEmail
-func (mr *MockLoginControllerInterfaceMockRecorder) LoginByEmail(ctx, email, emailCode, password interface{}) *gomock.Call {
+// LoginByEmailAndCode indicates an expected call of LoginByEmailAndCode
+func (mr *MockLoginControllerInterfaceMockRecorder) LoginByEmailAndCode(ctx, email, emailCode interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByEmail", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByEmail), ctx, email, emailCode, password)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByEmailAndCode", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByEmailAndCode), ctx, email, emailCode)
 }
 
-// LoginByPhone mocks base method
-func (m *MockLoginControllerInterface) LoginByPhone(ctx context.Context, phone, phoneCode, password string) (int, *models.User) {
+// LoginByEmailAndPassword mocks base method
+func (m *MockLoginControllerInterface) LoginByEmailAndPassword(ctx context.Context, email, password string) (int, *models.User) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LoginByPhone", ctx, phone, phoneCode, password)
+	ret := m.ctrl.Call(m, "LoginByEmailAndPassword", ctx, email, password)
 	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(*models.User)
 	return ret0, ret1
 }
 
-// LoginByPhone indicates an expected call of LoginByPhone
-func (mr *MockLoginControllerInterfaceMockRecorder) LoginByPhone(ctx, phone, phoneCode, password interface{}) *gomock.Call {
+// LoginByEmailAndPassword indicates an expected call of LoginByEmailAndPassword
+func (mr *MockLoginControllerInterfaceMockRecorder) LoginByEmailAndPassword(ctx, email, password interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByPhone", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByPhone), ctx, phone, phoneCode, password)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByEmailAndPassword", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByEmailAndPassword), ctx, email, password)
+}
+
+// LoginByPhoneAndCode mocks base method
+func (m *MockLoginControllerInterface) LoginByPhoneAndCode(ctx context.Context, phone, phoneCode string) (int, *models.User) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoginByPhoneAndCode", ctx, phone, phoneCode)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(*models.User)
+	return ret0, ret1
+}
+
+// LoginByPhoneAndCode indicates an expected call of LoginByPhoneAndCode
+func (mr *MockLoginControllerInterfaceMockRecorder) LoginByPhoneAndCode(ctx, phone, phoneCode interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByPhoneAndCode", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByPhoneAndCode), ctx, phone, phoneCode)
+}
+
+// LoginByPhoneAndPassword mocks base method
+func (m *MockLoginControllerInterface) LoginByPhoneAndPassword(ctx context.Context, phone, password string) (int, *models.User) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoginByPhoneAndPassword", ctx, phone, password)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(*models.User)
+	return ret0, ret1
+}
+
+// LoginByPhoneAndPassword indicates an expected call of LoginByPhoneAndPassword
+func (mr *MockLoginControllerInterfaceMockRecorder) LoginByPhoneAndPassword(ctx, phone, password interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByPhoneAndPassword", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByPhoneAndPassword), ctx, phone, password)
 }
 
 // NormalizePhone mocks base method

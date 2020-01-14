@@ -92,8 +92,10 @@ type LoginControllerInterface interface {
 	Login(ctx context.Context, credentials inout.CreateSessionRequestV1) (int, *models.User)
 
 	LoginByTokens(ctx context.Context, refreshToken string, accessToken string, fingerprint string) (int, *models.User)
-	LoginByEmail(ctx context.Context, email string, emailCode string, password string) (int, *models.User)
-	LoginByPhone(ctx context.Context, phone string, phoneCode string, password string) (int, *models.User)
+	LoginByEmailAndCode(ctx context.Context, email string, emailCode string) (int, *models.User)
+	LoginByEmailAndPassword(ctx context.Context, email string, password string) (int, *models.User)
+	LoginByPhoneAndCode(ctx context.Context, phone string, phoneCode string) (int, *models.User)
+	LoginByPhoneAndPassword(ctx context.Context, phone string, password string) (int, *models.User)
 
 	NormalizePhone(ctx context.Context, phone string) string
 	NormalizeEmail(ctx context.Context, email string) string

@@ -184,7 +184,7 @@ func (controller *LoginController) LoginByTokens(ctx context.Context, refreshTok
 	return enums.Ok, user
 }
 
-func (controller *LoginController) LoginByEmail(ctx context.Context, emailValue string, emailCode string, passwordValue string) (int, *models.User) {
+func (controller *LoginController) LoginByEmailAndCode(ctx context.Context, emailValue string, emailCode string) (int, *models.User) {
 
 	emailValue = controller.NormalizeEmail(ctx, emailValue)
 	if emailValue == "" {
@@ -196,6 +196,29 @@ func (controller *LoginController) LoginByEmail(ctx context.Context, emailValue 
 		return enums.EmailConfirmationCodeNotFound, nil
 	} else if code != emailCode {
 		return enums.IncorrectEmailCode, nil
+	}
+
+	status, email := controller.Store.GetEmail(ctx, emailValue)
+	if status != enums.Ok {
+		return status, nil
+	}
+	if email == nil {
+		return enums.EmailNotFound, nil
+	}
+
+	user := controller.Store.GetUser(ctx, email.UserId)
+	if user == nil {
+		return enums.UserNotFound, nil
+	}
+
+	return enums.Ok, user
+}
+
+func (controller *LoginController) LoginByEmailAndPassword(ctx context.Context, emailValue string, passwordValue string) (int, *models.User) {
+
+	emailValue = controller.NormalizeEmail(ctx, emailValue)
+	if emailValue == "" {
+		return enums.IncorrectEmail, nil
 	}
 
 	status, email := controller.Store.GetEmail(ctx, emailValue)
@@ -227,7 +250,42 @@ func (controller *LoginController) LoginByEmail(ctx context.Context, emailValue 
 	return enums.Ok, user
 }
 
-func (controller *LoginController) LoginByPhone(ctx context.Context, phoneValue string, phoneCode string, passwordValue string) (int, *models.User) {
+func (controller *LoginController) LoginByPhoneAndPassword(ctx context.Context, phoneValue string, passwordValue string) (int, *models.User) {
+	phoneValue = controller.NormalizePhone(ctx, phoneValue)
+	if phoneValue == "" {
+		return enums.IncorrectPhone, nil
+	}
+
+	status, phone := controller.Store.GetPhone(ctx, phoneValue)
+	if status != enums.Ok {
+		return status, nil
+	}
+	if phone == nil {
+		return enums.PhoneNotFound, nil
+	}
+
+	status, password := controller.Store.GetLatestPassword(ctx, phone.UserId)
+	if status != enums.Ok {
+		return status, nil
+	}
+	if password == nil {
+		return enums.PasswordNotFound, nil
+	}
+
+	passwordVerified := controller.VerifyPassword(ctx, passwordValue, password.Value)
+	if !passwordVerified {
+		return enums.IncorrectPassword, nil
+	}
+
+	user := controller.Store.GetUser(ctx, phone.UserId)
+	if user == nil {
+		return enums.UserNotFound, nil
+	}
+
+	return enums.Ok, user
+}
+
+func (controller *LoginController) LoginByPhoneAndCode(ctx context.Context, phoneValue string, phoneCode string) (int, *models.User) {
 	phoneValue = controller.NormalizePhone(ctx, phoneValue)
 	if phoneValue == "" {
 		return enums.IncorrectPhone, nil
@@ -244,15 +302,8 @@ func (controller *LoginController) LoginByPhone(ctx context.Context, phoneValue 
 	if status != enums.Ok {
 		return status, nil
 	}
-
-	status, password := controller.Store.GetLatestPassword(ctx, phone.UserId)
-	if status != enums.Ok {
-		return status, nil
-	}
-
-	passwordVerified := controller.VerifyPassword(ctx, passwordValue, password.Value)
-	if !passwordVerified {
-		return enums.IncorrectPassword, nil
+	if phone == nil {
+		return enums.PhoneNotFound, nil
 	}
 
 	user := controller.Store.GetUser(ctx, phone.UserId)
@@ -267,16 +318,22 @@ func (controller *LoginController) Login(ctx context.Context, credentials inout.
 	var status int
 	var user *models.User
 
-	switch credentials.Type {
-	case inout.CreateSessionRequestV1_Email:
-		status, user = controller.LoginByEmail(ctx, credentials.Email, credentials.EmailCode, credentials.Password)
-		break
-	case inout.CreateSessionRequestV1_Phone:
-		status, user = controller.LoginByPhone(ctx, credentials.Phone, credentials.PhoneCode, credentials.Password)
-		break
-	case inout.CreateSessionRequestV1_Token:
-		status, user = controller.LoginByTokens(ctx, credentials.RefreshToken, credentials.AccessToken, credentials.Fingerprint)
-		break
+	switch credentials.Data.(type) {
+	case *inout.CreateSessionRequestV1_Tokens_:
+		tokens := credentials.GetTokens()
+		status, user = controller.LoginByTokens(ctx, tokens.RefreshToken, tokens.AccessToken, credentials.Fingerprint)
+	case *inout.CreateSessionRequestV1_EmailAndPassword_:
+		emailAndPassword := credentials.GetEmailAndPassword()
+		status, user = controller.LoginByEmailAndPassword(ctx, emailAndPassword.Email, emailAndPassword.Password)
+	case *inout.CreateSessionRequestV1_EmailAndCode_:
+		emailAndCode := credentials.GetEmailAndCode()
+		status, user = controller.LoginByEmailAndCode(ctx, emailAndCode.Email, emailAndCode.Code)
+	case *inout.CreateSessionRequestV1_PhoneAndPassword_:
+		phoneAndPassword := credentials.GetPhoneAndPassword()
+		status, user = controller.LoginByPhoneAndPassword(ctx, phoneAndPassword.Phone, phoneAndPassword.Password)
+	case *inout.CreateSessionRequestV1_PhoneAndCode_:
+		phoneAndCode := credentials.GetPhoneAndCode()
+		status, user = controller.LoginByPhoneAndPassword(ctx, phoneAndCode.Phone, phoneAndCode.Code)
 	default:
 		return enums.CredentialsNotProvided, nil
 	}

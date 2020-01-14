@@ -24,11 +24,16 @@ func createSessionV1(r *functools.Request, app infrastructure.AppInterface) (int
 		return http.StatusBadRequest, nil
 	}
 
-	cookie, err := r.Cookie(enums.RefreshToken)
-	if err != nil {
-		sentry.CaptureException(err)
-	} else {
-		body.RefreshToken = cookie.Value
+	tokens := body.GetTokens()
+
+	if tokens != nil {
+		cookie, err := r.Cookie(enums.RefreshToken)
+		if err != nil {
+			sentry.CaptureException(err)
+		} else {
+			tokens.RefreshToken = cookie.Value
+			body.Data = &inout.CreateSessionRequestV1_Tokens_{Tokens: tokens}
+		}
 	}
 
 	status, session := controllers.CreateSession(app.GetStore(), app.GetLoginController(), r.Context(), body)
@@ -39,7 +44,7 @@ func createSessionV1(r *functools.Request, app infrastructure.AppInterface) (int
 		http.SetCookie(r.Response, &http.Cookie{
 			Name:     enums.RefreshToken,
 			Value:    session.RefreshToken,
-			Domain:   r.Host,
+			Domain:   r.Referer(),
 			Expires:  time.Now().Add(time.Hour * 24 * time.Duration(env.RefreshTokenLifetime)),
 			Secure:   true,
 			HttpOnly: true,
