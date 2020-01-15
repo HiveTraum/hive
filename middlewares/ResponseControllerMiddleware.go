@@ -6,6 +6,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/protobuf/proto"
 	"net/http"
+	"reflect"
 )
 
 type ResponseControllerHandler func(*functools.Request) (int, proto.Message)
@@ -38,7 +39,7 @@ func ResponseControllerMiddleware(next ResponseControllerHandler) http.HandlerFu
 
 		var bytes []byte
 
-		if data != nil {
+		if data != nil && !reflect.ValueOf(data).IsNil() {
 			if request.IsProto() {
 				bytes, err = proto.Marshal(data)
 			} else {

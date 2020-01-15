@@ -3,24 +3,25 @@ package modelsFunctools
 import (
 	"auth/functools"
 	"auth/models"
+	"strings"
 )
 
-func UserIDListToInt64List(id []models.UserID) []int64 {
-	identifiers := make([]int64, len(id))
+func UserIDListToStringList(id []models.UserID) []string {
+	identifiers := make([]string, len(id))
 
 	for i, v := range id {
-		identifiers[i] = int64(v)
+		identifiers[i] = string(v)
 	}
 
 	return identifiers
 }
 
 func UserIDListToString(id []models.UserID, delimiter string) string {
-	return functools.Int64SliceToString(UserIDListToInt64List(id), delimiter)
+	return strings.Join(UserIDListToStringList(id), delimiter)
 }
 
 func UserIDListToPGArray(id []models.UserID) string {
-	return functools.Int64ListToPGArray(UserIDListToInt64List(id))
+	return functools.StringsToPGArray(UserIDListToStringList(id))
 }
 
 func Int64SliceToUserIDSlice(id []int64) []models.UserID {

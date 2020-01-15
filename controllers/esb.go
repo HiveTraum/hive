@@ -9,6 +9,7 @@ import (
 	"context"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
+	"strings"
 )
 
 const SENDER = "auth"
@@ -24,7 +25,7 @@ func (esb *ESB) onUserChanged(userId []models.UserID) {
 	ctx := context.Background()
 	span, ctx := opentracing.StartSpanFromContext(ctx, "OnUserChanged")
 	CreateOrUpdateUsersView(esb.Store, esb, ctx, userId)
-	span.LogFields(log.String("user_id", functools.Int64SliceToString(modelsFunctools.UserIDListToInt64List(userId), ", ")))
+	span.LogFields(log.String("user_id", strings.Join(modelsFunctools.UserIDListToStringList(userId), ", ")))
 	span.Finish()
 	ctx.Done()
 }
@@ -33,7 +34,7 @@ func (esb *ESB) onPhoneChanged(userId []models.UserID) {
 	ctx := context.Background()
 	span, ctx := opentracing.StartSpanFromContext(ctx, "OnPhoneChanged")
 	CreateOrUpdateUsersView(esb.Store, esb, ctx, userId)
-	span.LogFields(log.String("user_id", functools.Int64SliceToString(modelsFunctools.UserIDListToInt64List(userId), ", ")))
+	span.LogFields(log.String("user_id", strings.Join(modelsFunctools.UserIDListToStringList(userId), ", ")))
 	span.Finish()
 	ctx.Done()
 }
@@ -42,7 +43,7 @@ func (esb *ESB) onEmailChanged(userId []models.UserID) {
 	ctx := context.Background()
 	span, ctx := opentracing.StartSpanFromContext(ctx, "OnEmailChanged")
 	CreateOrUpdateUsersView(esb.Store, esb, ctx, userId)
-	span.LogFields(log.String("user_id", functools.Int64SliceToString(modelsFunctools.UserIDListToInt64List(userId), ", ")))
+	span.LogFields(log.String("user_id", strings.Join(modelsFunctools.UserIDListToStringList(userId), ", ")))
 	span.Finish()
 	ctx.Done()
 }
@@ -85,10 +86,7 @@ func (esb *ESB) onEmailCodeConfirmationCreated(email string, code string) {
 
 func (esb *ESB) getUserViewChangedEvent(userId []models.UserID) inout.Event {
 
-	int64list := make([]int64, len(userId))
-	for i, v := range userId {
-		int64list[i] = int64(v)
-	}
+	int64list := modelsFunctools.UserIDListToStringList(userId)
 
 	return inout.Event{
 		Sender:       SENDER,

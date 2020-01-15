@@ -12,7 +12,7 @@ message CreateRoleBadRequestV1 {
 }
 
 message GetRoleResponseV1 {
-    int64 id = 1;
+    string id = 1;
     int64 created = 2;
     string title = 3;
 }
@@ -24,8 +24,8 @@ message ListRoleResponseV1 {
 // User Roles API
 
 message CreateUserRoleRequestV1 {
-    int64 userId = 1;
-    int64 roleId = 2;
+    string userId = 1;
+    string roleId = 2;
 }
 
 message CreateUserRoleBadRequestV1 {
@@ -43,10 +43,10 @@ message CreateUserRolesBadRequestV1 {
 }
 
 message GetUserRoleResponseV1 {
-    int64 id = 1;
+    string id = 1;
     int64 created = 2;
-    int64 userId = 3;
-    int64 roleId = 4;
+    string userId = 3;
+    string roleId = 4;
 }
 
 message ListUserRolesResponseV1 {
@@ -58,7 +58,7 @@ message ListUserRolesResponseV1 {
 message CreateEmailRequestV1 {
     string email = 1;
     string code = 2;
-    int64 userId = 3;
+    string userId = 3;
 }
 
 message CreateEmailBadRequestV1 {
@@ -68,9 +68,9 @@ message CreateEmailBadRequestV1 {
 }
 
 message CreateEmailResponseV1 {
-    int64 id = 1;
+    string id = 1;
     int64 created = 2;
-    int64 userId = 3;
+    string userId = 3;
     string email = 4;
 }
 
@@ -95,7 +95,7 @@ message CreateEmailConfirmationResponseV1 {
 message CreatePhoneRequestV1 {
     string phone = 1;
     string code = 2;
-    int64 userId = 3;
+    string userId = 3;
 }
 
 message CreatePhoneBadRequestV1 {
@@ -105,9 +105,9 @@ message CreatePhoneBadRequestV1 {
 }
 
 message CreatePhoneResponseV1 {
-    int64 id = 1;
+    string id = 1;
     int64 created = 2;
-    int64 userId = 3;
+    string userId = 3;
     string phone = 4;
 }
 
@@ -130,7 +130,7 @@ message CreatePhoneConfirmationResponseV1 {
 // Passwords API
 
 message CreatePasswordRequestV1 {
-    int64 userId = 1;
+    string userId = 1;
     string value = 2;
 }
 
@@ -140,9 +140,9 @@ message CreatePasswordBadRequestResponseV1 {
 }
 
 message CreatePasswordResponseV1 {
-    int64 id = 1;
+    string id = 1;
     int64 created = 2;
-    int64 userId = 3;
+    string userId = 3;
 }
 
 // Users API
@@ -165,7 +165,7 @@ message CreateUserBadRequestV1 {
 }
 
 message GetUserResponseV1 {
-    int64 id = 1;
+    string id = 1;
     int64 created = 2;
 }
 
@@ -234,7 +234,7 @@ message CreateSessionResponseV1 {
 // Secrets
 
 message SecretCache {
-    int64 id = 1;
+    string id = 1;
     int64 created = 2;
     string value = 3;
 }
@@ -242,7 +242,7 @@ message SecretCache {
 // User Views API
 
 message GetUserViewResponseV1 {
-    int64 id = 1;
+    string id = 1;
     int64 created = 2;
     repeated string roles = 3;
     repeated string phones = 4;
@@ -266,7 +266,7 @@ message CreatePhoneConfirmationEventV1 {
 }
 
 message ChangedUserViewsEventV1 {
-    repeated int64 identifiers = 1;
+    repeated string identifiers = 1;
 }
 
 message Event {

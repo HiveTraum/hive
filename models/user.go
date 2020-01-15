@@ -1,6 +1,6 @@
 package models
 
-type UserID int64
+type UserID string
 
 type User struct {
 	Id      UserID
