@@ -20,6 +20,7 @@ require (
 	github.com/opentracing-contrib/go-gorilla v0.0.0-20190110000444-ced666783644
 	github.com/opentracing-contrib/go-stdlib v0.0.0-20190519235532-cf7a6c988dc9 // indirect
 	github.com/opentracing/opentracing-go v1.1.0
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/satori/go.uuid v1.2.0
 	github.com/smacker/opentracing-go-redis v0.0.0-20190628101507-6225d3249491 // indirect
 	github.com/stretchr/testify v1.4.0

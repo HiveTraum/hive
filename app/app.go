@@ -37,7 +37,8 @@ func InitApp(tracer opentracing.Tracer) *App {
 	config.InitSentry()
 	pool := config.InitPool(tracer)
 	redis := config.InitRedis()
-	store := stores.DatabaseStore{Db: pool, Cache: redis,}
+	inMemoryCache := config.InitInMemoryCache()
+	store := stores.DatabaseStore{Db: pool, Cache: redis, InMemoryCache: inMemoryCache}
 	loginController := controllers.LoginController{Store: &store}
 	esb := InitESB(&store)
 	return &App{ESB: esb, Store: &store, LoginController: &loginController}

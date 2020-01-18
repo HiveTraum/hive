@@ -22,10 +22,10 @@ type Environment struct {
 }
 
 var cfg Environment
-var once sync.Once
+var onceEnvironment sync.Once
 
 func GetEnvironment() Environment {
-	once.Do(func() {
+	onceEnvironment.Do(func() {
 		cfg = Environment{}
 		if err := env.Parse(&cfg); err != nil {
 			panic(err)

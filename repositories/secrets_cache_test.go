@@ -38,7 +38,7 @@ func TestGetSecretByIDSecret(t *testing.T) {
 
 	_ = CacheSecret(cache, ctx, secret, time.Millisecond)
 
-	cachedSecret := GetSecretByID(cache, ctx, id)
+	cachedSecret := GetSecretByIDFromCache(cache, ctx, id)
 	require.NotNil(t, cachedSecret)
 	require.Equal(t, secret, cachedSecret)
 }
@@ -58,7 +58,7 @@ func TestGetExpiredSecretByIDSecret(t *testing.T) {
 
 	_ = CacheSecret(cache, ctx, secret, time.Millisecond)
 	time.Sleep(time.Millisecond * 2)
-	cachedSecret := GetSecretByID(cache, ctx, id)
+	cachedSecret := GetSecretByIDFromCache(cache, ctx, id)
 	require.Nil(t, cachedSecret)
 }
 
@@ -86,7 +86,7 @@ func TestGetActualSecret(t *testing.T) {
 		Value:   uuid.NewV4(),
 	}
 	_ = CacheActualSecret(cache, ctx, secret, time.Millisecond)
-	cachedSecret := GetActualSecret(cache, ctx)
+	cachedSecret := GetActualSecretFromCache(cache, ctx)
 	require.NotNil(t, cachedSecret)
 	require.Equal(t, secret, cachedSecret)
 }

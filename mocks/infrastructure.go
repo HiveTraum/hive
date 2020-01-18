@@ -454,18 +454,18 @@ func (mr *MockStoreInterfaceMockRecorder) GetSecret(ctx, id interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecret", reflect.TypeOf((*MockStoreInterface)(nil).GetSecret), ctx, id)
 }
 
-// GetActualSecret mocks base method
+// GetActualSecretFromCache mocks base method
 func (m *MockStoreInterface) GetActualSecret(ctx context.Context) *models.Secret {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetActualSecret", ctx)
+	ret := m.ctrl.Call(m, "GetActualSecretFromCache", ctx)
 	ret0, _ := ret[0].(*models.Secret)
 	return ret0
 }
 
-// GetActualSecret indicates an expected call of GetActualSecret
+// GetActualSecretFromCache indicates an expected call of GetActualSecretFromCache
 func (mr *MockStoreInterfaceMockRecorder) GetActualSecret(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActualSecret", reflect.TypeOf((*MockStoreInterface)(nil).GetActualSecret), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActualSecretFromCache", reflect.TypeOf((*MockStoreInterface)(nil).GetActualSecret), ctx)
 }
 
 // CreateSession mocks base method

@@ -7,9 +7,10 @@ import (
 
 type AccessTokenPayload struct {
 	jwt.StandardClaims
-	IsAdmin bool      `json:"isAdmin"`
-	Roles   []string  `json:"roles"`
-	UserID  uuid.UUID `json:"userID"`
+	IsAdmin  bool      `json:"isAdmin"`
+	Roles    []string  `json:"roles"`
+	UserID   uuid.UUID `json:"userID"`
+	SecretID uuid.UUID `json:"secretID"`
 }
 
 func (payload *AccessTokenPayload) GetUserID() uuid.UUID {

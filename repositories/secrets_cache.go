@@ -83,14 +83,14 @@ func CacheSecret(cache *redis.Client, ctx context.Context, secret *models.Secret
 	return err
 }
 
-func GetActualSecret(cache *redis.Client, ctx context.Context) *models.Secret {
+func GetActualSecretFromCache(cache *redis.Client, ctx context.Context) *models.Secret {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "Get actual secret")
 	secret := getSecretFromCache(cache, span, enums.ActualSecret)
 	span.Finish()
 	return secret
 }
 
-func GetSecretByID(cache *redis.Client, ctx context.Context, id uuid.UUID) *models.Secret {
+func GetSecretByIDFromCache(cache *redis.Client, ctx context.Context, id uuid.UUID) *models.Secret {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "Get secret")
 	secret := getSecretFromCache(cache, span, getSecretKey(id))
 	span.Finish()

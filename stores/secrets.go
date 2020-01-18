@@ -12,8 +12,14 @@ import (
 
 func (store *DatabaseStore) GetSecret(ctx context.Context, id uuid.UUID) *models.Secret {
 
-	secret := repositories.GetSecretByID(store.Cache, ctx, id)
+	secret := repositories.GetSecretByIDFromInMemoryCache(store.InMemoryCache, ctx, id)
 	if secret != nil {
+		return secret
+	}
+
+	secret = repositories.GetSecretByIDFromCache(store.Cache, ctx, id)
+	if secret != nil {
+		repositories.CacheSecretInMemory(store.InMemoryCache, ctx, secret, time.Hour*24)
 		return secret
 	}
 
@@ -22,6 +28,7 @@ func (store *DatabaseStore) GetSecret(ctx context.Context, id uuid.UUID) *models
 	if err != nil {
 		sentry.CaptureException(err)
 	}
+	repositories.CacheSecretInMemory(store.InMemoryCache, ctx, secret, time.Hour*24)
 	return secret
 }
 
@@ -29,9 +36,14 @@ func (store *DatabaseStore) GetActualSecret(ctx context.Context) *models.Secret 
 
 	env := config.GetEnvironment()
 
-	actualSecret := repositories.GetActualSecret(store.Cache, ctx)
-
+	actualSecret := repositories.GetActualSecretFromInMemoryCache(store.InMemoryCache, ctx)
 	if actualSecret != nil {
+		return actualSecret
+	}
+
+	actualSecret = repositories.GetActualSecretFromCache(store.Cache, ctx)
+	if actualSecret != nil {
+		repositories.CacheActualSecretInMemory(store.InMemoryCache, ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
 		return actualSecret
 	}
 
@@ -44,5 +56,7 @@ func (store *DatabaseStore) GetActualSecret(ctx context.Context) *models.Secret 
 	if err != nil {
 		sentry.CaptureException(err)
 	}
+	repositories.CacheActualSecretInMemory(store.InMemoryCache, ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
+	repositories.CacheSecretInMemory(store.InMemoryCache, ctx, actualSecret, time.Hour*time.Duration(env.RefreshTokenLifetime))
 	return actualSecret
 }
