@@ -8,6 +8,7 @@ import (
 	"auth/models"
 	"bytes"
 	"github.com/golang/mock/gomock"
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
@@ -170,6 +171,8 @@ func TestSuccessfulCreateUserWithEmail(t *testing.T) {
 
 	app, store, esb, passwordProcessor := mocks.InitMockApp(ctrl)
 
+	userID := uuid.NewV4()
+
 	passwordProcessor.
 		EXPECT().
 		EncodePassword(gomock.Any(), "hello").
@@ -201,13 +204,13 @@ func TestSuccessfulCreateUserWithEmail(t *testing.T) {
 		}).
 		Times(1).
 		Return(enums.Ok, &models.User{
-			Id:      1,
+			Id:      userID,
 			Created: 2,
 		})
 
 	esb.
 		EXPECT().
-		OnUserChanged([]models.UserID{1}).
+		OnUserChanged([]uuid.UUID{userID}).
 		Times(1)
 
 	r.Header.Add("Content-Type", "application/json")

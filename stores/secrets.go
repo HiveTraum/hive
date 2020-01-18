@@ -6,10 +6,11 @@ import (
 	"auth/repositories"
 	"context"
 	"github.com/getsentry/sentry-go"
+	uuid "github.com/satori/go.uuid"
 	"time"
 )
 
-func (store *DatabaseStore) GetSecret(ctx context.Context, id models.SecretID) *models.Secret {
+func (store *DatabaseStore) GetSecret(ctx context.Context, id uuid.UUID) *models.Secret {
 
 	secret := repositories.GetSecretByID(store.Cache, ctx, id)
 	if secret != nil {

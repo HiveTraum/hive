@@ -8,8 +8,8 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
-	"auth/models"
 	"github.com/golang/protobuf/proto"
+	uuid "github.com/satori/go.uuid"
 	"net/http"
 )
 
@@ -21,14 +21,14 @@ func createPhoneV1(r *functools.Request, app infrastructure.AppInterface) (int, 
 		return http.StatusBadRequest, nil
 	}
 
-	status, phone := controllers.CreatePhone(app.GetStore(), app.GetESB(), r.Context(), body.Phone, body.Code, models.UserID(body.UserId))
+	status, phone := controllers.CreatePhone(app.GetStore(), app.GetESB(), r.Context(), body.Phone, body.Code, uuid.FromBytesOrNil(body.UserID))
 
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.CreatePhoneResponseV1{
-			Id:      int64(phone.Id),
+			Id:      phone.Id.Bytes(),
 			Created: phone.Created,
-			UserId:  int64(phone.UserId),
+			UserID:  phone.UserId.Bytes(),
 			Phone:   phone.Value,
 		}
 	case enums.IncorrectPhoneCode:
@@ -41,7 +41,7 @@ func createPhoneV1(r *functools.Request, app infrastructure.AppInterface) (int, 
 		}
 	case enums.UserNotFound:
 		return http.StatusBadRequest, &inout.CreatePhoneBadRequestV1{
-			UserId: []string{"Такого пользователя не существует"},
+			UserID: []string{"Такого пользователя не существует"},
 		}
 	case enums.IncorrectPhone:
 		return http.StatusBadRequest, &inout.CreatePhoneBadRequestV1{
@@ -49,9 +49,9 @@ func createPhoneV1(r *functools.Request, app infrastructure.AppInterface) (int, 
 		}
 	default:
 		return http.StatusCreated, &inout.CreatePhoneResponseV1{
-			Id:      int64(phone.Id),
+			Id:      phone.Id.Bytes(),
 			Created: phone.Created,
-			UserId:  int64(phone.UserId),
+			UserID:  phone.UserId.Bytes(),
 			Phone:   phone.Value,
 		}
 	}

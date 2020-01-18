@@ -8,6 +8,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
+	uuid "github.com/satori/go.uuid"
 	"strings"
 )
 
@@ -49,7 +50,7 @@ func scanEmail(row pgx.Row) (int, *models.Email) {
 	return enums.Ok, email
 }
 
-func CreateEmail(db DB, ctx context.Context, userId models.UserID, value string) (int, *models.Email) {
+func CreateEmail(db DB, ctx context.Context, userId uuid.UUID, value string) (int, *models.Email) {
 	sql := createEmailSQL()
 	row := db.QueryRow(ctx, sql, userId, value)
 	return scanEmail(row)

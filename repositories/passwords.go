@@ -8,6 +8,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
+	uuid "github.com/satori/go.uuid"
 	"strings"
 )
 
@@ -21,7 +22,7 @@ func getPasswordsSQL() string {
 	return `SELECT id, created, user_id, value 
 			FROM passwords 
 			WHERE user_id = $1 
-			ORDER BY id DESC
+			ORDER BY created DESC
 			LIMIT $2;`
 }
 
@@ -62,13 +63,13 @@ func scanPasswords(rows pgx.Rows, limit int) []*models.Password {
 	return passwords[0:i]
 }
 
-func CreatePassword(db DB, ctx context.Context, userId models.UserID, value string) (int, *models.Password) {
+func CreatePassword(db DB, ctx context.Context, userId uuid.UUID, value string) (int, *models.Password) {
 	sql := createPasswordSQL()
 	row := db.QueryRow(ctx, sql, userId, value)
 	return scanPassword(row)
 }
 
-func GetPasswords(db DB, ctx context.Context, userId models.UserID) []*models.Password {
+func GetPasswords(db DB, ctx context.Context, userId uuid.UUID) []*models.Password {
 	sql := getPasswordsSQL()
 	limit := 10
 	rows, err := db.Query(ctx, sql, userId, limit)
@@ -80,7 +81,7 @@ func GetPasswords(db DB, ctx context.Context, userId models.UserID) []*models.Pa
 	return scanPasswords(rows, limit)
 }
 
-func GetLatestPassword(db DB, ctx context.Context, userId models.UserID) (int, *models.Password) {
+func GetLatestPassword(db DB, ctx context.Context, userId uuid.UUID) (int, *models.Password) {
 	sql := getPasswordsSQL()
 	row := db.QueryRow(ctx, sql, userId, 1)
 	return scanPassword(row)

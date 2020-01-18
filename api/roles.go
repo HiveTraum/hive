@@ -8,29 +8,28 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
-	"auth/models"
 	"auth/repositories"
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/mux"
+	uuid "github.com/satori/go.uuid"
 	"net/http"
-	"strconv"
 )
 
 func GetRolesV1Query(r *functools.Request) repositories.GetRolesQuery {
 	return repositories.GetRolesQuery{
-		Limit: r.GetLimit(), Identifiers:
-		functools.StringsSliceToInt64String(r.URL.Query()["id"]),
+		Limit:       r.GetLimit(),
+		Identifiers: r.URL.Query()["id"],
 	}
 }
 
-func getRoleV1(r *functools.Request, app *app.App, id models.RoleID) (int, *inout.GetRoleResponseV1) {
+func getRoleV1(r *functools.Request, app *app.App, id uuid.UUID) (int, *inout.GetRoleResponseV1) {
 	status, role := app.Store.GetRole(r.Context(), id)
 
 	switch status {
 	case enums.Ok:
 		return http.StatusOK, &inout.GetRoleResponseV1{
-			Id:      int64(role.Id),
+			Id:      role.Id.Bytes(),
 			Created: role.Created,
 			Title:   role.Title,
 		}
@@ -38,7 +37,7 @@ func getRoleV1(r *functools.Request, app *app.App, id models.RoleID) (int, *inou
 		return http.StatusNotFound, nil
 	default:
 		return http.StatusOK, &inout.GetRoleResponseV1{
-			Id:      int64(role.Id),
+			Id:      role.Id.Bytes(),
 			Created: role.Created,
 			Title:   role.Title,
 		}
@@ -53,7 +52,7 @@ func getRolesV1(r *functools.Request, app *app.App) (int, *inout.ListRoleRespons
 
 	for i, role := range roles {
 		rolesData[i] = &inout.GetRoleResponseV1{
-			Id:      int64(role.Id),
+			Id:      role.Id.Bytes(),
 			Created: role.Created,
 			Title:   role.Title,
 		}
@@ -77,7 +76,7 @@ func createRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.GetRoleResponseV1{
-			Id:      int64(role.Id),
+			Id:      role.Id.Bytes(),
 			Created: role.Created,
 			Title:   role.Title,
 		}
@@ -87,7 +86,7 @@ func createRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 		}
 	default:
 		return http.StatusCreated, &inout.GetRoleResponseV1{
-			Id:      int64(role.Id),
+			Id:      role.Id.Bytes(),
 			Created: role.Created,
 			Title:   role.Title,
 		}
@@ -98,7 +97,7 @@ func RoleAPIV1(app *app.App) middlewares.ResponseControllerHandler {
 	return func(request *functools.Request) (i int, message proto.Message) {
 
 		vars := mux.Vars(request.Request)
-		id, err := strconv.ParseInt(vars["id"], 10, 64)
+		id, err := uuid.FromString(vars["id"])
 
 		if err != nil {
 			// Сознательно отправляем отчет об ошибке, т.к. в vars["id"] не должны попасть не числовые значения.
@@ -107,7 +106,7 @@ func RoleAPIV1(app *app.App) middlewares.ResponseControllerHandler {
 			return http.StatusBadRequest, nil
 		}
 
-		return getRoleV1(request, app, models.RoleID(id))
+		return getRoleV1(request, app, id)
 	}
 }
 

@@ -4,10 +4,11 @@ import (
 	"auth/models"
 	"auth/repositories"
 	"context"
+	uuid "github.com/satori/go.uuid"
 	"time"
 )
 
-func (store *DatabaseStore) CreateEmail(ctx context.Context, userId models.UserID, value string) (int, *models.Email) {
+func (store *DatabaseStore) CreateEmail(ctx context.Context, userId uuid.UUID, value string) (int, *models.Email) {
 	return repositories.CreateEmail(store.Db, ctx, userId, value)
 }
 

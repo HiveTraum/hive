@@ -11,6 +11,7 @@ import (
 	repositories "auth/repositories"
 	context "context"
 	gomock "github.com/golang/mock/gomock"
+	go_uuid "github.com/satori/go.uuid"
 	reflect "reflect"
 	time "time"
 )
@@ -54,7 +55,7 @@ func (mr *MockStoreInterfaceMockRecorder) CreateUser(ctx, query interface{}) *go
 }
 
 // GetUser mocks base method
-func (m *MockStoreInterface) GetUser(context context.Context, id models.UserID) *models.User {
+func (m *MockStoreInterface) GetUser(context context.Context, id go_uuid.UUID) *models.User {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUser", context, id)
 	ret0, _ := ret[0].(*models.User)
@@ -82,10 +83,10 @@ func (mr *MockStoreInterfaceMockRecorder) GetUsers(context, query interface{}) *
 }
 
 // GetUsersView mocks base method
-func (m *MockStoreInterface) GetUsersView(context context.Context, query repositories.GetUsersViewStoreQuery) []*inout.GetUserViewResponseV1 {
+func (m *MockStoreInterface) GetUsersView(context context.Context, query repositories.GetUsersViewStoreQuery) []*models.UserView {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUsersView", context, query)
-	ret0, _ := ret[0].([]*inout.GetUserViewResponseV1)
+	ret0, _ := ret[0].([]*models.UserView)
 	return ret0
 }
 
@@ -96,10 +97,10 @@ func (mr *MockStoreInterfaceMockRecorder) GetUsersView(context, query interface{
 }
 
 // GetUserView mocks base method
-func (m *MockStoreInterface) GetUserView(context context.Context, id models.UserID) *inout.GetUserViewResponseV1 {
+func (m *MockStoreInterface) GetUserView(context context.Context, id go_uuid.UUID) *models.UserView {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserView", context, id)
-	ret0, _ := ret[0].(*inout.GetUserViewResponseV1)
+	ret0, _ := ret[0].(*models.UserView)
 	return ret0
 }
 
@@ -110,10 +111,10 @@ func (mr *MockStoreInterfaceMockRecorder) GetUserView(context, id interface{}) *
 }
 
 // CreateOrUpdateUsersView mocks base method
-func (m *MockStoreInterface) CreateOrUpdateUsersView(context context.Context, query repositories.CreateOrUpdateUsersViewStoreQuery) []*inout.GetUserViewResponseV1 {
+func (m *MockStoreInterface) CreateOrUpdateUsersView(context context.Context, query repositories.CreateOrUpdateUsersViewStoreQuery) []*models.UserView {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrUpdateUsersView", context, query)
-	ret0, _ := ret[0].([]*inout.GetUserViewResponseV1)
+	ret0, _ := ret[0].([]*models.UserView)
 	return ret0
 }
 
@@ -124,10 +125,10 @@ func (mr *MockStoreInterfaceMockRecorder) CreateOrUpdateUsersView(context, query
 }
 
 // CreateOrUpdateUsersViewByUsersID mocks base method
-func (m *MockStoreInterface) CreateOrUpdateUsersViewByUsersID(context context.Context, id []models.UserID) []*inout.GetUserViewResponseV1 {
+func (m *MockStoreInterface) CreateOrUpdateUsersViewByUsersID(context context.Context, id []go_uuid.UUID) []*models.UserView {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrUpdateUsersViewByUsersID", context, id)
-	ret0, _ := ret[0].([]*inout.GetUserViewResponseV1)
+	ret0, _ := ret[0].([]*models.UserView)
 	return ret0
 }
 
@@ -138,10 +139,10 @@ func (mr *MockStoreInterfaceMockRecorder) CreateOrUpdateUsersViewByUsersID(conte
 }
 
 // CreateOrUpdateUsersViewByRolesID mocks base method
-func (m *MockStoreInterface) CreateOrUpdateUsersViewByRolesID(context context.Context, id []models.RoleID) []*inout.GetUserViewResponseV1 {
+func (m *MockStoreInterface) CreateOrUpdateUsersViewByRolesID(context context.Context, id []go_uuid.UUID) []*models.UserView {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrUpdateUsersViewByRolesID", context, id)
-	ret0, _ := ret[0].([]*inout.GetUserViewResponseV1)
+	ret0, _ := ret[0].([]*models.UserView)
 	return ret0
 }
 
@@ -152,10 +153,10 @@ func (mr *MockStoreInterfaceMockRecorder) CreateOrUpdateUsersViewByRolesID(conte
 }
 
 // CreateOrUpdateUsersViewByUserID mocks base method
-func (m *MockStoreInterface) CreateOrUpdateUsersViewByUserID(context context.Context, id models.UserID) []*inout.GetUserViewResponseV1 {
+func (m *MockStoreInterface) CreateOrUpdateUsersViewByUserID(context context.Context, id go_uuid.UUID) []*models.UserView {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrUpdateUsersViewByUserID", context, id)
-	ret0, _ := ret[0].([]*inout.GetUserViewResponseV1)
+	ret0, _ := ret[0].([]*models.UserView)
 	return ret0
 }
 
@@ -166,10 +167,10 @@ func (mr *MockStoreInterfaceMockRecorder) CreateOrUpdateUsersViewByUserID(contex
 }
 
 // CreateOrUpdateUsersViewByRoleID mocks base method
-func (m *MockStoreInterface) CreateOrUpdateUsersViewByRoleID(context context.Context, id models.RoleID) []*inout.GetUserViewResponseV1 {
+func (m *MockStoreInterface) CreateOrUpdateUsersViewByRoleID(context context.Context, id go_uuid.UUID) []*models.UserView {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrUpdateUsersViewByRoleID", context, id)
-	ret0, _ := ret[0].([]*inout.GetUserViewResponseV1)
+	ret0, _ := ret[0].([]*models.UserView)
 	return ret0
 }
 
@@ -180,7 +181,7 @@ func (mr *MockStoreInterfaceMockRecorder) CreateOrUpdateUsersViewByRoleID(contex
 }
 
 // CacheUserView mocks base method
-func (m *MockStoreInterface) CacheUserView(ctx context.Context, userViews []*inout.GetUserViewResponseV1) {
+func (m *MockStoreInterface) CacheUserView(ctx context.Context, userViews []*models.UserView) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "CacheUserView", ctx, userViews)
 }
@@ -192,7 +193,7 @@ func (mr *MockStoreInterfaceMockRecorder) CacheUserView(ctx, userViews interface
 }
 
 // CreateEmail mocks base method
-func (m *MockStoreInterface) CreateEmail(ctx context.Context, userId models.UserID, value string) (int, *models.Email) {
+func (m *MockStoreInterface) CreateEmail(ctx context.Context, userId go_uuid.UUID, value string) (int, *models.Email) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateEmail", ctx, userId, value)
 	ret0, _ := ret[0].(int)
@@ -250,7 +251,7 @@ func (mr *MockStoreInterfaceMockRecorder) GetEmailConfirmationCode(ctx, email in
 }
 
 // CreatePassword mocks base method
-func (m *MockStoreInterface) CreatePassword(ctx context.Context, userId models.UserID, value string) (int, *models.Password) {
+func (m *MockStoreInterface) CreatePassword(ctx context.Context, userId go_uuid.UUID, value string) (int, *models.Password) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreatePassword", ctx, userId, value)
 	ret0, _ := ret[0].(int)
@@ -265,7 +266,7 @@ func (mr *MockStoreInterfaceMockRecorder) CreatePassword(ctx, userId, value inte
 }
 
 // GetPasswords mocks base method
-func (m *MockStoreInterface) GetPasswords(ctx context.Context, userId models.UserID) []*models.Password {
+func (m *MockStoreInterface) GetPasswords(ctx context.Context, userId go_uuid.UUID) []*models.Password {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPasswords", ctx, userId)
 	ret0, _ := ret[0].([]*models.Password)
@@ -279,7 +280,7 @@ func (mr *MockStoreInterfaceMockRecorder) GetPasswords(ctx, userId interface{}) 
 }
 
 // GetLatestPassword mocks base method
-func (m *MockStoreInterface) GetLatestPassword(ctx context.Context, userId models.UserID) (int, *models.Password) {
+func (m *MockStoreInterface) GetLatestPassword(ctx context.Context, userId go_uuid.UUID) (int, *models.Password) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetLatestPassword", ctx, userId)
 	ret0, _ := ret[0].(int)
@@ -294,7 +295,7 @@ func (mr *MockStoreInterfaceMockRecorder) GetLatestPassword(ctx, userId interfac
 }
 
 // CreatePhone mocks base method
-func (m *MockStoreInterface) CreatePhone(ctx context.Context, userId models.UserID, value string) (int, *models.Phone) {
+func (m *MockStoreInterface) CreatePhone(ctx context.Context, userId go_uuid.UUID, value string) (int, *models.Phone) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreatePhone", ctx, userId, value)
 	ret0, _ := ret[0].(int)
@@ -367,7 +368,7 @@ func (mr *MockStoreInterfaceMockRecorder) CreateRole(context, title interface{})
 }
 
 // GetRole mocks base method
-func (m *MockStoreInterface) GetRole(context context.Context, id models.RoleID) (int, *models.Role) {
+func (m *MockStoreInterface) GetRole(context context.Context, id go_uuid.UUID) (int, *models.Role) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRole", context, id)
 	ret0, _ := ret[0].(int)
@@ -396,7 +397,7 @@ func (mr *MockStoreInterfaceMockRecorder) GetRoles(context, query interface{}) *
 }
 
 // CreateUserRole mocks base method
-func (m *MockStoreInterface) CreateUserRole(ctx context.Context, userId models.UserID, roleId models.RoleID) (int, *models.UserRole) {
+func (m *MockStoreInterface) CreateUserRole(ctx context.Context, userId, roleId go_uuid.UUID) (int, *models.UserRole) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUserRole", ctx, userId, roleId)
 	ret0, _ := ret[0].(int)
@@ -425,7 +426,7 @@ func (mr *MockStoreInterfaceMockRecorder) GetUserRoles(ctx, query interface{}) *
 }
 
 // DeleteUserRole mocks base method
-func (m *MockStoreInterface) DeleteUserRole(ctx context.Context, id models.UserRoleID) (int, *models.UserRole) {
+func (m *MockStoreInterface) DeleteUserRole(ctx context.Context, id go_uuid.UUID) (int, *models.UserRole) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteUserRole", ctx, id)
 	ret0, _ := ret[0].(int)
@@ -440,7 +441,7 @@ func (mr *MockStoreInterfaceMockRecorder) DeleteUserRole(ctx, id interface{}) *g
 }
 
 // GetSecret mocks base method
-func (m *MockStoreInterface) GetSecret(ctx context.Context, id models.SecretID) *models.Secret {
+func (m *MockStoreInterface) GetSecret(ctx context.Context, id go_uuid.UUID) *models.Secret {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSecret", ctx, id)
 	ret0, _ := ret[0].(*models.Secret)
@@ -468,7 +469,7 @@ func (mr *MockStoreInterfaceMockRecorder) GetActualSecret(ctx interface{}) *gomo
 }
 
 // CreateSession mocks base method
-func (m *MockStoreInterface) CreateSession(ctx context.Context, fingerprint string, userID models.UserID, secretID models.SecretID, userAgent string) (int, *models.Session) {
+func (m *MockStoreInterface) CreateSession(ctx context.Context, fingerprint string, userID, secretID go_uuid.UUID, userAgent string) (int, *models.Session) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateSession", ctx, fingerprint, userID, secretID, userAgent)
 	ret0, _ := ret[0].(int)
@@ -483,7 +484,7 @@ func (mr *MockStoreInterfaceMockRecorder) CreateSession(ctx, fingerprint, userID
 }
 
 // GetSession mocks base method
-func (m *MockStoreInterface) GetSession(ctx context.Context, fingerprint, refreshToken string, userID models.UserID) *models.Session {
+func (m *MockStoreInterface) GetSession(ctx context.Context, fingerprint, refreshToken string, userID go_uuid.UUID) *models.Session {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSession", ctx, fingerprint, refreshToken, userID)
 	ret0, _ := ret[0].(*models.Session)
@@ -520,7 +521,7 @@ func (m *MockESBInterface) EXPECT() *MockESBInterfaceMockRecorder {
 }
 
 // OnUserChanged mocks base method
-func (m *MockESBInterface) OnUserChanged(id []models.UserID) {
+func (m *MockESBInterface) OnUserChanged(id []go_uuid.UUID) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "OnUserChanged", id)
 }
@@ -556,7 +557,7 @@ func (mr *MockESBInterfaceMockRecorder) OnPhoneCodeConfirmationCreated(phone, co
 }
 
 // OnUsersViewChanged mocks base method
-func (m *MockESBInterface) OnUsersViewChanged(usersView []*inout.GetUserViewResponseV1) {
+func (m *MockESBInterface) OnUsersViewChanged(usersView []*models.UserView) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "OnUsersViewChanged", usersView)
 }
@@ -568,7 +569,7 @@ func (mr *MockESBInterfaceMockRecorder) OnUsersViewChanged(usersView interface{}
 }
 
 // OnPasswordChanged mocks base method
-func (m *MockESBInterface) OnPasswordChanged(userId models.UserID) {
+func (m *MockESBInterface) OnPasswordChanged(userId go_uuid.UUID) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "OnPasswordChanged", userId)
 }
@@ -580,7 +581,7 @@ func (mr *MockESBInterfaceMockRecorder) OnPasswordChanged(userId interface{}) *g
 }
 
 // OnPhoneChanged mocks base method
-func (m *MockESBInterface) OnPhoneChanged(userId []models.UserID) {
+func (m *MockESBInterface) OnPhoneChanged(userId []go_uuid.UUID) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "OnPhoneChanged", userId)
 }
@@ -592,7 +593,7 @@ func (mr *MockESBInterfaceMockRecorder) OnPhoneChanged(userId interface{}) *gomo
 }
 
 // OnEmailChanged mocks base method
-func (m *MockESBInterface) OnEmailChanged(userId []models.UserID) {
+func (m *MockESBInterface) OnEmailChanged(userId []go_uuid.UUID) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "OnEmailChanged", userId)
 }
@@ -604,7 +605,7 @@ func (mr *MockESBInterfaceMockRecorder) OnEmailChanged(userId interface{}) *gomo
 }
 
 // OnRoleChanged mocks base method
-func (m *MockESBInterface) OnRoleChanged(roleId []models.RoleID) {
+func (m *MockESBInterface) OnRoleChanged(roleId []go_uuid.UUID) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "OnRoleChanged", roleId)
 }
@@ -792,7 +793,7 @@ func (mr *MockLoginControllerInterfaceMockRecorder) NormalizeEmail(ctx, email in
 }
 
 // DecodeAccessToken mocks base method
-func (m *MockLoginControllerInterface) DecodeAccessToken(ctx context.Context, token, secret string) (int, *models.AccessTokenPayload) {
+func (m *MockLoginControllerInterface) DecodeAccessToken(ctx context.Context, token string, secret go_uuid.UUID) (int, *models.AccessTokenPayload) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DecodeAccessToken", ctx, token, secret)
 	ret0, _ := ret[0].(int)
@@ -822,7 +823,7 @@ func (mr *MockLoginControllerInterfaceMockRecorder) DecodeAccessTokenWithoutVali
 }
 
 // EncodeAccessToken mocks base method
-func (m *MockLoginControllerInterface) EncodeAccessToken(ctx context.Context, userID models.UserID, roles []string, secret string, expire time.Time) string {
+func (m *MockLoginControllerInterface) EncodeAccessToken(ctx context.Context, userID go_uuid.UUID, roles []string, secret go_uuid.UUID, expire time.Time) string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EncodeAccessToken", ctx, userID, roles, secret, expire)
 	ret0, _ := ret[0].(string)

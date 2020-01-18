@@ -4,6 +4,7 @@ import (
 	"auth/config"
 	"auth/enums"
 	"context"
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -24,7 +25,7 @@ func TestCreateEmailWithoutUser(t *testing.T) {
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	PurgeEmails(pool, ctx)
-	status, email := CreateEmail(pool, ctx, 1, "mail@mail.com")
+	status, email := CreateEmail(pool, ctx, uuid.NewV4(), "mail@mail.com")
 	require.Equal(t, enums.UserNotFound, status)
 	require.Nil(t, email)
 }

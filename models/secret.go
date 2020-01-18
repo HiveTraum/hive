@@ -1,9 +1,9 @@
 package models
 
-type SecretID int64
+import uuid "github.com/satori/go.uuid"
 
 type Secret struct {
-	Id      SecretID
+	Id      uuid.UUID
 	Created int64
-	Value   string
+	Value   uuid.UUID
 }

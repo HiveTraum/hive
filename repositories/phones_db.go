@@ -8,6 +8,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
+	uuid "github.com/satori/go.uuid"
 	"strings"
 )
 
@@ -47,7 +48,7 @@ func scanPhone(row pgx.Row) (int, *models.Phone) {
 	return enums.Ok, phone
 }
 
-func CreatePhone(db DB, ctx context.Context, userId models.UserID, value string) (int, *models.Phone) {
+func CreatePhone(db DB, ctx context.Context, userId uuid.UUID, value string) (int, *models.Phone) {
 	sql := createPhoneSQL()
 	row := db.QueryRow(ctx, sql, userId, value)
 	return scanPhone(row)

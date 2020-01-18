@@ -1,16 +1,17 @@
 package models
 
-type UserID string
+import uuid "github.com/satori/go.uuid"
 
 type User struct {
-	Id      UserID
+	Id      uuid.UUID
 	Created int64
 }
 
 type UserView struct {
-	Id      UserID
+	Id      uuid.UUID
 	Created int64
 	Roles   []string
 	Phones  []string
 	Emails  []string
+	RolesID []uuid.UUID
 }

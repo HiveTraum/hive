@@ -15,6 +15,7 @@ import (
 	"github.com/nyaruka/phonenumbers"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
+	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 	"strings"
 	"time"
@@ -85,7 +86,7 @@ func (controller *LoginController) NormalizePhone(_ context.Context, phone strin
 
 // Access Token
 
-func (controller *LoginController) EncodeAccessToken(_ context.Context, userID models.UserID, roles []string, secret string, expires time.Time) string {
+func (controller *LoginController) EncodeAccessToken(_ context.Context, userID uuid.UUID, roles []string, secret uuid.UUID, expires time.Time) string {
 
 	claims := models.AccessTokenPayload{
 		UserID:  userID,
@@ -98,7 +99,7 @@ func (controller *LoginController) EncodeAccessToken(_ context.Context, userID m
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	ss, err := token.SignedString([]byte(secret))
+	ss, err := token.SignedString(secret.Bytes())
 	if err != nil {
 		sentry.CaptureException(err)
 		return ""
@@ -126,10 +127,10 @@ func (controller *LoginController) DecodeAccessTokenWithoutValidation(_ context.
 	}
 }
 
-func (controller *LoginController) DecodeAccessToken(_ context.Context, tokenValue string, secret string) (int, *models.AccessTokenPayload) {
+func (controller *LoginController) DecodeAccessToken(_ context.Context, tokenValue string, secret uuid.UUID) (int, *models.AccessTokenPayload) {
 
 	token, err := jwt.ParseWithClaims(tokenValue, &models.AccessTokenPayload{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(secret), nil
+		return secret.Bytes(), nil
 	})
 
 	var e *jwt.ValidationError

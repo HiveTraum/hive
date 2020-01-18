@@ -7,14 +7,13 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
-	"auth/models"
 	"auth/modelsFunctools"
 	"auth/repositories"
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/mux"
+	uuid "github.com/satori/go.uuid"
 	"net/http"
-	"strconv"
 )
 
 func GetUserRolesV1Query(r *functools.Request) repositories.GetUserRoleQuery {
@@ -35,10 +34,10 @@ func getUserRolesV1(r *functools.Request, app infrastructure.AppInterface) (int,
 
 	for i, userRole := range userRoles {
 		usersData[i] = &inout.GetUserRoleResponseV1{
-			Id:      int64(userRole.Id),
+			Id:      userRole.Id.Bytes(),
 			Created: userRole.Created,
-			UserId:  int64(userRole.UserId),
-			RoleId:  int64(userRole.RoleId),
+			UserID:  userRole.UserId.Bytes(),
+			RoleID:  userRole.RoleId.Bytes(),
 		}
 	}
 
@@ -55,23 +54,23 @@ func createUserRoleV1(r *functools.Request, app infrastructure.AppInterface) (in
 		return http.StatusBadRequest, nil
 	}
 
-	status, userRole := controllers.CreateUserRole(app.GetStore(), app.GetESB(), r.Context(), models.UserID(body.UserId), models.RoleID(body.RoleId))
+	status, userRole := controllers.CreateUserRole(app.GetStore(), app.GetESB(), r.Context(), uuid.FromBytesOrNil(body.UserID), uuid.FromBytesOrNil(body.RoleID))
 
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.GetUserRoleResponseV1{
-			Id:      int64(userRole.Id),
+			Id:      userRole.Id.Bytes(),
 			Created: userRole.Created,
-			UserId:  int64(userRole.UserId),
-			RoleId:  int64(userRole.RoleId),
+			UserID:  userRole.UserId.Bytes(),
+			RoleID:  userRole.RoleId.Bytes(),
 		}
 	case enums.RoleNotFound:
 		return http.StatusBadRequest, &inout.CreateUserRoleBadRequestV1{
-			RoleId: []string{"Такой роли не существует"},
+			RoleID: []string{"Такой роли не существует"},
 		}
 	case enums.UserNotFound:
 		return http.StatusBadRequest, &inout.CreateUserRoleBadRequestV1{
-			UserId: []string{"Такого пользователя не существует"},
+			UserID: []string{"Такого пользователя не существует"},
 		}
 	case enums.UserRoleAlreadyExist:
 		return http.StatusBadRequest, &inout.CreateUserRoleBadRequestV1{
@@ -79,15 +78,15 @@ func createUserRoleV1(r *functools.Request, app infrastructure.AppInterface) (in
 		}
 	default:
 		return http.StatusCreated, &inout.GetUserRoleResponseV1{
-			Id:      int64(userRole.Id),
+			Id:      userRole.Id.Bytes(),
 			Created: userRole.Created,
-			UserId:  int64(userRole.UserId),
-			RoleId:  int64(userRole.RoleId),
+			UserID:  userRole.UserId.Bytes(),
+			RoleID:  userRole.RoleId.Bytes(),
 		}
 	}
 }
 
-func deleteUserRoleV1(r *functools.Request, app infrastructure.AppInterface, id models.UserRoleID) (int, proto.Message) {
+func deleteUserRoleV1(r *functools.Request, app infrastructure.AppInterface, id uuid.UUID) (int, proto.Message) {
 
 	status, _ := controllers.DeleteUserRole(app.GetStore(), app.GetESB(), r.Context(), id)
 
@@ -115,7 +114,7 @@ func UserRolesAPIV1(app infrastructure.AppInterface) middlewares.ResponseControl
 func UserRoleAPIV1(app infrastructure.AppInterface) middlewares.ResponseControllerHandler {
 	return func(r *functools.Request) (int, proto.Message) {
 		vars := mux.Vars(r.Request)
-		id, err := strconv.ParseInt(vars["id"], 10, 64)
+		id, err := uuid.FromString(vars["id"])
 
 		if err != nil {
 			// Сознательно отправляем отчет об ошибке, т.к. в vars["id"] не должны попасть не числовые значения.
@@ -124,6 +123,6 @@ func UserRoleAPIV1(app infrastructure.AppInterface) middlewares.ResponseControll
 			return http.StatusBadRequest, nil
 		}
 
-		return deleteUserRoleV1(r, app, models.UserRoleID(id))
+		return deleteUserRoleV1(r, app, id)
 	}
 }

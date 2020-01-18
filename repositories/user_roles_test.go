@@ -3,8 +3,8 @@ package repositories
 import (
 	"auth/config"
 	"auth/enums"
-	"auth/models"
 	"context"
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -29,7 +29,7 @@ func TestCreateUserRoleWithoutRole(t *testing.T) {
 	PurgeRoles(pool, ctx)
 	PurgeUsers(pool, ctx)
 	user := CreateUser(pool, ctx)
-	status, userRole := CreateUserRole(pool, ctx, user.Id, 1)
+	status, userRole := CreateUserRole(pool, ctx, user.Id, uuid.NewV4())
 	require.Equal(t, enums.RoleNotFound, status)
 	require.Nil(t, userRole)
 }
@@ -41,7 +41,7 @@ func TestCreateUserRoleWithoutUser(t *testing.T) {
 	PurgeRoles(pool, ctx)
 	PurgeUsers(pool, ctx)
 	_, role := CreateRole(pool, ctx, "role")
-	status, userRole := CreateUserRole(pool, ctx, 1, role.Id)
+	status, userRole := CreateUserRole(pool, ctx, uuid.NewV4(), role.Id)
 	require.Equal(t, enums.UserNotFound, status)
 	require.Nil(t, userRole)
 }
@@ -52,7 +52,7 @@ func TestCreateUserRoleWithoutUserAndRole(t *testing.T) {
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
 	PurgeUsers(pool, ctx)
-	status, userRole := CreateUserRole(pool, ctx, 1, 1)
+	status, userRole := CreateUserRole(pool, ctx, uuid.NewV4(), uuid.NewV4())
 	require.Equal(t, enums.UserNotFound, status)
 	require.Nil(t, userRole)
 }
@@ -83,7 +83,7 @@ func TestGetUserRolesWithTwoRoles(t *testing.T) {
 	CreateUserRole(pool, ctx, user.Id, role.Id)
 	CreateUserRole(pool, ctx, user.Id, adminRole.Id)
 	userRoles := GetUserRoles(pool, ctx, GetUserRoleQuery{
-		UserId: []models.UserID{user.Id},
+		UserId: []uuid.UUID{user.Id},
 		RoleId: nil,
 		Limit:  10,
 	})
@@ -101,7 +101,7 @@ func TestDeleteUserRole(t *testing.T) {
 	_, userRole := CreateUserRole(pool, ctx, user.Id, role.Id)
 	DeleteUserRole(pool, ctx, userRole.Id)
 	userRoles := GetUserRoles(pool, ctx, GetUserRoleQuery{
-		UserId: []models.UserID{user.Id},
+		UserId: []uuid.UUID{user.Id},
 		RoleId: nil,
 		Limit:  10,
 	})

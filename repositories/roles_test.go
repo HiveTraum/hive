@@ -4,6 +4,7 @@ import (
 	"auth/config"
 	"auth/enums"
 	"context"
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -64,7 +65,7 @@ func TestGetRoleWithEmptyTable(t *testing.T) {
 	pool := config.InitPool(nil)
 	ctx := context.Background()
 	PurgeRoles(pool, ctx)
-	status, role := GetRole(pool, ctx, 1)
+	status, role := GetRole(pool, ctx, uuid.NewV4())
 	require.Equal(t, enums.RoleNotFound, status)
 	require.Nil(t, role)
 }

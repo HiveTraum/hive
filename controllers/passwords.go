@@ -5,6 +5,7 @@ import (
 	"auth/infrastructure"
 	"auth/models"
 	"context"
+	uuid "github.com/satori/go.uuid"
 )
 
 func CreatePassword(
@@ -12,7 +13,7 @@ func CreatePassword(
 	esb infrastructure.ESBInterface,
 	passwordProcessor infrastructure.LoginControllerInterface,
 	ctx context.Context,
-	userId models.UserID,
+	userId uuid.UUID,
 	value string) (int, *models.Password) {
 
 	value = passwordProcessor.EncodePassword(ctx, value)

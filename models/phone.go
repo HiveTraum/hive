@@ -1,11 +1,11 @@
 package models
 
-type PhoneID int64
+import uuid "github.com/satori/go.uuid"
 
 type Phone struct {
-	Id      PhoneID
+	Id      uuid.UUID
 	Created int64
-	UserId  UserID
+	UserId  uuid.UUID
 	Value   string
 }
 

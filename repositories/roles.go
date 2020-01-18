@@ -9,6 +9,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
+	uuid "github.com/satori/go.uuid"
 	"math"
 	"strings"
 )
@@ -17,7 +18,7 @@ func getRolesSQL() string {
 	return `
 		SELECT id, created, title
 		FROM roles
-		WHERE (array_length($1::integer[], 1) IS NULL OR id = ANY ($1::bigint[]))
+		WHERE (array_length($1::uuid[], 1) IS NULL OR id = ANY ($1::uuid[]))
 		LIMIT $2;
 		`
 }
@@ -68,7 +69,7 @@ func scanRoles(rows pgx.Rows, limit int) []*models.Role {
 
 type GetRolesQuery struct {
 	Limit       int
-	Identifiers []int64
+	Identifiers []string
 }
 
 type getRolesRawQuery struct {
@@ -87,7 +88,7 @@ func convertGetRolesQueryToRaw(query GetRolesQuery) getRolesRawQuery {
 
 	return getRolesRawQuery{
 		Limit:       limit,
-		Identifiers: functools.Int64ListToPGArray(query.Identifiers),
+		Identifiers: functools.StringListToPGArray(query.Identifiers),
 	}
 }
 
@@ -97,9 +98,9 @@ func CreateRole(db DB, context context.Context, title string) (int, *models.Role
 	return scanRole(row)
 }
 
-func GetRole(db DB, context context.Context, id models.RoleID) (int, *models.Role) {
+func GetRole(db DB, context context.Context, id uuid.UUID) (int, *models.Role) {
 	sql := getRolesSQL()
-	row := db.QueryRow(context, sql, functools.Int64ListToPGArray([]int64{int64(id)}), 1)
+	row := db.QueryRow(context, sql, functools.StringListToPGArray([]string{id.String()}), 1)
 	return scanRole(row)
 }
 

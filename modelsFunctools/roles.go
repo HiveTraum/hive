@@ -2,37 +2,30 @@ package modelsFunctools
 
 import (
 	"auth/functools"
-	"auth/models"
+	uuid "github.com/satori/go.uuid"
 )
 
-func RoleIDListToInt64List(id []models.RoleID) []int64 {
-	identifiers := make([]int64, len(id))
+func RoleIDListToStringList(id []uuid.UUID) []string {
+	identifiers := make([]string, len(id))
 
 	for i, v := range id {
-		identifiers[i] = int64(v)
+		identifiers[i] = v.String()
 	}
 
 	return identifiers
 }
 
-func RoleIDListToString(id []models.RoleID, delimiter string) string {
-	return functools.Int64SliceToString(RoleIDListToInt64List(id), delimiter)
+func RoleIDListToPGArray(id []uuid.UUID) string {
+	return functools.StringListToPGArray(RoleIDListToStringList(id))
 }
 
-func RoleIDListToPGArray(id []models.RoleID) string {
-	return functools.Int64ListToPGArray(RoleIDListToInt64List(id))
-}
-
-func Int64SliceToRoleIDSlice(id []int64) []models.RoleID {
-	identifiers := make([]models.RoleID, len(id))
+func StringsSliceToRoleIDSlice(id []string) []uuid.UUID {
+	identifiers := make([]uuid.UUID, len(id))
 
 	for i, v := range id {
-		identifiers[i] = models.RoleID(v)
+		identifiers[i] = uuid.FromStringOrNil(v)
 	}
 
 	return identifiers
 }
 
-func StringsSliceToRoleIDSlice(str []string) []models.RoleID {
-	return Int64SliceToRoleIDSlice(functools.StringsSliceToInt64String(str))
-}

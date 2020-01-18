@@ -8,8 +8,8 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
-	"auth/models"
 	"github.com/golang/protobuf/proto"
+	uuid "github.com/satori/go.uuid"
 	"net/http"
 )
 
@@ -21,14 +21,14 @@ func createEmailV1(r *functools.Request, app infrastructure.AppInterface) (int, 
 		return http.StatusBadRequest, nil
 	}
 
-	status, email := controllers.CreateEmail(app.GetStore(), app.GetESB(), r.Context(), body.Email, body.Code, models.UserID(body.UserId))
+	status, email := controllers.CreateEmail(app.GetStore(), app.GetESB(), r.Context(), body.Email, body.Code, uuid.FromBytesOrNil(body.UserID))
 
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.CreateEmailResponseV1{
-			Id:      int64(email.Id),
+			Id:      email.Id.Bytes(),
 			Created: email.Created,
-			UserId:  int64(email.UserId),
+			UserID:  email.UserId.Bytes(),
 			Email:   email.Value,
 		}
 	case enums.IncorrectEmailCode:
@@ -49,9 +49,9 @@ func createEmailV1(r *functools.Request, app infrastructure.AppInterface) (int, 
 		}
 	default:
 		return http.StatusCreated, &inout.CreateEmailResponseV1{
-			Id:      int64(email.Id),
+			Id:      email.Id.Bytes(),
 			Created: email.Created,
-			UserId:  int64(email.UserId),
+			UserID:  email.UserId.Bytes(),
 			Email:   email.Value,
 		}
 	}

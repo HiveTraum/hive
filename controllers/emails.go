@@ -8,6 +8,7 @@ import (
 	"context"
 	"github.com/badoux/checkmail"
 	"github.com/getsentry/sentry-go"
+	uuid "github.com/satori/go.uuid"
 	"time"
 )
 
@@ -48,7 +49,7 @@ func validateEmail(ctx context.Context, store infrastructure.StoreInterface, ema
 	return status, email
 }
 
-func CreateEmail(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, email string, code string, userId models.UserID) (int, *models.Email) {
+func CreateEmail(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, email string, code string, userId uuid.UUID) (int, *models.Email) {
 
 	status, email := validateEmail(ctx, store, email, code)
 
@@ -58,7 +59,7 @@ func CreateEmail(store infrastructure.StoreInterface, esb infrastructure.ESBInte
 
 	_, oldEmail := store.GetEmail(ctx, email)
 
-	identifiers := []models.UserID{userId}
+	identifiers := []uuid.UUID{userId}
 
 	if oldEmail != nil {
 		identifiers = append(identifiers, oldEmail.UserId)

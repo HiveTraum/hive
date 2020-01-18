@@ -1,11 +1,13 @@
 package models
 
+import uuid "github.com/satori/go.uuid"
+
 type EmailID int64
 
 type Email struct {
-	Id      EmailID
+	Id      uuid.UUID
 	Created int64
-	UserId  UserID
+	UserId  uuid.UUID
 	Value   string
 }
 

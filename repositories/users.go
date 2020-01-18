@@ -6,6 +6,7 @@ import (
 	"context"
 	"github.com/getsentry/sentry-go"
 	"github.com/jackc/pgx/v4"
+	uuid "github.com/satori/go.uuid"
 	"math"
 )
 
@@ -51,7 +52,7 @@ func scanUsers(rows pgx.Rows, limit int) []*models.User {
 
 type GetUsersQuery struct {
 	Limit int
-	Id    []models.UserID
+	Id    []uuid.UUID
 }
 
 type getUsersRawQuery struct {
@@ -80,9 +81,9 @@ func CreateUser(db DB, ctx context.Context) *models.User {
 	return scanUser(row)
 }
 
-func GetUser(db DB, context context.Context, id models.UserID) *models.User {
+func GetUser(db DB, context context.Context, id uuid.UUID) *models.User {
 	sql := getUsersSQL()
-	row := db.QueryRow(context, sql, modelsFunctools.UserIDListToPGArray([]models.UserID{id}), 1)
+	row := db.QueryRow(context, sql, modelsFunctools.UserIDListToPGArray([]uuid.UUID{id}), 1)
 	return scanUser(row)
 }
 

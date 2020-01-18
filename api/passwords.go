@@ -8,8 +8,8 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
-	"auth/models"
 	"github.com/golang/protobuf/proto"
+	uuid "github.com/satori/go.uuid"
 	"net/http"
 )
 
@@ -23,18 +23,18 @@ func createPasswordV1(r *functools.Request, app infrastructure.AppInterface) (in
 		return http.StatusBadRequest, nil
 	}
 
-	status, password := controllers.CreatePassword(app.GetStore(), app.GetESB(), app.GetLoginController(), r.Context(), models.UserID(body.UserId), body.Value)
+	status, password := controllers.CreatePassword(app.GetStore(), app.GetESB(), app.GetLoginController(), r.Context(), uuid.FromBytesOrNil(body.UserID), body.Value)
 
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.CreatePasswordResponseV1{
-			Id:      int64(password.Id),
+			Id:      password.Id.Bytes(),
 			Created: password.Created,
-			UserId:  int64(password.UserId),
+			UserID:  password.UserId.Bytes(),
 		}
 	case enums.UserNotFound:
 		return http.StatusBadRequest, &inout.CreatePasswordBadRequestResponseV1{
-			UserId: []string{"Пользователь не найден"},
+			UserID: []string{"Пользователь не найден"},
 		}
 	case enums.IncorrectPassword:
 		return http.StatusBadRequest, &inout.CreatePasswordBadRequestResponseV1{
@@ -42,9 +42,9 @@ func createPasswordV1(r *functools.Request, app infrastructure.AppInterface) (in
 		}
 	default:
 		return http.StatusCreated, &inout.CreatePasswordResponseV1{
-			Id:      int64(password.Id),
+			Id:      password.Id.Bytes(),
 			Created: password.Created,
-			UserId:  int64(password.UserId),
+			UserID:  password.UserId.Bytes(),
 		}
 	}
 }

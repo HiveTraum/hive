@@ -5,23 +5,24 @@ import (
 	"auth/infrastructure"
 	"auth/models"
 	"context"
+	uuid "github.com/satori/go.uuid"
 )
 
-func CreateUserRole(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, userId models.UserID, roleId models.RoleID) (int, *models.UserRole) {
-	status, userRole := store.CreateUserRole(ctx, userId, roleId)
+func CreateUserRole(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, userId uuid.UUID, roleID uuid.UUID) (int, *models.UserRole) {
+	status, userRole := store.CreateUserRole(ctx, userId, roleID)
 
 	if status == enums.Ok {
-		esb.OnUserChanged([]models.UserID{userRole.UserId})
+		esb.OnUserChanged([]uuid.UUID{userRole.UserId})
 	}
 
 	return status, userRole
 }
 
-func DeleteUserRole(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, id models.UserRoleID) (int, *models.UserRole) {
+func DeleteUserRole(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, id uuid.UUID) (int, *models.UserRole) {
 	status, userRole := store.DeleteUserRole(ctx, id)
 
 	if status == enums.Ok {
-		esb.OnUserChanged([]models.UserID{userRole.UserId})
+		esb.OnUserChanged([]uuid.UUID{userRole.UserId})
 	}
 
 	return status, userRole

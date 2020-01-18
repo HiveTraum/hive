@@ -5,6 +5,7 @@ import (
 	"auth/models"
 	"auth/repositories"
 	"context"
+	uuid "github.com/satori/go.uuid"
 	"time"
 )
 
@@ -16,36 +17,36 @@ type StoreInterface interface {
 	// Users
 
 	CreateUser(ctx context.Context, query *inout.CreateUserRequestV1) (int, *models.User)
-	GetUser(context context.Context, id models.UserID) *models.User
+	GetUser(context context.Context, id uuid.UUID) *models.User
 	GetUsers(context context.Context, query repositories.GetUsersQuery) []*models.User
 
 	// User Views
 
-	GetUsersView(context context.Context, query repositories.GetUsersViewStoreQuery) []*inout.GetUserViewResponseV1
-	GetUserView(context context.Context, id models.UserID) *inout.GetUserViewResponseV1
-	CreateOrUpdateUsersView(context context.Context, query repositories.CreateOrUpdateUsersViewStoreQuery) []*inout.GetUserViewResponseV1
-	CreateOrUpdateUsersViewByUsersID(context context.Context, id []models.UserID) []*inout.GetUserViewResponseV1
-	CreateOrUpdateUsersViewByRolesID(context context.Context, id []models.RoleID) []*inout.GetUserViewResponseV1
-	CreateOrUpdateUsersViewByUserID(context context.Context, id models.UserID) []*inout.GetUserViewResponseV1
-	CreateOrUpdateUsersViewByRoleID(context context.Context, id models.RoleID) []*inout.GetUserViewResponseV1
-	CacheUserView(ctx context.Context, userViews []*inout.GetUserViewResponseV1)
+	GetUsersView(context context.Context, query repositories.GetUsersViewStoreQuery) []*models.UserView
+	GetUserView(context context.Context, id uuid.UUID) *models.UserView
+	CreateOrUpdateUsersView(context context.Context, query repositories.CreateOrUpdateUsersViewStoreQuery) []*models.UserView
+	CreateOrUpdateUsersViewByUsersID(context context.Context, id []uuid.UUID) []*models.UserView
+	CreateOrUpdateUsersViewByRolesID(context context.Context, id []uuid.UUID) []*models.UserView
+	CreateOrUpdateUsersViewByUserID(context context.Context, id uuid.UUID) []*models.UserView
+	CreateOrUpdateUsersViewByRoleID(context context.Context, id uuid.UUID) []*models.UserView
+	CacheUserView(ctx context.Context, userViews []*models.UserView)
 
 	// Emails
 
-	CreateEmail(ctx context.Context, userId models.UserID, value string) (int, *models.Email)
+	CreateEmail(ctx context.Context, userId uuid.UUID, value string) (int, *models.Email)
 	GetEmail(ctx context.Context, email string) (int, *models.Email)
 	CreateEmailConfirmationCode(ctx context.Context, email string, code string, duration time.Duration) *models.EmailConfirmation
 	GetEmailConfirmationCode(ctx context.Context, email string) string
 
 	// Passwords
 
-	CreatePassword(ctx context.Context, userId models.UserID, value string) (int, *models.Password)
-	GetPasswords(ctx context.Context, userId models.UserID) []*models.Password
-	GetLatestPassword(ctx context.Context, userId models.UserID) (int, *models.Password)
+	CreatePassword(ctx context.Context, userId uuid.UUID, value string) (int, *models.Password)
+	GetPasswords(ctx context.Context, userId uuid.UUID) []*models.Password
+	GetLatestPassword(ctx context.Context, userId uuid.UUID) (int, *models.Password)
 
 	// Phones
 
-	CreatePhone(ctx context.Context, userId models.UserID, value string) (int, *models.Phone)
+	CreatePhone(ctx context.Context, userId uuid.UUID, value string) (int, *models.Phone)
 	GetPhone(ctx context.Context, phone string) (int, *models.Phone)
 	CreatePhoneConfirmationCode(ctx context.Context, phone string, code string, duration time.Duration) *models.PhoneConfirmation
 	GetPhoneConfirmationCode(ctx context.Context, phone string) string
@@ -53,35 +54,35 @@ type StoreInterface interface {
 	// Roles
 
 	CreateRole(context context.Context, title string) (int, *models.Role)
-	GetRole(context context.Context, id models.RoleID) (int, *models.Role)
+	GetRole(context context.Context, id uuid.UUID) (int, *models.Role)
 	GetRoles(context context.Context, query repositories.GetRolesQuery) []*models.Role
 
 	// User Roles
 
-	CreateUserRole(ctx context.Context, userId models.UserID, roleId models.RoleID) (int, *models.UserRole)
+	CreateUserRole(ctx context.Context, userId uuid.UUID, roleId uuid.UUID) (int, *models.UserRole)
 	GetUserRoles(ctx context.Context, query repositories.GetUserRoleQuery) []*models.UserRole
-	DeleteUserRole(ctx context.Context, id models.UserRoleID) (int, *models.UserRole)
+	DeleteUserRole(ctx context.Context, id uuid.UUID) (int, *models.UserRole)
 
 	// Secrets
 
-	GetSecret(ctx context.Context, id models.SecretID) *models.Secret
+	GetSecret(ctx context.Context, id uuid.UUID) *models.Secret
 	GetActualSecret(ctx context.Context) *models.Secret
 
 	// Sessions
 
-	CreateSession(ctx context.Context, fingerprint string, userID models.UserID, secretID models.SecretID, userAgent string) (int, *models.Session)
-	GetSession(ctx context.Context, fingerprint string, refreshToken string, userID models.UserID) *models.Session
+	CreateSession(ctx context.Context, fingerprint string, userID uuid.UUID, secretID uuid.UUID, userAgent string) (int, *models.Session)
+	GetSession(ctx context.Context, fingerprint string, refreshToken string, userID uuid.UUID) *models.Session
 }
 
 type ESBInterface interface {
-	OnUserChanged(id []models.UserID)
+	OnUserChanged(id []uuid.UUID)
 	OnEmailCodeConfirmationCreated(email string, code string)
 	OnPhoneCodeConfirmationCreated(phone string, code string)
-	OnUsersViewChanged(usersView []*inout.GetUserViewResponseV1)
-	OnPasswordChanged(userId models.UserID)
-	OnPhoneChanged(userId []models.UserID)
-	OnEmailChanged(userId []models.UserID)
-	OnRoleChanged(roleId []models.RoleID)
+	OnUsersViewChanged(usersView []*models.UserView)
+	OnPasswordChanged(userId uuid.UUID)
+	OnPhoneChanged(userId []uuid.UUID)
+	OnEmailChanged(userId []uuid.UUID)
+	OnRoleChanged(roleId []uuid.UUID)
 }
 
 type ESBDispatcherInterface interface {
@@ -100,9 +101,9 @@ type LoginControllerInterface interface {
 	NormalizePhone(ctx context.Context, phone string) string
 	NormalizeEmail(ctx context.Context, email string) string
 
-	DecodeAccessToken(ctx context.Context, token string, secret string) (int, *models.AccessTokenPayload)
+	DecodeAccessToken(ctx context.Context, token string, secret uuid.UUID) (int, *models.AccessTokenPayload)
 	DecodeAccessTokenWithoutValidation(ctx context.Context, tokenValue string) (int, *models.AccessTokenPayload)
-	EncodeAccessToken(ctx context.Context, userID models.UserID, roles []string, secret string, expire time.Time) string
+	EncodeAccessToken(ctx context.Context, userID uuid.UUID, roles []string, secret uuid.UUID, expire time.Time) string
 
 	EncodePassword(context.Context, string) string
 	VerifyPassword(ctx context.Context, password string, encodedPassword string) bool

@@ -7,6 +7,7 @@ import (
 	"context"
 	"github.com/getsentry/sentry-go"
 	"github.com/nyaruka/phonenumbers"
+	uuid "github.com/satori/go.uuid"
 	"math/rand"
 	"strconv"
 	"time"
@@ -50,7 +51,7 @@ func validatePhone(store infrastructure.StoreInterface, ctx context.Context, pho
 	return status, phone
 }
 
-func CreatePhone(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, phone string, code string, userId models.UserID) (int, *models.Phone) {
+func CreatePhone(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, phone string, code string, userId uuid.UUID) (int, *models.Phone) {
 
 	status, phone := validatePhone(store, ctx, phone, code)
 
@@ -60,7 +61,7 @@ func CreatePhone(store infrastructure.StoreInterface, esb infrastructure.ESBInte
 
 	_, oldPhone := store.GetPhone(ctx, phone)
 
-	identifiers := []models.UserID{userId}
+	identifiers := []uuid.UUID{userId}
 
 	if oldPhone != nil {
 		identifiers = append(identifiers, oldPhone.UserId)

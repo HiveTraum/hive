@@ -58,7 +58,7 @@ CREATE TABLE users_view
     phones  TEXT[],
     roles   TEXT[],
     emails  TEXT[],
-    role_id BIGINT[]
+    role_id UUID[]
 );
 
 CREATE TABLE secrets

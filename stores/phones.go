@@ -4,10 +4,11 @@ import (
 	"auth/models"
 	"auth/repositories"
 	"context"
+	uuid "github.com/satori/go.uuid"
 	"time"
 )
 
-func (store *DatabaseStore) CreatePhone(ctx context.Context, userId models.UserID, value string) (int, *models.Phone) {
+func (store *DatabaseStore) CreatePhone(ctx context.Context, userId uuid.UUID, value string) (int, *models.Phone) {
 	return repositories.CreatePhone(store.Db, ctx, userId, value)
 }
 

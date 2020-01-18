@@ -9,6 +9,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
+	uuid "github.com/satori/go.uuid"
 	"strings"
 )
 
@@ -24,8 +25,8 @@ func getUserRolesSQL() string {
 	return `
 		SELECT id, created, user_id, role_id 
 		FROM user_roles
-		WHERE (array_length($1::integer[], 1) IS NULL OR user_id = ANY ($1::bigint[])) AND 
-		      (array_length($2::integer[], 1) IS NULL OR role_id = ANY ($2::bigint[])) 
+		WHERE (array_length($1::uuid[], 1) IS NULL OR user_id = ANY ($1::uuid[])) AND 
+		      (array_length($2::uuid[], 1) IS NULL OR role_id = ANY ($2::uuid[])) 
 		LIMIT $3;
 		`
 }
@@ -86,8 +87,8 @@ func scanUserRoles(rows pgx.Rows, limit int) []*models.UserRole {
 }
 
 type GetUserRoleQuery struct {
-	UserId []models.UserID
-	RoleId []models.RoleID
+	UserId []uuid.UUID
+	RoleId []uuid.UUID
 	Limit  int
 }
 
@@ -105,9 +106,9 @@ func convertGetUserRoleQueryToRaw(query GetUserRoleQuery) getUserRoleRawQuery {
 	}
 }
 
-func CreateUserRole(db DB, ctx context.Context, userId models.UserID, roleId models.RoleID) (int, *models.UserRole) {
+func CreateUserRole(db DB, ctx context.Context, userID uuid.UUID, roleID uuid.UUID) (int, *models.UserRole) {
 	sql := createUserRoleSQL()
-	row := db.QueryRow(ctx, sql, userId, roleId)
+	row := db.QueryRow(ctx, sql, userID, roleID)
 	return scanUserRole(row)
 }
 
@@ -123,7 +124,7 @@ func GetUserRoles(db DB, ctx context.Context, query GetUserRoleQuery) []*models.
 	return scanUserRoles(rows, rawQuery.Limit)
 }
 
-func DeleteUserRole(db DB, ctx context.Context, id models.UserRoleID) (int, *models.UserRole) {
+func DeleteUserRole(db DB, ctx context.Context, id uuid.UUID) (int, *models.UserRole) {
 	sql := deleteUserRoleSQL()
 	row := db.QueryRow(ctx, sql, id)
 	return scanUserRole(row)

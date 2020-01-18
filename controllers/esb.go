@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"auth/functools"
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/models"
@@ -9,6 +8,7 @@ import (
 	"context"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
+	uuid "github.com/satori/go.uuid"
 	"strings"
 )
 
@@ -21,7 +21,7 @@ type ESB struct {
 
 // Private methods / Implementation
 
-func (esb *ESB) onUserChanged(userId []models.UserID) {
+func (esb *ESB) onUserChanged(userId []uuid.UUID) {
 	ctx := context.Background()
 	span, ctx := opentracing.StartSpanFromContext(ctx, "OnUserChanged")
 	CreateOrUpdateUsersView(esb.Store, esb, ctx, userId)
@@ -30,7 +30,7 @@ func (esb *ESB) onUserChanged(userId []models.UserID) {
 	ctx.Done()
 }
 
-func (esb *ESB) onPhoneChanged(userId []models.UserID) {
+func (esb *ESB) onPhoneChanged(userId []uuid.UUID) {
 	ctx := context.Background()
 	span, ctx := opentracing.StartSpanFromContext(ctx, "OnPhoneChanged")
 	CreateOrUpdateUsersView(esb.Store, esb, ctx, userId)
@@ -39,7 +39,7 @@ func (esb *ESB) onPhoneChanged(userId []models.UserID) {
 	ctx.Done()
 }
 
-func (esb *ESB) onEmailChanged(userId []models.UserID) {
+func (esb *ESB) onEmailChanged(userId []uuid.UUID) {
 	ctx := context.Background()
 	span, ctx := opentracing.StartSpanFromContext(ctx, "OnEmailChanged")
 	CreateOrUpdateUsersView(esb.Store, esb, ctx, userId)
@@ -48,22 +48,22 @@ func (esb *ESB) onEmailChanged(userId []models.UserID) {
 	ctx.Done()
 }
 
-func (esb *ESB) onRoleChanged(roleId []models.RoleID) {
+func (esb *ESB) onRoleChanged(roleId []uuid.UUID) {
 	ctx := context.Background()
 	span, ctx := opentracing.StartSpanFromContext(ctx, "OnRoleChanged")
 	CreateOrUpdateUsersViewByRoles(esb.Store, esb, ctx, roleId)
-	span.LogFields(log.String("role_id", functools.Int64SliceToString(modelsFunctools.RoleIDListToInt64List(roleId), ", ")))
+	span.LogFields(log.String("role_id", strings.Join(modelsFunctools.RoleIDListToStringList(roleId), "")))
 	span.Finish()
 	ctx.Done()
 }
 
-func (esb *ESB) onUsersViewChanged(usersView []*inout.GetUserViewResponseV1) {
+func (esb *ESB) onUsersViewChanged(usersView []*models.UserView) {
 	ctx := context.Background()
 	span, ctx := opentracing.StartSpanFromContext(ctx, "OnUserViewChanged")
-	identifiers := make([]models.UserID, len(usersView))
+	identifiers := make([]uuid.UUID, len(usersView))
 
 	for i, u := range usersView {
-		identifiers[i] = models.UserID(u.Id)
+		identifiers[i] = u.Id
 	}
 
 	esb.Store.CacheUserView(ctx, usersView)
@@ -84,7 +84,7 @@ func (esb *ESB) onEmailCodeConfirmationCreated(email string, code string) {
 	esb.Dispatcher.Send(event)
 }
 
-func (esb *ESB) getUserViewChangedEvent(userId []models.UserID) inout.Event {
+func (esb *ESB) getUserViewChangedEvent(userId []uuid.UUID) inout.Event {
 
 	int64list := modelsFunctools.UserIDListToStringList(userId)
 
@@ -143,26 +143,26 @@ func (esb *ESB) OnPhoneCodeConfirmationCreated(phone string, code string) {
 	go esb.onPhoneCodeConfirmationCreated(phone, code)
 }
 
-func (esb *ESB) OnUsersViewChanged(usersView []*inout.GetUserViewResponseV1) {
+func (esb *ESB) OnUsersViewChanged(usersView []*models.UserView) {
 	go esb.onUsersViewChanged(usersView)
 }
 
-func (esb *ESB) OnPasswordChanged(userId models.UserID) {
+func (esb *ESB) OnPasswordChanged(userId uuid.UUID) {
 	// Todo tokens invalidation
 }
 
-func (esb *ESB) OnUserChanged(id []models.UserID) {
+func (esb *ESB) OnUserChanged(id []uuid.UUID) {
 	go esb.onUserChanged(id)
 }
 
-func (esb *ESB) OnEmailChanged(userId []models.UserID) {
+func (esb *ESB) OnEmailChanged(userId []uuid.UUID) {
 	go esb.onEmailChanged(userId)
 }
 
-func (esb *ESB) OnPhoneChanged(userId []models.UserID) {
+func (esb *ESB) OnPhoneChanged(userId []uuid.UUID) {
 	go esb.onPhoneChanged(userId)
 }
 
-func (esb *ESB) OnRoleChanged(roleId []models.RoleID) {
+func (esb *ESB) OnRoleChanged(roleId []uuid.UUID) {
 	go esb.onRoleChanged(roleId)
 }

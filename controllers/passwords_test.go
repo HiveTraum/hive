@@ -6,6 +6,7 @@ import (
 	"auth/models"
 	"context"
 	"github.com/golang/mock/gomock"
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -17,6 +18,8 @@ func TestCreatePassword(t *testing.T) {
 	app, store, esb, passwordProcessor := mocks.InitMockApp(ctrl)
 	ctx := context.Background()
 
+	userID := uuid.NewV4()
+
 	passwordProcessor.
 		EXPECT().
 		EncodePassword(ctx, "hello").
@@ -24,20 +27,20 @@ func TestCreatePassword(t *testing.T) {
 
 	store.
 		EXPECT().
-		CreatePassword(ctx, models.UserID(10), gomock.Not("hello")).
+		CreatePassword(ctx, userID, gomock.Not("hello")).
 		Return(enums.Ok, &models.Password{
-			Id:      1,
+			Id:      uuid.NewV4(),
 			Created: 0,
-			UserId:  10,
+			UserId:  userID,
 			Value:   "",
 		})
 
 	esb.
 		EXPECT().
-		OnPasswordChanged(models.UserID(10)).
+		OnPasswordChanged(userID).
 		Times(1)
 
-	status, password := CreatePassword(store, esb, app.GetLoginController(), ctx, 10, "hello")
+	status, password := CreatePassword(store, esb, app.GetLoginController(), ctx, userID, "hello")
 	require.NotEqual(t, "hello", password.Value)
 	require.NotNil(t, password)
 	require.Equal(t, enums.Ok, status)

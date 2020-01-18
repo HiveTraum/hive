@@ -4,6 +4,7 @@ import (
 	"auth/config"
 	"auth/enums"
 	"context"
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -24,7 +25,7 @@ func TestCreatePasswordWithoutUser(t *testing.T) {
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	PurgePasswords(pool, ctx)
-	status, password := CreatePassword(pool, ctx, 1, "123")
+	status, password := CreatePassword(pool, ctx, uuid.NewV4(), "123")
 	require.Equal(t, enums.UserNotFound, status)
 	require.Nil(t, password)
 }

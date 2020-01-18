@@ -6,6 +6,7 @@ import (
 	"auth/models"
 	"context"
 	"github.com/golang/mock/gomock"
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
@@ -78,7 +79,7 @@ func TestLoginController_EncodeAccessToken(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	controller := LoginController{Store: nil}
-	token := controller.EncodeAccessToken(ctx, 1, []string{"admin"}, "123", time.Now().Add(time.Millisecond))
+	token := controller.EncodeAccessToken(ctx, uuid.NewV4(), []string{"admin"}, uuid.NewV4(), time.Now().Add(time.Millisecond))
 	require.NotEmpty(t, token)
 }
 
@@ -86,11 +87,13 @@ func TestLoginController_DecodeAccessToken(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	controller := LoginController{Store: nil}
-	encodedToken := controller.EncodeAccessToken(ctx, 1, []string{"admin"}, "123", time.Now().Add(time.Millisecond))
-	status, decodedToken := controller.DecodeAccessToken(ctx, encodedToken, "123")
+	secret := uuid.NewV4()
+	userID := uuid.NewV4()
+	encodedToken := controller.EncodeAccessToken(ctx, userID, []string{"admin"}, secret, time.Now().Add(time.Millisecond))
+	status, decodedToken := controller.DecodeAccessToken(ctx, encodedToken, secret)
 	require.Equal(t, enums.Ok, status)
 	require.NotNil(t, decodedToken)
-	require.Equal(t, models.UserID(1), decodedToken.UserID)
+	require.Equal(t, userID, decodedToken.UserID)
 	require.Contains(t, decodedToken.Roles, "admin")
 }
 
@@ -98,7 +101,7 @@ func TestLoginController_DecodeIncorrectAccessToken(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	controller := LoginController{Store: nil}
-	status, decodedToken := controller.DecodeAccessToken(ctx, "123", "123")
+	status, decodedToken := controller.DecodeAccessToken(ctx, "123", uuid.NewV4())
 	require.Equal(t, enums.IncorrectToken, status)
 	require.Nil(t, decodedToken)
 }
@@ -107,9 +110,10 @@ func TestLoginController_DecodeExpiredAccessToken(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	controller := LoginController{Store: nil}
-	encodedToken := controller.EncodeAccessToken(ctx, 1, []string{"admin"}, "123", time.Now().Add(time.Second))
+	secret := uuid.NewV4()
+	encodedToken := controller.EncodeAccessToken(ctx, uuid.NewV4(), []string{"admin"}, secret, time.Now().Add(time.Second))
 	time.Sleep(time.Second * 2)
-	status, decodedToken := controller.DecodeAccessToken(ctx, encodedToken, "123")
+	status, decodedToken := controller.DecodeAccessToken(ctx, encodedToken, secret)
 	require.Equal(t, enums.InvalidToken, status)
 	require.Nil(t, decodedToken)
 }
@@ -118,11 +122,12 @@ func TestLoginController_DecodeAccessTokenWithoutValidation(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	controller := LoginController{Store: nil}
-	encodedToken := controller.EncodeAccessToken(ctx, 1, []string{"admin"}, "123", time.Now().Add(time.Millisecond))
+	userID := uuid.NewV4()
+	encodedToken := controller.EncodeAccessToken(ctx, userID, []string{"admin"}, uuid.NewV4(), time.Now().Add(time.Millisecond))
 	status, decodedToken := controller.DecodeAccessTokenWithoutValidation(ctx, encodedToken)
 	require.Equal(t, enums.Ok, status)
 	require.NotNil(t, decodedToken)
-	require.Equal(t, models.UserID(1), decodedToken.UserID)
+	require.Equal(t, userID, decodedToken.UserID)
 	require.Contains(t, decodedToken.Roles, "admin")
 }
 
@@ -145,12 +150,13 @@ func TestLoginController_DecodeExpiredAccessTokenWithoutValidation(t *testing.T)
 	t.Parallel()
 	ctx := context.Background()
 	controller := LoginController{Store: nil}
-	encodedToken := controller.EncodeAccessToken(ctx, 1, []string{"admin"}, "123", time.Now().Add(time.Second))
+	userID := uuid.NewV4()
+	encodedToken := controller.EncodeAccessToken(ctx,  userID, []string{"admin"}, uuid.NewV4(), time.Now().Add(time.Second))
 	time.Sleep(time.Second * 2)
 	status, decodedToken := controller.DecodeAccessTokenWithoutValidation(ctx, encodedToken)
 	require.Equal(t, enums.Ok, status)
 	require.NotNil(t, decodedToken)
-	require.Equal(t, models.UserID(1), decodedToken.UserID)
+	require.Equal(t, userID, decodedToken.UserID)
 	require.Contains(t, decodedToken.Roles, "admin")
 }
 
@@ -164,9 +170,9 @@ func TestLoginController_LoginByTokens(t *testing.T) {
 
 	refreshToken := "refreshToken"
 	fingerprint := "fingerprint"
-	userID := models.UserID(1)
-	secretID := models.SecretID(1)
-	secretValue := "123"
+	userID := uuid.NewV4()
+	secretID := uuid.NewV4()
+	secretValue := uuid.NewV4()
 
 	store.
 		EXPECT().
@@ -183,7 +189,7 @@ func TestLoginController_LoginByTokens(t *testing.T) {
 
 	store.
 		EXPECT().
-		GetSecret(ctx, models.SecretID(1)).
+		GetSecret(ctx, secretID).
 		Times(1).
 		Return(&models.Secret{
 			Id:      secretID,
@@ -229,8 +235,8 @@ func TestLoginController_LoginByTokensWithoutSession(t *testing.T) {
 
 	refreshToken := "refreshToken"
 	fingerprint := "fingerprint"
-	userID := models.UserID(1)
-	secretValue := "123"
+	userID := uuid.NewV4()
+	secretValue := uuid.NewV4()
 
 	store.
 		EXPECT().
@@ -254,9 +260,9 @@ func TestLoginController_LoginByTokensWithoutSecret(t *testing.T) {
 
 	refreshToken := "refreshToken"
 	fingerprint := "fingerprint"
-	userID := models.UserID(1)
-	secretID := models.SecretID(1)
-	secretValue := "123"
+	userID := uuid.NewV4()
+	secretID := uuid.NewV4()
+	secretValue := uuid.NewV4()
 
 	store.
 		EXPECT().
@@ -273,7 +279,7 @@ func TestLoginController_LoginByTokensWithoutSecret(t *testing.T) {
 
 	store.
 		EXPECT().
-		GetSecret(ctx, models.SecretID(1)).
+		GetSecret(ctx, secretID).
 		Times(1).
 		Return(nil)
 
@@ -293,9 +299,9 @@ func TestLoginController_LoginByTokensWithoutUser(t *testing.T) {
 
 	refreshToken := "refreshToken"
 	fingerprint := "fingerprint"
-	userID := models.UserID(1)
-	secretID := models.SecretID(1)
-	secretValue := "123"
+	userID := uuid.NewV4()
+	secretID := uuid.NewV4()
+	secretValue := uuid.NewV4()
 
 	store.
 		EXPECT().
@@ -312,7 +318,7 @@ func TestLoginController_LoginByTokensWithoutUser(t *testing.T) {
 
 	store.
 		EXPECT().
-		GetSecret(ctx, models.SecretID(1)).
+		GetSecret(ctx, secretID).
 		Times(1).
 		Return(&models.Secret{
 			Id:      secretID,
@@ -345,14 +351,14 @@ func TestLoginController_LoginByEmailAndPassword(t *testing.T) {
 	password := "123"
 	encodedPassword := controller.EncodePassword(ctx, password)
 	email := "mail@mail.com"
-	userID := models.UserID(1)
+	userID := uuid.NewV4()
 
 	store.
 		EXPECT().
 		GetEmail(ctx, email).
 		Times(1).
 		Return(enums.Ok, &models.Email{
-			Id:      models.EmailID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   email,
@@ -363,7 +369,7 @@ func TestLoginController_LoginByEmailAndPassword(t *testing.T) {
 		GetLatestPassword(ctx, userID).
 		Times(1).
 		Return(enums.Ok, &models.Password{
-			Id:      models.PasswordID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   encodedPassword,
@@ -425,14 +431,14 @@ func TestLoginController_LoginByEmailAndPasswordWithoutPassword(t *testing.T) {
 
 	password := "123"
 	email := "mail@mail.com"
-	userID := models.UserID(1)
+	userID := uuid.NewV4()
 
 	store.
 		EXPECT().
 		GetEmail(ctx, email).
 		Times(1).
 		Return(enums.Ok, &models.Email{
-			Id:      models.EmailID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   email,
@@ -460,14 +466,14 @@ func TestLoginController_LoginByEmailAndPasswordWithIncorrectPassword(t *testing
 	password := "123"
 	encodedPassword := controller.EncodePassword(ctx, "321")
 	email := "mail@mail.com"
-	userID := models.UserID(1)
+	userID := uuid.NewV4()
 
 	store.
 		EXPECT().
 		GetEmail(ctx, email).
 		Times(1).
 		Return(enums.Ok, &models.Email{
-			Id:      models.EmailID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   email,
@@ -478,7 +484,7 @@ func TestLoginController_LoginByEmailAndPasswordWithIncorrectPassword(t *testing
 		GetLatestPassword(ctx, userID).
 		Times(1).
 		Return(enums.Ok, &models.Password{
-			Id:      models.PasswordID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   encodedPassword,
@@ -500,14 +506,14 @@ func TestLoginController_LoginByEmailAndPasswordWithoutUser(t *testing.T) {
 	password := "123"
 	encodedPassword := controller.EncodePassword(ctx, password)
 	email := "mail@mail.com"
-	userID := models.UserID(1)
+	userID := uuid.NewV4()
 
 	store.
 		EXPECT().
 		GetEmail(ctx, email).
 		Times(1).
 		Return(enums.Ok, &models.Email{
-			Id:      models.EmailID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   email,
@@ -518,7 +524,7 @@ func TestLoginController_LoginByEmailAndPasswordWithoutUser(t *testing.T) {
 		GetLatestPassword(ctx, userID).
 		Times(1).
 		Return(enums.Ok, &models.Password{
-			Id:      models.PasswordID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   encodedPassword,
@@ -547,14 +553,14 @@ func TestLoginController_LoginByEmailAndCode(t *testing.T) {
 
 	code := "123"
 	email := "mail@mail.com"
-	userID := models.UserID(1)
+	userID := uuid.NewV4()
 
 	store.
 		EXPECT().
 		GetEmail(ctx, email).
 		Times(1).
 		Return(enums.Ok, &models.Email{
-			Id:      models.EmailID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   email,
@@ -674,14 +680,14 @@ func TestLoginController_LoginByEmailAndCodeWithoutUser(t *testing.T) {
 
 	code := "123"
 	email := "mail@mail.com"
-	userID := models.UserID(1)
+	userID := uuid.NewV4()
 
 	store.
 		EXPECT().
 		GetEmail(ctx, email).
 		Times(1).
 		Return(enums.Ok, &models.Email{
-			Id:      models.EmailID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   email,
@@ -717,14 +723,14 @@ func TestLoginController_LoginByPhoneAndPassword(t *testing.T) {
 	password := "123"
 	encodedPassword := controller.EncodePassword(ctx, password)
 	phone := "+71234567890"
-	userID := models.UserID(1)
+	userID := uuid.NewV4()
 
 	store.
 		EXPECT().
 		GetPhone(ctx, phone).
 		Times(1).
 		Return(enums.Ok, &models.Phone{
-			Id:      models.PhoneID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   phone,
@@ -735,7 +741,7 @@ func TestLoginController_LoginByPhoneAndPassword(t *testing.T) {
 		GetLatestPassword(ctx, userID).
 		Times(1).
 		Return(enums.Ok, &models.Password{
-			Id:      models.PasswordID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   encodedPassword,
@@ -797,14 +803,14 @@ func TestLoginController_LoginByPhoneAndPasswordWithoutPassword(t *testing.T) {
 
 	password := "123"
 	phone := "+71234567890"
-	userID := models.UserID(1)
+	userID := uuid.NewV4()
 
 	store.
 		EXPECT().
 		GetPhone(ctx, phone).
 		Times(1).
 		Return(enums.Ok, &models.Phone{
-			Id:      models.PhoneID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   phone,
@@ -832,14 +838,14 @@ func TestLoginController_LoginByPhoneAndPasswordWithIncorrectPassword(t *testing
 	password := "123"
 	encodedPassword := controller.EncodePassword(ctx, "321")
 	phone := "+71234567890"
-	userID := models.UserID(1)
+	userID := uuid.NewV4()
 
 	store.
 		EXPECT().
 		GetPhone(ctx, phone).
 		Times(1).
 		Return(enums.Ok, &models.Phone{
-			Id:      models.PhoneID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   phone,
@@ -850,7 +856,7 @@ func TestLoginController_LoginByPhoneAndPasswordWithIncorrectPassword(t *testing
 		GetLatestPassword(ctx, userID).
 		Times(1).
 		Return(enums.Ok, &models.Password{
-			Id:      models.PasswordID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   encodedPassword,
@@ -872,14 +878,14 @@ func TestLoginController_LoginByPhoneAndPasswordWithoutUser(t *testing.T) {
 	password := "123"
 	encodedPassword := controller.EncodePassword(ctx, password)
 	phone := "+71234567890"
-	userID := models.UserID(1)
+	userID := uuid.NewV4()
 
 	store.
 		EXPECT().
 		GetPhone(ctx, phone).
 		Times(1).
 		Return(enums.Ok, &models.Phone{
-			Id:      models.PhoneID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   phone,
@@ -890,7 +896,7 @@ func TestLoginController_LoginByPhoneAndPasswordWithoutUser(t *testing.T) {
 		GetLatestPassword(ctx, userID).
 		Times(1).
 		Return(enums.Ok, &models.Password{
-			Id:      models.PasswordID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   encodedPassword,
@@ -919,14 +925,14 @@ func TestLoginController_LoginByPhoneAndCode(t *testing.T) {
 
 	code := "123"
 	phone := "+71234567890"
-	userID := models.UserID(1)
+	userID := uuid.NewV4()
 
 	store.
 		EXPECT().
 		GetPhone(ctx, phone).
 		Times(1).
 		Return(enums.Ok, &models.Phone{
-			Id:      models.PhoneID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   phone,
@@ -1046,14 +1052,14 @@ func TestLoginController_LoginByPhoneAndCodeWithoutUser(t *testing.T) {
 
 	code := "123"
 	phone := "+71234567890"
-	userID := models.UserID(1)
+	userID := uuid.NewV4()
 
 	store.
 		EXPECT().
 		GetPhone(ctx, phone).
 		Times(1).
 		Return(enums.Ok, &models.Phone{
-			Id:      models.PhoneID(1),
+			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
 			Value:   phone,

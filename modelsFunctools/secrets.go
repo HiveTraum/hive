@@ -2,19 +2,19 @@ package modelsFunctools
 
 import (
 	"auth/functools"
-	"auth/models"
+	uuid "github.com/satori/go.uuid"
 )
 
-func SecretIDListToInt64List(id []models.SecretID) []int64 {
-	identifiers := make([]int64, len(id))
+func SecretIDListToStringList(id []uuid.UUID) []string {
+	identifiers := make([]string, len(id))
 
 	for i, v := range id {
-		identifiers[i] = int64(v)
+		identifiers[i] = v.String()
 	}
 
 	return identifiers
 }
 
-func SecretIDListToPGArray(id []models.SecretID) string {
-	return functools.Int64ListToPGArray(SecretIDListToInt64List(id))
+func SecretIDListToPGArray(id []uuid.UUID) string {
+	return functools.StringsToPGArray(SecretIDListToStringList(id))
 }

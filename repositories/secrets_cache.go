@@ -11,19 +11,19 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
-	"strconv"
+	uuid "github.com/satori/go.uuid"
 	"time"
 )
 
-func getSecretKey(id models.SecretID) string {
-	return fmt.Sprintf("%s:%d", enums.Secret, id)
+func getSecretKey(id uuid.UUID) string {
+	return fmt.Sprintf("%s:%s", enums.Secret, id.String())
 }
 
 func cacheSecret(cache *redis.Client, span opentracing.Span, secret *models.Secret, key string, timeout time.Duration) error {
 	secretCache := &inout.SecretCache{
-		Id:      int64(secret.Id),
+		Id:      secret.Id.Bytes(),
 		Created: secret.Created,
-		Value:   secret.Value,
+		Value:   secret.Value.Bytes(),
 	}
 
 	data, err := proto.Marshal(secretCache)
@@ -58,19 +58,19 @@ func getSecretFromCache(cache *redis.Client, span opentracing.Span, key string) 
 		return nil
 	}
 
-	span.LogFields(log.String("secret_id", strconv.Itoa(int(secretCache.Id))))
+	span.LogFields(log.String("secret_id", uuid.FromBytesOrNil(secretCache.Id).String()))
 
 	return &models.Secret{
-		Id:      models.SecretID(secretCache.Id),
+		Id:      uuid.FromBytesOrNil(secretCache.Id),
 		Created: secretCache.Created,
-		Value:   secretCache.Value,
+		Value:   uuid.FromBytesOrNil(secretCache.Value),
 	}
 }
 
 func CacheActualSecret(cache *redis.Client, ctx context.Context, secret *models.Secret, timeout time.Duration) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "Cache actual secret")
 	err := cacheSecret(cache, span, secret, enums.ActualSecret, timeout)
-	span.LogFields(log.String("secret_id", strconv.Itoa(int(secret.Id))))
+	span.LogFields(log.String("secret_id", secret.Id.String()))
 	span.Finish()
 	return err
 }
@@ -78,7 +78,7 @@ func CacheActualSecret(cache *redis.Client, ctx context.Context, secret *models.
 func CacheSecret(cache *redis.Client, ctx context.Context, secret *models.Secret, timeout time.Duration) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "Cache secret")
 	err := cacheSecret(cache, span, secret, getSecretKey(secret.Id), timeout)
-	span.LogFields(log.String("secret_id", strconv.Itoa(int(secret.Id))))
+	span.LogFields(log.String("secret_id", secret.Id.String()))
 	span.Finish()
 	return err
 }
@@ -90,7 +90,7 @@ func GetActualSecret(cache *redis.Client, ctx context.Context) *models.Secret {
 	return secret
 }
 
-func GetSecretByID(cache *redis.Client, ctx context.Context, id models.SecretID) *models.Secret {
+func GetSecretByID(cache *redis.Client, ctx context.Context, id uuid.UUID) *models.Secret {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "Get secret")
 	secret := getSecretFromCache(cache, span, getSecretKey(id))
 	span.Finish()

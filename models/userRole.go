@@ -2,8 +2,9 @@ package models
 
 import uuid "github.com/satori/go.uuid"
 
-type Role struct {
+type UserRole struct {
 	Id      uuid.UUID
 	Created int64
-	Title   string
+	UserId  uuid.UUID
+	RoleId  uuid.UUID
 }

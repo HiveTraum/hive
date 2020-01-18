@@ -1,7 +1,8 @@
 package repositories
 
 import (
-	"auth/models"
+	"fmt"
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -9,9 +10,11 @@ import (
 func TestGetRawQueryWithModifiedLimit(t *testing.T) {
 	t.Parallel()
 
+	repeatedUserID := uuid.NewV4()
+
 	q := GetUsersQuery{
-		Limit:       100,
-		Id: []models.UserID{1, 2, 3, 4, 5, 5},
+		Limit: 100,
+		Id:    []uuid.UUID{uuid.NewV4(), uuid.NewV4(), uuid.NewV4(), uuid.NewV4(), repeatedUserID, repeatedUserID},
 	}
 
 	rw := convertGetUsersQueryToRaw(q)
@@ -23,8 +26,8 @@ func TestGetRawQueryLimitWithEmptyId(t *testing.T) {
 	t.Parallel()
 
 	q := GetUsersQuery{
-		Limit:       100,
-		Id: []models.UserID{},
+		Limit: 100,
+		Id:    []uuid.UUID{},
 	}
 
 	rw := convertGetUsersQueryToRaw(q)
@@ -35,9 +38,11 @@ func TestGetRawQueryLimitWithEmptyId(t *testing.T) {
 func TestGetRawQueryWithLimitLessThenId(t *testing.T) {
 	t.Parallel()
 
+	repeatedUserID := uuid.NewV4()
+
 	q := GetUsersQuery{
-		Limit:       3,
-		Id: []models.UserID{1, 2, 3, 4, 5, 5},
+		Limit: 3,
+		Id:    []uuid.UUID{uuid.NewV4(), uuid.NewV4(), uuid.NewV4(), uuid.NewV4(), repeatedUserID, repeatedUserID},
 	}
 
 	rw := convertGetUsersQueryToRaw(q)
@@ -49,7 +54,7 @@ func TestGetRawQueryWithEmptyId(t *testing.T) {
 	t.Parallel()
 
 	q := GetUsersQuery{
-		Id: []models.UserID{},
+		Id: []uuid.UUID{},
 	}
 
 	rw := convertGetUsersQueryToRaw(q)
@@ -60,11 +65,13 @@ func TestGetRawQueryWithEmptyId(t *testing.T) {
 func TestGetRawQueryWithId(t *testing.T) {
 	t.Parallel()
 
+	first, second, third := uuid.NewV4(), uuid.NewV4(), uuid.NewV4()
+
 	q := GetUsersQuery{
-		Id: []models.UserID{1, 2, 3, 4, 5},
+		Id: []uuid.UUID{first, second, third},
 	}
 
 	rw := convertGetUsersQueryToRaw(q)
 
-	require.True(t, rw.Id == "{1,2,3,4,5}")
+	require.True(t, rw.Id == fmt.Sprintf("{%s,%s,%s}", first.String(), second.String(), third.String()))
 }

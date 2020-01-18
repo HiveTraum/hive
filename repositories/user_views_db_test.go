@@ -3,8 +3,8 @@ package repositories
 import (
 	"auth/config"
 	"auth/enums"
-	"auth/models"
 	"context"
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -35,10 +35,10 @@ func TestCreateOrUpdateUsersViewOnUserCreation(t *testing.T) {
 	CreateUser(pool, ctx)
 	CreateUser(pool, ctx)
 	views = CreateOrUpdateUsersView(pool, ctx, CreateOrUpdateUsersViewStoreQuery{
-		Id: []models.UserID{user.Id}, Roles: nil,
+		Id: []uuid.UUID{user.Id}, Roles: nil,
 	})
 	require.Len(t, views, 1)
-	require.Equal(t, int64(user.Id), views[0].Id)
+	require.Equal(t, user.Id, views[0].Id)
 
 	views = CreateOrUpdateUsersView(pool, ctx, CreateOrUpdateUsersViewStoreQuery{})
 	require.Len(t, views, 4)
@@ -53,7 +53,7 @@ func TestCreateOrUpdateUsersViewWithTheSamePhone(t *testing.T) {
 	firstUser := CreateUser(pool, ctx)
 	status, phone := CreatePhone(pool, ctx, firstUser.Id, "+71234567890")
 	require.Equal(t, enums.Ok, status)
-	views := CreateOrUpdateUsersView(pool, ctx, CreateOrUpdateUsersViewStoreQuery{Id: []models.UserID{firstUser.Id}})
+	views := CreateOrUpdateUsersView(pool, ctx, CreateOrUpdateUsersViewStoreQuery{Id: []uuid.UUID{firstUser.Id}})
 	require.Len(t, views, 1)
 	require.Len(t, views[0].Phones, 1)
 	require.Equal(t, phone.Value, views[0].Phones[0])
@@ -62,7 +62,7 @@ func TestCreateOrUpdateUsersViewWithTheSamePhone(t *testing.T) {
 	require.Equal(t, enums.Ok, status)
 	require.Equal(t, secondsUserWithTheSamePhone.Id, phone.UserId)
 	views = CreateOrUpdateUsersView(pool, ctx, CreateOrUpdateUsersViewStoreQuery{
-		Id: []models.UserID{firstUser.Id, secondsUserWithTheSamePhone.Id},
+		Id: []uuid.UUID{firstUser.Id, secondsUserWithTheSamePhone.Id},
 	})
 	require.Len(t, views, 2)
 	require.Len(t, views[0].Phones, 0)

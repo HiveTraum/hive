@@ -73,18 +73,18 @@ func main() {
 
 	handlers := []handler{
 		{pattern: "/views/v1/users", h: usersView, methods: R},
-		{pattern: "/views/v1/users/{id:[0-9]+}", h: userView, methods: R},
+		{pattern: "/views/v1/users/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: userView, methods: R},
 
 		{pattern: "/api/v1/users", h: usersAPI, methods: CR},
-		{pattern: "/api/v1/users/{id:[0-9]+}", h: userAPI, methods: R},
+		{pattern: "/api/v1/users/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: userAPI, methods: R},
 
 		{pattern: "/api/v1/passwords", h: passwordsAPI, methods: C},
 
 		{pattern: "/api/v1/roles", h: rolesAPI, methods: CR},
-		{pattern: "/api/v1/roles/{id:[0-9]+}", h: roleAPI, methods: R},
+		{pattern: "/api/v1/roles/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: roleAPI, methods: R},
 
 		{pattern: "/api/v1/user_roles", h: userRolesAPI, methods: CR},
-		{pattern: "/api/v1/user_roles/{id:[0-9]+}", h: userRoleAPI, methods: D},
+		{pattern: "/api/v1/user_roles/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: userRoleAPI, methods: D},
 
 		{pattern: "/api/v1/phoneConfirmations", h: phoneConfirmationsAPI, methods: C},
 		{pattern: "/api/v1/phones", h: phonesAPI, methods: C},

@@ -6,6 +6,7 @@ import (
 	"auth/inout"
 	"auth/models"
 	"context"
+	uuid "github.com/satori/go.uuid"
 )
 
 func CreateUser(
@@ -15,7 +16,7 @@ func CreateUser(
 	ctx context.Context,
 	body *inout.CreateUserRequestV1) (int, *models.User) {
 
-	var identifiers []models.UserID
+	var identifiers []uuid.UUID
 
 	if body.Password == "" {
 		return enums.PasswordRequired, nil

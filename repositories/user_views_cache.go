@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"auth/enums"
+	"auth/functools"
 	"auth/inout"
 	"auth/models"
 	"auth/modelsFunctools"
@@ -12,14 +13,15 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
+	uuid "github.com/satori/go.uuid"
 	"time"
 )
 
-func getUserKey(id models.UserID) string {
-	return fmt.Sprintf("%s:%d", enums.UserView, id)
+func getUserKey(id uuid.UUID) string {
+	return fmt.Sprintf("%s:%s", enums.UserView, id.String())
 }
 
-func GetUserViewFromCache(cache *redis.Client, ctx context.Context, id models.UserID) *inout.GetUserViewResponseV1 {
+func GetUserViewFromCache(cache *redis.Client, ctx context.Context, id uuid.UUID) *models.UserView {
 
 	span, ctx := opentracing.StartSpanFromContext(ctx, "Get user view from cache")
 
@@ -32,7 +34,7 @@ func GetUserViewFromCache(cache *redis.Client, ctx context.Context, id models.Us
 		return nil
 	}
 
-	var userView inout.GetUserViewResponseV1
+	var userView inout.UserViewCache
 
 	err = proto.Unmarshal(value, &userView)
 
@@ -44,10 +46,22 @@ func GetUserViewFromCache(cache *redis.Client, ctx context.Context, id models.Us
 
 	span.Finish()
 
-	return &userView
+	rolesID := make([]uuid.UUID, len(userView.RolesID))
+	for i, id := range userView.RolesID {
+		rolesID[i] = uuid.FromBytesOrNil(id)
+	}
+
+	return &models.UserView{
+		Id:      uuid.FromBytesOrNil(userView.Id),
+		Created: userView.Created,
+		Roles:   userView.Roles,
+		Phones:  userView.Phones,
+		Emails:  userView.Emails,
+		RolesID: rolesID,
+	}
 }
 
-func CacheUserView(cache *redis.Client, ctx context.Context, userViews []*inout.GetUserViewResponseV1) {
+func CacheUserView(cache *redis.Client, ctx context.Context, userViews []*models.UserView) {
 
 	span, ctx := opentracing.StartSpanFromContext(ctx, "Cache user views")
 
@@ -55,10 +69,23 @@ func CacheUserView(cache *redis.Client, ctx context.Context, userViews []*inout.
 		return
 	}
 
-	identifiers := make([]models.UserID, len(userViews))
+	userViewsCache := make([]*inout.UserViewCache, len(userViews))
+
+	for i, uv := range userViews {
+		userViewsCache[i] = &inout.UserViewCache{
+			Id:                   uv.Id.Bytes(),
+			Created:              uv.Created,
+			Roles:                uv.Roles,
+			Phones:               uv.Phones,
+			Emails:               uv.Emails,
+			RolesID:              functools.UUIDSliceToByteArraySlice(uv.RolesID),
+		}
+	}
+
+	identifiers := make([]uuid.UUID, len(userViews))
 
 	pipeline := cache.TxPipeline()
-	for i, uv := range userViews {
+	for i, uv := range userViewsCache {
 		data, err := proto.Marshal(uv)
 		if err != nil {
 			span.LogFields(log.Error(err))
@@ -66,7 +93,7 @@ func CacheUserView(cache *redis.Client, ctx context.Context, userViews []*inout.
 			continue
 		}
 
-		userID := models.UserID(uv.Id)
+		userID := uuid.FromBytesOrNil(uv.Id)
 
 		identifiers[i] = userID
 		pipeline.Set(getUserKey(userID), data, time.Hour*48)

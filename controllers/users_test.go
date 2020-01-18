@@ -7,6 +7,7 @@ import (
 	"auth/models"
 	"context"
 	"github.com/golang/mock/gomock"
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -16,6 +17,8 @@ func TestCreateUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	_, store, esb, loginController := mocks.InitMockApp(ctrl)
 	ctx := context.Background()
+
+	firstUserID, secondUserID, thirdUserID := uuid.NewV4(), uuid.NewV4(), uuid.NewV4()
 
 	loginController.
 		EXPECT().
@@ -31,9 +34,9 @@ func TestCreateUser(t *testing.T) {
 		EXPECT().
 		GetPhone(ctx, "+71234567890").
 		Return(enums.Ok, &models.Phone{
-			Id:      1,
+			Id:      uuid.NewV4(),
 			Created: 0,
-			UserId:  2,
+			UserId:  firstUserID,
 			Value:   "+71234567890",
 		})
 
@@ -46,9 +49,9 @@ func TestCreateUser(t *testing.T) {
 		EXPECT().
 		GetEmail(ctx, "email@email.com").
 		Return(enums.Ok, &models.Email{
-			Id:      3,
+			Id:      uuid.NewV4(),
 			Created: 0,
-			UserId:  4,
+			UserId:  secondUserID,
 			Value:   "email@email.com",
 		})
 
@@ -70,13 +73,13 @@ func TestCreateUser(t *testing.T) {
 			EmailCode: body.EmailCode,
 		}).
 		Return(enums.Ok, &models.User{
-			Id:      5,
+			Id:      thirdUserID,
 			Created: 0,
 		})
 
 	esb.
 		EXPECT().
-		OnUserChanged([]models.UserID{2, 4, 5}).
+		OnUserChanged([]uuid.UUID{firstUserID, secondUserID, thirdUserID}).
 		Times(1)
 
 	body.Phone = "71234567890"
@@ -84,7 +87,7 @@ func TestCreateUser(t *testing.T) {
 	status, user := CreateUser(store, esb, loginController, ctx, &body)
 
 	require.Equal(t, &models.User{
-		Id:      5,
+		Id:      thirdUserID,
 		Created: 0,
 	}, user)
 

@@ -6,6 +6,7 @@ import (
 	"context"
 	"github.com/getsentry/sentry-go"
 	"github.com/jackc/pgx/v4"
+	uuid "github.com/satori/go.uuid"
 )
 
 func createSessionSQL() string {
@@ -35,13 +36,13 @@ func scanSession(row pgx.Row) *models.Session {
 	return session
 }
 
-func CreateSession(db DB, ctx context.Context, fingerprint string, userID models.UserID, secretID models.SecretID, userAgent string) (int, *models.Session) {
+func CreateSession(db DB, ctx context.Context, fingerprint string, userID uuid.UUID, secretID uuid.UUID, userAgent string) (int, *models.Session) {
 	sql := createSessionSQL()
 	row := db.QueryRow(ctx, sql, fingerprint, userID, secretID, userAgent)
 	return enums.Ok, scanSession(row)
 }
 
-func GetSession(db DB, ctx context.Context, fingerprint string, refreshToken string, userID models.UserID) *models.Session {
+func GetSession(db DB, ctx context.Context, fingerprint string, refreshToken string, userID uuid.UUID) *models.Session {
 	sql := getSessionsSQL()
 	row := db.QueryRow(ctx, sql, refreshToken, fingerprint, userID, 1)
 	return scanSession(row)

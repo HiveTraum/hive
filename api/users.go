@@ -7,14 +7,13 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
-	"auth/models"
 	"auth/modelsFunctools"
 	"auth/repositories"
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/mux"
+	uuid "github.com/satori/go.uuid"
 	"net/http"
-	"strconv"
 )
 
 func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
@@ -31,7 +30,7 @@ func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.GetUserResponseV1{
-			Id:      int64(user.Id),
+			Id:      user.Id.Bytes(),
 			Created: user.Created,
 		}
 	case enums.MinimumOneFieldRequired:
@@ -82,7 +81,7 @@ func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 
 	default:
 		return http.StatusCreated, &inout.GetUserResponseV1{
-			Id:      int64(user.Id),
+			Id:      user.Id.Bytes(),
 			Created: user.Created,
 		}
 	}
@@ -104,7 +103,7 @@ func getUsersV1(r *functools.Request, app infrastructure.AppInterface) (int, *in
 
 	for i, user := range users {
 		usersData[i] = &inout.GetUserResponseV1{
-			Id:      int64(user.Id),
+			Id:      user.Id.Bytes(),
 			Created: user.Created,
 		}
 	}
@@ -112,7 +111,7 @@ func getUsersV1(r *functools.Request, app infrastructure.AppInterface) (int, *in
 	return http.StatusOK, &inout.ListUserResponseV1{Data: usersData}
 }
 
-func getUserV1(r *functools.Request, app infrastructure.AppInterface, id models.UserID) (int, *inout.GetUserResponseV1) {
+func getUserV1(r *functools.Request, app infrastructure.AppInterface, id uuid.UUID) (int, *inout.GetUserResponseV1) {
 	user := app.GetStore().GetUser(r.Context(), id)
 
 	if user == nil {
@@ -120,7 +119,7 @@ func getUserV1(r *functools.Request, app infrastructure.AppInterface, id models.
 	}
 
 	return http.StatusOK, &inout.GetUserResponseV1{
-		Id:      int64(user.Id),
+		Id:      user.Id.Bytes(),
 		Created: user.Created,
 	}
 }
@@ -139,7 +138,7 @@ func UserAPIV1(app infrastructure.AppInterface) middlewares.ResponseControllerHa
 	return func(request *functools.Request) (i int, message proto.Message) {
 
 		vars := mux.Vars(request.Request)
-		id, err := strconv.ParseInt(vars["id"], 10, 64)
+		id, err := uuid.FromString(vars["id"])
 
 		if err != nil {
 			// Сознательно отправляем отчет об ошибке, т.к. в vars["id"] не должны попасть не числовые значения.
@@ -148,6 +147,6 @@ func UserAPIV1(app infrastructure.AppInterface) middlewares.ResponseControllerHa
 			return http.StatusBadRequest, nil
 		}
 
-		return getUserV1(request, app, models.UserID(id))
+		return getUserV1(request, app, id)
 	}
 }

@@ -1,11 +1,12 @@
 package repositories
 
 import (
+	"auth/functools"
 	"auth/models"
-	"auth/modelsFunctools"
 	"context"
 	"github.com/getsentry/sentry-go"
 	"github.com/jackc/pgx/v4"
+	uuid "github.com/satori/go.uuid"
 )
 
 func createSecretSQL() string {
@@ -16,7 +17,7 @@ func getSecretsSQL() string {
 	return `
 		SELECT id, created, value
 		FROM secrets
-		WHERE (array_length($1::integer[], 1) IS NULL OR id = ANY ($1::bigint[]))
+		WHERE (array_length($1::uuid[], 1) IS NULL OR id = ANY ($1::uuid[]))
 		LIMIT $2;
 		`
 }
@@ -39,8 +40,8 @@ func CreateSecret(db DB, ctx context.Context) *models.Secret {
 	return scanSecret(row)
 }
 
-func GetSecretFromDB(db DB, ctx context.Context, id models.SecretID) *models.Secret {
+func GetSecretFromDB(db DB, ctx context.Context, id uuid.UUID) *models.Secret {
 	sql := getSecretsSQL()
-	row := db.QueryRow(ctx, sql, modelsFunctools.SecretIDListToPGArray([]models.SecretID{id}), 1)
+	row := db.QueryRow(ctx, sql, functools.StringsToPGArray([]string{id.String()}), 1)
 	return scanSecret(row)
 }

@@ -1,10 +1,10 @@
 package models
 
-type PasswordID int64
+import uuid "github.com/satori/go.uuid"
 
 type Password struct {
-	Id      PasswordID
+	Id      uuid.UUID
 	Created int64
-	UserId  UserID
+	UserId  uuid.UUID
 	Value   string
 }
