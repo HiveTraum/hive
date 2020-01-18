@@ -231,23 +231,6 @@ message CreateSessionResponseV1 {
     string accessToken = 2;
 }
 
-// Cache
-
-message SecretCache {
-    bytes id = 1;
-    int64 created = 2;
-    bytes value = 3;
-}
-
-message UserViewCache {
-    bytes id = 1;
-    int64 created = 2;
-    repeated string roles = 3;
-    repeated string phones = 4;
-    repeated string emails = 5;
-    repeated bytes rolesID = 6;
-}
-
 // User Views API
 
 message GetUserViewResponseV1 {
@@ -260,33 +243,4 @@ message GetUserViewResponseV1 {
 
 message ListUserViewResponseV1 {
     repeated GetUserViewResponseV1 data = 1;
-}
-
-// Events
-
-message CreateEmailConfirmationEventV1 {
-    string email = 1;
-    string code = 2;
-}
-
-message CreatePhoneConfirmationEventV1 {
-    string phone = 1;
-    string code = 2;
-}
-
-message ChangedUserViewsEventV1 {
-    repeated string identifiers = 1;
-}
-
-message Event {
-    string sender = 1;
-    string object = 2;
-    string action = 3;
-    string event_version = 4;
-    string data_version = 5;
-    oneof data {
-        CreatePhoneConfirmationEventV1 phoneConfirmationEvent = 6;
-        CreateEmailConfirmationEventV1 emailConfirmationEvent = 7;
-        ChangedUserViewsEventV1 changedUserViewsEvent = 8;
-    }
 }

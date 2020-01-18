@@ -1,0 +1,17 @@
+syntax = "proto3";
+package inout;
+
+message SecretCache {
+    bytes id = 1;
+    int64 created = 2;
+    bytes value = 3;
+}
+
+message UserViewCache {
+    bytes id = 1;
+    int64 created = 2;
+    repeated string roles = 3;
+    repeated string phones = 4;
+    repeated string emails = 5;
+    repeated bytes rolesID = 6;
+}

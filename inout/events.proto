@@ -1,0 +1,29 @@
+syntax = "proto3";
+package inout;
+
+message CreateEmailConfirmationEventV1 {
+    string email = 1;
+    string code = 2;
+}
+
+message CreatePhoneConfirmationEventV1 {
+    string phone = 1;
+    string code = 2;
+}
+
+message ChangedUserViewsEventV1 {
+    repeated string identifiers = 1;
+}
+
+message Event {
+    string sender = 1;
+    string object = 2;
+    string action = 3;
+    string event_version = 4;
+    string data_version = 5;
+    oneof data {
+        CreatePhoneConfirmationEventV1 phoneConfirmationEvent = 6;
+        CreateEmailConfirmationEventV1 emailConfirmationEvent = 7;
+        ChangedUserViewsEventV1 changedUserViewsEvent = 8;
+    }
+}
