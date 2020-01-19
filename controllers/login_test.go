@@ -516,49 +516,9 @@ func TestLoginController_LoginByEmailAndCodeWithoutEmail(t *testing.T) {
 		Times(1).
 		Return(enums.Ok, nil)
 
-	status, user := controller.LoginByEmailAndCode(ctx, email, emailCode)
+	status, loggedUserID := controller.LoginByEmailAndCode(ctx, email, emailCode)
 	require.Equal(t, enums.EmailNotFound, status)
-	require.Nil(t, user)
-}
-
-func TestLoginController_LoginByEmailAndCodeWithoutUser(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	_, store, _, _ := mocks.InitMockApp(ctrl)
-	controller := LoginController{Store: store}
-
-	code := "123"
-	email := "mail@mail.com"
-	userID := uuid.NewV4()
-
-	store.
-		EXPECT().
-		GetEmail(ctx, email).
-		Times(1).
-		Return(enums.Ok, &models.Email{
-			Id:      uuid.NewV4(),
-			Created: 1,
-			UserId:  userID,
-			Value:   email,
-		})
-
-	store.
-		EXPECT().
-		GetEmailConfirmationCode(ctx, email).
-		Times(1).
-		Return(code)
-
-	store.
-		EXPECT().
-		GetUser(ctx, userID).
-		Times(1).
-		Return(nil)
-
-	status, user := controller.LoginByEmailAndCode(ctx, email, code)
-	require.Equal(t, enums.UserNotFound, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }
 
 // Phone and password
@@ -598,18 +558,9 @@ func TestLoginController_LoginByPhoneAndPassword(t *testing.T) {
 			Value:   encodedPassword,
 		})
 
-	store.
-		EXPECT().
-		GetUser(ctx, userID).
-		Times(1).
-		Return(&models.User{
-			Id:      userID,
-			Created: 1,
-		})
-
-	status, user := controller.LoginByPhoneAndPassword(ctx, phone, password)
+	status, loggedUserID := controller.LoginByPhoneAndPassword(ctx, phone, password)
 	require.Equal(t, enums.Ok, status)
-	require.NotNil(t, user)
+	require.Equal(t, userID, loggedUserID)
 }
 
 func TestLoginController_LoginByPhoneAndPasswordWithIncorrectPhone(t *testing.T) {
@@ -617,9 +568,9 @@ func TestLoginController_LoginByPhoneAndPasswordWithIncorrectPhone(t *testing.T)
 	ctx := context.Background()
 	controller := LoginController{Store: nil}
 
-	status, user := controller.LoginByPhoneAndPassword(ctx, "123", "password")
+	status, loggedUserID := controller.LoginByPhoneAndPassword(ctx, "123", "password")
 	require.Equal(t, enums.IncorrectPhone, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }
 
 func TestLoginController_LoginByPhoneAndPasswordWithoutPhone(t *testing.T) {
@@ -639,9 +590,9 @@ func TestLoginController_LoginByPhoneAndPasswordWithoutPhone(t *testing.T) {
 		Times(1).
 		Return(enums.Ok, nil)
 
-	status, user := controller.LoginByPhoneAndPassword(ctx, phone, password)
+	status, loggedUserID := controller.LoginByPhoneAndPassword(ctx, phone, password)
 	require.Equal(t, enums.PhoneNotFound, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }
 
 func TestLoginController_LoginByPhoneAndPasswordWithoutPassword(t *testing.T) {
@@ -673,9 +624,9 @@ func TestLoginController_LoginByPhoneAndPasswordWithoutPassword(t *testing.T) {
 		Times(1).
 		Return(enums.Ok, nil)
 
-	status, user := controller.LoginByPhoneAndPassword(ctx, phone, password)
+	status, loggedUserID := controller.LoginByPhoneAndPassword(ctx, phone, password)
 	require.Equal(t, enums.PasswordNotFound, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }
 
 func TestLoginController_LoginByPhoneAndPasswordWithIncorrectPassword(t *testing.T) {
@@ -713,55 +664,9 @@ func TestLoginController_LoginByPhoneAndPasswordWithIncorrectPassword(t *testing
 			Value:   encodedPassword,
 		})
 
-	status, user := controller.LoginByPhoneAndPassword(ctx, phone, password)
+	status, loggedUserID := controller.LoginByPhoneAndPassword(ctx, phone, password)
 	require.Equal(t, enums.IncorrectPassword, status)
-	require.Nil(t, user)
-}
-
-func TestLoginController_LoginByPhoneAndPasswordWithoutUser(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	_, store, _, _ := mocks.InitMockApp(ctrl)
-	controller := LoginController{Store: store}
-
-	password := "123"
-	encodedPassword := controller.EncodePassword(ctx, password)
-	phone := "+71234567890"
-	userID := uuid.NewV4()
-
-	store.
-		EXPECT().
-		GetPhone(ctx, phone).
-		Times(1).
-		Return(enums.Ok, &models.Phone{
-			Id:      uuid.NewV4(),
-			Created: 1,
-			UserId:  userID,
-			Value:   phone,
-		})
-
-	store.
-		EXPECT().
-		GetLatestPassword(ctx, userID).
-		Times(1).
-		Return(enums.Ok, &models.Password{
-			Id:      uuid.NewV4(),
-			Created: 1,
-			UserId:  userID,
-			Value:   encodedPassword,
-		})
-
-	store.
-		EXPECT().
-		GetUser(ctx, userID).
-		Times(1).
-		Return(nil)
-
-	status, user := controller.LoginByPhoneAndPassword(ctx, phone, password)
-	require.Equal(t, enums.UserNotFound, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }
 
 // Phone and code
@@ -795,18 +700,9 @@ func TestLoginController_LoginByPhoneAndCode(t *testing.T) {
 		Times(1).
 		Return(code)
 
-	store.
-		EXPECT().
-		GetUser(ctx, userID).
-		Times(1).
-		Return(&models.User{
-			Id:      userID,
-			Created: 1,
-		})
-
-	status, user := controller.LoginByPhoneAndCode(ctx, phone, code)
+	status, loggedUserID := controller.LoginByPhoneAndCode(ctx, phone, code)
 	require.Equal(t, enums.Ok, status)
-	require.NotNil(t, user)
+	require.Equal(t, userID, loggedUserID)
 }
 
 func TestLoginController_LoginByPhoneAndCodeWithIncorrectPhone(t *testing.T) {
@@ -817,9 +713,9 @@ func TestLoginController_LoginByPhoneAndCodeWithIncorrectPhone(t *testing.T) {
 	phone := "1234"
 	code := "1234"
 
-	status, user := controller.LoginByPhoneAndCode(ctx, phone, code)
+	status, loggedUserID := controller.LoginByPhoneAndCode(ctx, phone, code)
 	require.Equal(t, enums.IncorrectPhone, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }
 
 func TestLoginController_LoginByPhoneAndCodeWithoutPhoneConfirmationCode(t *testing.T) {
@@ -839,9 +735,9 @@ func TestLoginController_LoginByPhoneAndCodeWithoutPhoneConfirmationCode(t *test
 		Times(1).
 		Return("")
 
-	status, user := controller.LoginByPhoneAndCode(ctx, phone, code)
+	status, loggedUserID := controller.LoginByPhoneAndCode(ctx, phone, code)
 	require.Equal(t, enums.PhoneConfirmationCodeNotFound, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }
 
 func TestLoginController_LoginByPhoneAndCodeWithIncorrectPhoneConfirmationCode(t *testing.T) {
@@ -860,9 +756,9 @@ func TestLoginController_LoginByPhoneAndCodeWithIncorrectPhoneConfirmationCode(t
 		Times(1).
 		Return("4321")
 
-	status, user := controller.LoginByPhoneAndCode(ctx, phone, "1234")
+	status, loggedUserID := controller.LoginByPhoneAndCode(ctx, phone, "1234")
 	require.Equal(t, enums.IncorrectPhoneCode, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }
 
 func TestLoginController_LoginByPhoneAndCodeWithoutPhone(t *testing.T) {
@@ -888,47 +784,7 @@ func TestLoginController_LoginByPhoneAndCodeWithoutPhone(t *testing.T) {
 		Times(1).
 		Return(enums.Ok, nil)
 
-	status, user := controller.LoginByPhoneAndCode(ctx, phone, code)
+	status, loggedUserID := controller.LoginByPhoneAndCode(ctx, phone, code)
 	require.Equal(t, enums.PhoneNotFound, status)
-	require.Nil(t, user)
-}
-
-func TestLoginController_LoginByPhoneAndCodeWithoutUser(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	_, store, _, _ := mocks.InitMockApp(ctrl)
-	controller := LoginController{Store: store}
-
-	code := "123"
-	phone := "+71234567890"
-	userID := uuid.NewV4()
-
-	store.
-		EXPECT().
-		GetPhone(ctx, phone).
-		Times(1).
-		Return(enums.Ok, &models.Phone{
-			Id:      uuid.NewV4(),
-			Created: 1,
-			UserId:  userID,
-			Value:   phone,
-		})
-
-	store.
-		EXPECT().
-		GetPhoneConfirmationCode(ctx, phone).
-		Times(1).
-		Return(code)
-
-	store.
-		EXPECT().
-		GetUser(ctx, userID).
-		Times(1).
-		Return(nil)
-
-	status, user := controller.LoginByPhoneAndCode(ctx, phone, code)
-	require.Equal(t, enums.UserNotFound, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }

@@ -41,13 +41,13 @@ func unwrapUserRoleScanError(err error) int {
 	var e *pgconn.PgError
 
 	if errors.As(err, &e) {
-		if strings.Contains(e.Detail, "not present in table \"users\".") {
+		if strings.Contains(e.Detail, "not present in table \"users\".") || strings.Contains(e.Detail, "отсутствует в таблице \"users\"") {
 			return enums.UserNotFound
-		} else if strings.Contains(e.Detail, "not present in table \"roles\".") {
+		} else if strings.Contains(e.Detail, "not present in table \"roles\".") || strings.Contains(e.Detail, "отсутствует в таблице \"roles\"") {
 			return enums.RoleNotFound
 		} else if strings.Contains(e.Message, "violates unique constraint \"user_roles_pkey\"") {
 			return enums.UserRoleAlreadyExist
-		} else if strings.Contains(e.Message, "duplicate key value violates unique constraint \"user_roles_idx\"") {
+		} else if strings.Contains(e.Message, "duplicate key value violates unique constraint \"user_roles_idx\"") || strings.Contains(e.Message, "повторяющееся значение ключа нарушает ограничение уникальности \"user_roles_idx\"") {
 			return enums.UserRoleAlreadyExist
 		}
 	} else if strings.Contains(err.Error(), "no rows in result") {

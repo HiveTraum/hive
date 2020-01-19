@@ -29,7 +29,7 @@ func createRoleSQL() string {
 
 func unwrapRoleScanError(err error) int {
 	var e *pgconn.PgError
-	if errors.As(err, &e) && strings.Contains(e.Message, "unique constraint \"roles_title_key\"") {
+	if errors.As(err, &e) && (strings.Contains(e.Message, "unique constraint \"roles_title_key\"") || strings.Contains(e.Message, "нарушает ограничение уникальности \"roles_title_key\"")) {
 		return enums.RoleAlreadyExist
 	} else if strings.Contains(err.Error(), "no rows") {
 		return enums.RoleNotFound

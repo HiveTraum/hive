@@ -29,7 +29,7 @@ func getEmailSQL() string {
 
 func unwrapEmailScanError(err error) int {
 	var e *pgconn.PgError
-	if errors.As(err, &e) && strings.Contains(e.Detail, "is not present in table \"users\"") {
+	if errors.As(err, &e) && strings.Contains(e.Detail, "is not present in table \"users\"") || strings.Contains(e.Detail, "отсутствует в таблице \"users\"") {
 		return enums.UserNotFound
 	} else if strings.Contains(err.Error(), "no rows") {
 		return enums.Ok

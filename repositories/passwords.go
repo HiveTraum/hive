@@ -28,7 +28,7 @@ func getPasswordsSQL() string {
 
 func unwrapPasswordScanErrors(err error) int {
 	var e *pgconn.PgError
-	if errors.As(err, &e) && strings.Contains(e.Detail, "is not present in table \"users\"") {
+	if errors.As(err, &e) && strings.Contains(e.Detail, "is not present in table \"users\"") || strings.Contains(e.Detail, "отсутствует в таблице \"users\"") {
 		return enums.UserNotFound
 	}
 
