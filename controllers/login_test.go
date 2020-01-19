@@ -79,7 +79,12 @@ func TestLoginController_EncodeAccessToken(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	controller := LoginController{Store: nil}
-	token := controller.EncodeAccessToken(ctx, uuid.NewV4(), []string{"admin"}, uuid.NewV4(), time.Now().Add(time.Millisecond))
+	secret := &models.Secret{
+		Id:      uuid.NewV4(),
+		Created: 1,
+		Value:   uuid.NewV4(),
+	}
+	token := controller.EncodeAccessToken(ctx, uuid.NewV4(), []string{"admin"}, secret, time.Now().Add(time.Millisecond))
 	require.NotEmpty(t, token)
 }
 
@@ -87,14 +92,19 @@ func TestLoginController_DecodeAccessToken(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	controller := LoginController{Store: nil}
-	secret := uuid.NewV4()
+	secret := &models.Secret{
+		Id:      uuid.NewV4(),
+		Created: 1,
+		Value:   uuid.NewV4(),
+	}
 	userID := uuid.NewV4()
 	encodedToken := controller.EncodeAccessToken(ctx, userID, []string{"admin"}, secret, time.Now().Add(time.Millisecond))
-	status, decodedToken := controller.DecodeAccessToken(ctx, encodedToken, secret)
+	status, decodedToken := controller.DecodeAccessToken(ctx, encodedToken, secret.Value)
 	require.Equal(t, enums.Ok, status)
 	require.NotNil(t, decodedToken)
 	require.Equal(t, userID, decodedToken.UserID)
 	require.Contains(t, decodedToken.Roles, "admin")
+	require.Equal(t, secret.Id, decodedToken.SecretID)
 }
 
 func TestLoginController_DecodeIncorrectAccessToken(t *testing.T) {
@@ -110,10 +120,14 @@ func TestLoginController_DecodeExpiredAccessToken(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	controller := LoginController{Store: nil}
-	secret := uuid.NewV4()
+	secret := &models.Secret{
+		Id:      uuid.NewV4(),
+		Created: 1,
+		Value:   uuid.NewV4(),
+	}
 	encodedToken := controller.EncodeAccessToken(ctx, uuid.NewV4(), []string{"admin"}, secret, time.Now().Add(time.Second))
 	time.Sleep(time.Second * 2)
-	status, decodedToken := controller.DecodeAccessToken(ctx, encodedToken, secret)
+	status, decodedToken := controller.DecodeAccessToken(ctx, encodedToken, secret.Value)
 	require.Equal(t, enums.InvalidToken, status)
 	require.Nil(t, decodedToken)
 }
@@ -123,7 +137,12 @@ func TestLoginController_DecodeAccessTokenWithoutValidation(t *testing.T) {
 	ctx := context.Background()
 	controller := LoginController{Store: nil}
 	userID := uuid.NewV4()
-	encodedToken := controller.EncodeAccessToken(ctx, userID, []string{"admin"}, uuid.NewV4(), time.Now().Add(time.Millisecond))
+	secret := &models.Secret{
+		Id:      uuid.NewV4(),
+		Created: 0,
+		Value:   uuid.NewV4(),
+	}
+	encodedToken := controller.EncodeAccessToken(ctx, userID, []string{"admin"}, secret, time.Now().Add(time.Millisecond))
 	status, decodedToken := controller.DecodeAccessTokenWithoutValidation(ctx, encodedToken)
 	require.Equal(t, enums.Ok, status)
 	require.NotNil(t, decodedToken)
@@ -151,7 +170,12 @@ func TestLoginController_DecodeExpiredAccessTokenWithoutValidation(t *testing.T)
 	ctx := context.Background()
 	controller := LoginController{Store: nil}
 	userID := uuid.NewV4()
-	encodedToken := controller.EncodeAccessToken(ctx,  userID, []string{"admin"}, uuid.NewV4(), time.Now().Add(time.Second))
+	secret := &models.Secret{
+		Id:      uuid.NewV4(),
+		Created: 0,
+		Value:   uuid.NewV4(),
+	}
+	encodedToken := controller.EncodeAccessToken(ctx, userID, []string{"admin"}, secret, time.Now().Add(time.Second))
 	time.Sleep(time.Second * 2)
 	status, decodedToken := controller.DecodeAccessTokenWithoutValidation(ctx, encodedToken)
 	require.Equal(t, enums.Ok, status)
@@ -168,48 +192,28 @@ func TestLoginController_LoginByTokens(t *testing.T) {
 	_, store, _, _ := mocks.InitMockApp(ctrl)
 	controller := LoginController{Store: store}
 
-	refreshToken := "refreshToken"
-	fingerprint := "fingerprint"
 	userID := uuid.NewV4()
-	secretID := uuid.NewV4()
-	secretValue := uuid.NewV4()
+	secret := &models.Secret{
+		Id:      uuid.NewV4(),
+		Created: 0,
+		Value:   uuid.NewV4(),
+	}
 
 	store.
 		EXPECT().
-		GetSession(ctx, fingerprint, refreshToken, userID).
-		Times(1).
-		Return(&models.Session{
-			RefreshToken: refreshToken,
-			Fingerprint:  fingerprint,
-			UserID:       userID,
-			SecretID:     secretID,
-			Created:      1,
-			UserAgent:    "chrome",
-		})
-
-	store.
-		EXPECT().
-		GetSecret(ctx, secretID).
+		GetSecret(ctx, secret.Id).
 		Times(1).
 		Return(&models.Secret{
-			Id:      secretID,
+			Id:      secret.Id,
 			Created: 1,
-			Value:   secretValue,
+			Value:   secret.Value,
 		})
 
-	store.
-		EXPECT().
-		GetUser(ctx, userID).
-		Times(1).
-		Return(&models.User{
-			Id:      userID,
-			Created: 1,
-		})
-
-	encodedToken := controller.EncodeAccessToken(ctx, userID, []string{"admin"}, secretValue, time.Now().Add(time.Second))
-	status, user := controller.LoginByTokens(ctx, refreshToken, encodedToken, fingerprint)
+	encodedToken := controller.EncodeAccessToken(ctx, userID, []string{"admin"}, secret, time.Now().Add(time.Second))
+	status, loggedUserID := controller.LoginByTokens(ctx, encodedToken)
 	require.Equal(t, enums.Ok, status)
-	require.NotNil(t, user)
+	require.NotNil(t, loggedUserID)
+	require.Equal(t, userID, loggedUserID)
 }
 
 func TestLoginController_LoginByIncorrectTokens(t *testing.T) {
@@ -217,37 +221,9 @@ func TestLoginController_LoginByIncorrectTokens(t *testing.T) {
 	ctx := context.Background()
 	controller := LoginController{Store: nil}
 
-	refreshToken := "refreshToken"
-	fingerprint := "fingerprint"
-
-	status, user := controller.LoginByTokens(ctx, refreshToken, "123", fingerprint)
+	status, userID := controller.LoginByTokens(ctx, "123")
 	require.Equal(t, enums.IncorrectToken, status)
-	require.Nil(t, user)
-}
-
-func TestLoginController_LoginByTokensWithoutSession(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	_, store, _, _ := mocks.InitMockApp(ctrl)
-	controller := LoginController{Store: store}
-
-	refreshToken := "refreshToken"
-	fingerprint := "fingerprint"
-	userID := uuid.NewV4()
-	secretValue := uuid.NewV4()
-
-	store.
-		EXPECT().
-		GetSession(ctx, fingerprint, refreshToken, userID).
-		Times(1).
-		Return(nil)
-
-	encodedToken := controller.EncodeAccessToken(ctx, userID, []string{"admin"}, secretValue, time.Now().Add(time.Second))
-	status, user := controller.LoginByTokens(ctx, refreshToken, encodedToken, fingerprint)
-	require.Equal(t, enums.SessionNotFound, status)
-	require.Nil(t, user)
+	require.Equal(t, userID, uuid.Nil)
 }
 
 func TestLoginController_LoginByTokensWithoutSecret(t *testing.T) {
@@ -258,84 +234,23 @@ func TestLoginController_LoginByTokensWithoutSecret(t *testing.T) {
 	_, store, _, _ := mocks.InitMockApp(ctrl)
 	controller := LoginController{Store: store}
 
-	refreshToken := "refreshToken"
-	fingerprint := "fingerprint"
 	userID := uuid.NewV4()
-	secretID := uuid.NewV4()
-	secretValue := uuid.NewV4()
+	secret := &models.Secret{
+		Id:      uuid.NewV4(),
+		Created: 0,
+		Value:   uuid.NewV4(),
+	}
 
 	store.
 		EXPECT().
-		GetSession(ctx, fingerprint, refreshToken, userID).
-		Times(1).
-		Return(&models.Session{
-			RefreshToken: refreshToken,
-			Fingerprint:  fingerprint,
-			UserID:       userID,
-			SecretID:     secretID,
-			Created:      1,
-			UserAgent:    "chrome",
-		})
-
-	store.
-		EXPECT().
-		GetSecret(ctx, secretID).
+		GetSecret(ctx, secret.Id).
 		Times(1).
 		Return(nil)
 
-	encodedToken := controller.EncodeAccessToken(ctx, userID, []string{"admin"}, secretValue, time.Now().Add(time.Second))
-	status, user := controller.LoginByTokens(ctx, refreshToken, encodedToken, fingerprint)
+	encodedToken := controller.EncodeAccessToken(ctx, userID, []string{"admin"}, secret, time.Now().Add(time.Second))
+	status, loggedUserID := controller.LoginByTokens(ctx, encodedToken)
 	require.Equal(t, enums.SecretNotFound, status)
-	require.Nil(t, user)
-}
-
-func TestLoginController_LoginByTokensWithoutUser(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	_, store, _, _ := mocks.InitMockApp(ctrl)
-	controller := LoginController{Store: store}
-
-	refreshToken := "refreshToken"
-	fingerprint := "fingerprint"
-	userID := uuid.NewV4()
-	secretID := uuid.NewV4()
-	secretValue := uuid.NewV4()
-
-	store.
-		EXPECT().
-		GetSession(ctx, fingerprint, refreshToken, userID).
-		Times(1).
-		Return(&models.Session{
-			RefreshToken: refreshToken,
-			Fingerprint:  fingerprint,
-			UserID:       userID,
-			SecretID:     secretID,
-			Created:      1,
-			UserAgent:    "chrome",
-		})
-
-	store.
-		EXPECT().
-		GetSecret(ctx, secretID).
-		Times(1).
-		Return(&models.Secret{
-			Id:      secretID,
-			Created: 1,
-			Value:   secretValue,
-		})
-
-	store.
-		EXPECT().
-		GetUser(ctx, userID).
-		Times(1).
-		Return(nil)
-
-	encodedToken := controller.EncodeAccessToken(ctx, userID, []string{"admin"}, secretValue, time.Now().Add(time.Second))
-	status, user := controller.LoginByTokens(ctx, refreshToken, encodedToken, fingerprint)
-	require.Equal(t, enums.UserNotFound, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }
 
 // Email and password
@@ -375,18 +290,9 @@ func TestLoginController_LoginByEmailAndPassword(t *testing.T) {
 			Value:   encodedPassword,
 		})
 
-	store.
-		EXPECT().
-		GetUser(ctx, userID).
-		Times(1).
-		Return(&models.User{
-			Id:      userID,
-			Created: 1,
-		})
-
-	status, user := controller.LoginByEmailAndPassword(ctx, email, password)
+	status, loggedUserID := controller.LoginByEmailAndPassword(ctx, email, password)
 	require.Equal(t, enums.Ok, status)
-	require.NotNil(t, user)
+	require.Equal(t, userID, loggedUserID)
 }
 
 func TestLoginController_LoginByEmailAndPasswordWithIncorrectEmail(t *testing.T) {
@@ -394,9 +300,9 @@ func TestLoginController_LoginByEmailAndPasswordWithIncorrectEmail(t *testing.T)
 	ctx := context.Background()
 	controller := LoginController{Store: nil}
 
-	status, user := controller.LoginByEmailAndPassword(ctx, "mail", "password")
+	status, loggedUserID := controller.LoginByEmailAndPassword(ctx, "mail", "password")
 	require.Equal(t, enums.IncorrectEmail, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }
 
 func TestLoginController_LoginByEmailAndPasswordWithoutEmail(t *testing.T) {
@@ -416,9 +322,9 @@ func TestLoginController_LoginByEmailAndPasswordWithoutEmail(t *testing.T) {
 		Times(1).
 		Return(enums.Ok, nil)
 
-	status, user := controller.LoginByEmailAndPassword(ctx, email, password)
+	status, loggedUserID := controller.LoginByEmailAndPassword(ctx, email, password)
 	require.Equal(t, enums.EmailNotFound, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }
 
 func TestLoginController_LoginByEmailAndPasswordWithoutPassword(t *testing.T) {
@@ -450,9 +356,9 @@ func TestLoginController_LoginByEmailAndPasswordWithoutPassword(t *testing.T) {
 		Times(1).
 		Return(enums.Ok, nil)
 
-	status, user := controller.LoginByEmailAndPassword(ctx, email, password)
+	status, loggedUserID := controller.LoginByEmailAndPassword(ctx, email, password)
 	require.Equal(t, enums.PasswordNotFound, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }
 
 func TestLoginController_LoginByEmailAndPasswordWithIncorrectPassword(t *testing.T) {
@@ -490,55 +396,9 @@ func TestLoginController_LoginByEmailAndPasswordWithIncorrectPassword(t *testing
 			Value:   encodedPassword,
 		})
 
-	status, user := controller.LoginByEmailAndPassword(ctx, email, password)
+	status, loggedUserID := controller.LoginByEmailAndPassword(ctx, email, password)
 	require.Equal(t, enums.IncorrectPassword, status)
-	require.Nil(t, user)
-}
-
-func TestLoginController_LoginByEmailAndPasswordWithoutUser(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	_, store, _, _ := mocks.InitMockApp(ctrl)
-	controller := LoginController{Store: store}
-
-	password := "123"
-	encodedPassword := controller.EncodePassword(ctx, password)
-	email := "mail@mail.com"
-	userID := uuid.NewV4()
-
-	store.
-		EXPECT().
-		GetEmail(ctx, email).
-		Times(1).
-		Return(enums.Ok, &models.Email{
-			Id:      uuid.NewV4(),
-			Created: 1,
-			UserId:  userID,
-			Value:   email,
-		})
-
-	store.
-		EXPECT().
-		GetLatestPassword(ctx, userID).
-		Times(1).
-		Return(enums.Ok, &models.Password{
-			Id:      uuid.NewV4(),
-			Created: 1,
-			UserId:  userID,
-			Value:   encodedPassword,
-		})
-
-	store.
-		EXPECT().
-		GetUser(ctx, userID).
-		Times(1).
-		Return(nil)
-
-	status, user := controller.LoginByEmailAndPassword(ctx, email, password)
-	require.Equal(t, enums.UserNotFound, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }
 
 // Email and code
@@ -572,18 +432,9 @@ func TestLoginController_LoginByEmailAndCode(t *testing.T) {
 		Times(1).
 		Return(code)
 
-	store.
-		EXPECT().
-		GetUser(ctx, userID).
-		Times(1).
-		Return(&models.User{
-			Id:      userID,
-			Created: 1,
-		})
-
-	status, user := controller.LoginByEmailAndCode(ctx, email, code)
+	status, loggedUserID := controller.LoginByEmailAndCode(ctx, email, code)
 	require.Equal(t, enums.Ok, status)
-	require.NotNil(t, user)
+	require.Equal(t, userID, loggedUserID)
 }
 
 func TestLoginController_LoginByEmailAndCodeWithIncorrectEmail(t *testing.T) {
@@ -594,9 +445,9 @@ func TestLoginController_LoginByEmailAndCodeWithIncorrectEmail(t *testing.T) {
 	email := "mail"
 	emailCode := "1234"
 
-	status, user := controller.LoginByEmailAndCode(ctx, email, emailCode)
+	status, loggedUserID := controller.LoginByEmailAndCode(ctx, email, emailCode)
 	require.Equal(t, enums.IncorrectEmail, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }
 
 func TestLoginController_LoginByEmailAndCodeWithoutEmailConfirmationCode(t *testing.T) {
@@ -616,9 +467,9 @@ func TestLoginController_LoginByEmailAndCodeWithoutEmailConfirmationCode(t *test
 		Times(1).
 		Return("")
 
-	status, user := controller.LoginByEmailAndCode(ctx, email, emailCode)
+	status, loggedUserID := controller.LoginByEmailAndCode(ctx, email, emailCode)
 	require.Equal(t, enums.EmailConfirmationCodeNotFound, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }
 
 func TestLoginController_LoginByEmailAndCodeWithIncorrectEmailConfirmationCode(t *testing.T) {
@@ -637,9 +488,9 @@ func TestLoginController_LoginByEmailAndCodeWithIncorrectEmailConfirmationCode(t
 		Times(1).
 		Return("4321")
 
-	status, user := controller.LoginByEmailAndCode(ctx, email, "1234")
+	status, loggedUserID := controller.LoginByEmailAndCode(ctx, email, "1234")
 	require.Equal(t, enums.IncorrectEmailCode, status)
-	require.Nil(t, user)
+	require.Equal(t, uuid.Nil, loggedUserID)
 }
 
 func TestLoginController_LoginByEmailAndCodeWithoutEmail(t *testing.T) {

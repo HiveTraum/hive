@@ -454,18 +454,18 @@ func (mr *MockStoreInterfaceMockRecorder) GetSecret(ctx, id interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecret", reflect.TypeOf((*MockStoreInterface)(nil).GetSecret), ctx, id)
 }
 
-// GetActualSecretFromCache mocks base method
+// GetActualSecret mocks base method
 func (m *MockStoreInterface) GetActualSecret(ctx context.Context) *models.Secret {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetActualSecretFromCache", ctx)
+	ret := m.ctrl.Call(m, "GetActualSecret", ctx)
 	ret0, _ := ret[0].(*models.Secret)
 	return ret0
 }
 
-// GetActualSecretFromCache indicates an expected call of GetActualSecretFromCache
+// GetActualSecret indicates an expected call of GetActualSecret
 func (mr *MockStoreInterfaceMockRecorder) GetActualSecret(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActualSecretFromCache", reflect.TypeOf((*MockStoreInterface)(nil).GetActualSecret), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActualSecret", reflect.TypeOf((*MockStoreInterface)(nil).GetActualSecret), ctx)
 }
 
 // CreateSession mocks base method
@@ -675,11 +675,11 @@ func (m *MockLoginControllerInterface) EXPECT() *MockLoginControllerInterfaceMoc
 }
 
 // Login mocks base method
-func (m *MockLoginControllerInterface) Login(ctx context.Context, credentials inout.CreateSessionRequestV1) (int, *models.User) {
+func (m *MockLoginControllerInterface) Login(ctx context.Context, credentials inout.CreateSessionRequestV1) (int, go_uuid.UUID) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Login", ctx, credentials)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(*models.User)
+	ret1, _ := ret[1].(go_uuid.UUID)
 	return ret0, ret1
 }
 
@@ -690,26 +690,26 @@ func (mr *MockLoginControllerInterfaceMockRecorder) Login(ctx, credentials inter
 }
 
 // LoginByTokens mocks base method
-func (m *MockLoginControllerInterface) LoginByTokens(ctx context.Context, refreshToken, accessToken, fingerprint string) (int, *models.User) {
+func (m *MockLoginControllerInterface) LoginByTokens(ctx context.Context, accessToken string) (int, go_uuid.UUID) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LoginByTokens", ctx, refreshToken, accessToken, fingerprint)
+	ret := m.ctrl.Call(m, "LoginByTokens", ctx, accessToken)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(*models.User)
+	ret1, _ := ret[1].(go_uuid.UUID)
 	return ret0, ret1
 }
 
 // LoginByTokens indicates an expected call of LoginByTokens
-func (mr *MockLoginControllerInterfaceMockRecorder) LoginByTokens(ctx, refreshToken, accessToken, fingerprint interface{}) *gomock.Call {
+func (mr *MockLoginControllerInterfaceMockRecorder) LoginByTokens(ctx, accessToken interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByTokens", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByTokens), ctx, refreshToken, accessToken, fingerprint)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByTokens", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByTokens), ctx, accessToken)
 }
 
 // LoginByEmailAndCode mocks base method
-func (m *MockLoginControllerInterface) LoginByEmailAndCode(ctx context.Context, email, emailCode string) (int, *models.User) {
+func (m *MockLoginControllerInterface) LoginByEmailAndCode(ctx context.Context, email, emailCode string) (int, go_uuid.UUID) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LoginByEmailAndCode", ctx, email, emailCode)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(*models.User)
+	ret1, _ := ret[1].(go_uuid.UUID)
 	return ret0, ret1
 }
 
@@ -720,11 +720,11 @@ func (mr *MockLoginControllerInterfaceMockRecorder) LoginByEmailAndCode(ctx, ema
 }
 
 // LoginByEmailAndPassword mocks base method
-func (m *MockLoginControllerInterface) LoginByEmailAndPassword(ctx context.Context, email, password string) (int, *models.User) {
+func (m *MockLoginControllerInterface) LoginByEmailAndPassword(ctx context.Context, email, password string) (int, go_uuid.UUID) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LoginByEmailAndPassword", ctx, email, password)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(*models.User)
+	ret1, _ := ret[1].(go_uuid.UUID)
 	return ret0, ret1
 }
 
@@ -735,11 +735,11 @@ func (mr *MockLoginControllerInterfaceMockRecorder) LoginByEmailAndPassword(ctx,
 }
 
 // LoginByPhoneAndCode mocks base method
-func (m *MockLoginControllerInterface) LoginByPhoneAndCode(ctx context.Context, phone, phoneCode string) (int, *models.User) {
+func (m *MockLoginControllerInterface) LoginByPhoneAndCode(ctx context.Context, phone, phoneCode string) (int, go_uuid.UUID) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LoginByPhoneAndCode", ctx, phone, phoneCode)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(*models.User)
+	ret1, _ := ret[1].(go_uuid.UUID)
 	return ret0, ret1
 }
 
@@ -750,11 +750,11 @@ func (mr *MockLoginControllerInterfaceMockRecorder) LoginByPhoneAndCode(ctx, pho
 }
 
 // LoginByPhoneAndPassword mocks base method
-func (m *MockLoginControllerInterface) LoginByPhoneAndPassword(ctx context.Context, phone, password string) (int, *models.User) {
+func (m *MockLoginControllerInterface) LoginByPhoneAndPassword(ctx context.Context, phone, password string) (int, go_uuid.UUID) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LoginByPhoneAndPassword", ctx, phone, password)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(*models.User)
+	ret1, _ := ret[1].(go_uuid.UUID)
 	return ret0, ret1
 }
 
@@ -823,7 +823,7 @@ func (mr *MockLoginControllerInterfaceMockRecorder) DecodeAccessTokenWithoutVali
 }
 
 // EncodeAccessToken mocks base method
-func (m *MockLoginControllerInterface) EncodeAccessToken(ctx context.Context, userID go_uuid.UUID, roles []string, secret go_uuid.UUID, expire time.Time) string {
+func (m *MockLoginControllerInterface) EncodeAccessToken(ctx context.Context, userID go_uuid.UUID, roles []string, secret *models.Secret, expire time.Time) string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EncodeAccessToken", ctx, userID, roles, secret, expire)
 	ret0, _ := ret[0].(string)

@@ -90,20 +90,20 @@ type ESBDispatcherInterface interface {
 }
 
 type LoginControllerInterface interface {
-	Login(ctx context.Context, credentials inout.CreateSessionRequestV1) (int, *models.User)
+	Login(ctx context.Context, credentials inout.CreateSessionRequestV1) (int, uuid.UUID)
 
-	LoginByTokens(ctx context.Context, refreshToken string, accessToken string, fingerprint string) (int, *models.User)
-	LoginByEmailAndCode(ctx context.Context, email string, emailCode string) (int, *models.User)
-	LoginByEmailAndPassword(ctx context.Context, email string, password string) (int, *models.User)
-	LoginByPhoneAndCode(ctx context.Context, phone string, phoneCode string) (int, *models.User)
-	LoginByPhoneAndPassword(ctx context.Context, phone string, password string) (int, *models.User)
+	LoginByTokens(ctx context.Context, accessToken string) (int, uuid.UUID)
+	LoginByEmailAndCode(ctx context.Context, email string, emailCode string) (int, uuid.UUID)
+	LoginByEmailAndPassword(ctx context.Context, email string, password string) (int, uuid.UUID)
+	LoginByPhoneAndCode(ctx context.Context, phone string, phoneCode string) (int, uuid.UUID)
+	LoginByPhoneAndPassword(ctx context.Context, phone string, password string) (int, uuid.UUID)
 
 	NormalizePhone(ctx context.Context, phone string) string
 	NormalizeEmail(ctx context.Context, email string) string
 
 	DecodeAccessToken(ctx context.Context, token string, secret uuid.UUID) (int, *models.AccessTokenPayload)
 	DecodeAccessTokenWithoutValidation(ctx context.Context, tokenValue string) (int, *models.AccessTokenPayload)
-	EncodeAccessToken(ctx context.Context, userID uuid.UUID, roles []string, secret uuid.UUID, expire time.Time) string
+	EncodeAccessToken(ctx context.Context, userID uuid.UUID, roles []string, secret *models.Secret, expire time.Time) string
 
 	EncodePassword(context.Context, string) string
 	VerifyPassword(ctx context.Context, password string, encodedPassword string) bool

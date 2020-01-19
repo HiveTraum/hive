@@ -12,7 +12,7 @@ func ContentTypeMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			Request: r,
 		}
 
-		if !request.IsContentTypeAllowed(nil, r.Header) {
+		if !request.IsContentTypeAllowed(nil) {
 			w.WriteHeader(http.StatusUnsupportedMediaType)
 			return
 		}

@@ -86,12 +86,13 @@ func (controller *LoginController) NormalizePhone(_ context.Context, phone strin
 
 // Access Token
 
-func (controller *LoginController) EncodeAccessToken(_ context.Context, userID uuid.UUID, roles []string, secret uuid.UUID, expires time.Time) string {
+func (controller *LoginController) EncodeAccessToken(_ context.Context, userID uuid.UUID, roles []string, secret *models.Secret, expires time.Time) string {
 
 	claims := models.AccessTokenPayload{
-		UserID:  userID,
-		Roles:   roles,
-		IsAdmin: functools.Contains(config.AdminRole, roles),
+		UserID:   userID,
+		Roles:    roles,
+		IsAdmin:  functools.Contains(config.AdminRole, roles),
+		SecretID: secret.Id,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expires.Unix(),
 			NotBefore: time.Now().Unix(),
@@ -99,7 +100,7 @@ func (controller *LoginController) EncodeAccessToken(_ context.Context, userID u
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	ss, err := token.SignedString(secret.Bytes())
+	ss, err := token.SignedString(secret.Value.Bytes())
 	if err != nil {
 		sentry.CaptureException(err)
 		return ""
@@ -155,174 +156,144 @@ func (controller *LoginController) DecodeAccessToken(_ context.Context, tokenVal
 
 // Login
 
-func (controller *LoginController) LoginByTokens(ctx context.Context, refreshToken string, accessToken string, fingerprint string) (int, *models.User) {
+func (controller *LoginController) LoginByTokens(ctx context.Context, accessToken string) (int, uuid.UUID) {
 
 	status, unverifiedPayload := controller.DecodeAccessTokenWithoutValidation(ctx, accessToken)
 	if status != enums.Ok {
-		return status, nil
+		return status, uuid.Nil
 	}
 
-	session := controller.Store.GetSession(ctx, fingerprint, refreshToken, unverifiedPayload.UserID)
-	if session == nil {
-		return enums.SessionNotFound, nil
-	}
-
-	secret := controller.Store.GetSecret(ctx, session.SecretID)
+	secret := controller.Store.GetSecret(ctx, unverifiedPayload.SecretID)
 	if secret == nil {
-		return enums.SecretNotFound, nil
+		return enums.SecretNotFound, uuid.Nil
 	}
 
 	status, payload := controller.DecodeAccessToken(ctx, accessToken, secret.Value)
 	if status != enums.Ok {
-		return status, nil
+		return status, uuid.Nil
 	}
 
-	user := controller.Store.GetUser(ctx, payload.GetUserID())
-	if user == nil {
-		return enums.UserNotFound, nil
-	}
-
-	return enums.Ok, user
+	return enums.Ok, payload.UserID
 }
 
-func (controller *LoginController) LoginByEmailAndCode(ctx context.Context, emailValue string, emailCode string) (int, *models.User) {
+func (controller *LoginController) LoginByEmailAndCode(ctx context.Context, emailValue string, emailCode string) (int, uuid.UUID) {
 
 	emailValue = controller.NormalizeEmail(ctx, emailValue)
 	if emailValue == "" {
-		return enums.IncorrectEmail, nil
+		return enums.IncorrectEmail, uuid.Nil
 	}
 
 	code := controller.Store.GetEmailConfirmationCode(ctx, emailValue)
 	if code == "" {
-		return enums.EmailConfirmationCodeNotFound, nil
+		return enums.EmailConfirmationCodeNotFound, uuid.Nil
 	} else if code != emailCode {
-		return enums.IncorrectEmailCode, nil
+		return enums.IncorrectEmailCode, uuid.Nil
 	}
 
 	status, email := controller.Store.GetEmail(ctx, emailValue)
 	if status != enums.Ok {
-		return status, nil
+		return status, uuid.Nil
 	}
 	if email == nil {
-		return enums.EmailNotFound, nil
+		return enums.EmailNotFound, uuid.Nil
 	}
 
-	user := controller.Store.GetUser(ctx, email.UserId)
-	if user == nil {
-		return enums.UserNotFound, nil
-	}
-
-	return enums.Ok, user
+	return enums.Ok, email.UserId
 }
 
-func (controller *LoginController) LoginByEmailAndPassword(ctx context.Context, emailValue string, passwordValue string) (int, *models.User) {
+func (controller *LoginController) LoginByEmailAndPassword(ctx context.Context, emailValue string, passwordValue string) (int, uuid.UUID) {
 
 	emailValue = controller.NormalizeEmail(ctx, emailValue)
 	if emailValue == "" {
-		return enums.IncorrectEmail, nil
+		return enums.IncorrectEmail, uuid.Nil
 	}
 
 	status, email := controller.Store.GetEmail(ctx, emailValue)
 	if status != enums.Ok {
-		return status, nil
+		return status, uuid.Nil
 	}
 	if email == nil {
-		return enums.EmailNotFound, nil
+		return enums.EmailNotFound, uuid.Nil
 	}
 
 	status, password := controller.Store.GetLatestPassword(ctx, email.UserId)
 	if status != enums.Ok {
-		return status, nil
+		return status, uuid.Nil
 	}
 	if password == nil {
-		return enums.PasswordNotFound, nil
+		return enums.PasswordNotFound, uuid.Nil
 	}
 
 	passwordVerified := controller.VerifyPassword(ctx, passwordValue, password.Value)
 	if !passwordVerified {
-		return enums.IncorrectPassword, nil
+		return enums.IncorrectPassword, uuid.Nil
 	}
 
-	user := controller.Store.GetUser(ctx, email.UserId)
-	if user == nil {
-		return enums.UserNotFound, nil
-	}
-
-	return enums.Ok, user
+	return enums.Ok, password.UserId
 }
 
-func (controller *LoginController) LoginByPhoneAndPassword(ctx context.Context, phoneValue string, passwordValue string) (int, *models.User) {
+func (controller *LoginController) LoginByPhoneAndPassword(ctx context.Context, phoneValue string, passwordValue string) (int, uuid.UUID) {
 	phoneValue = controller.NormalizePhone(ctx, phoneValue)
 	if phoneValue == "" {
-		return enums.IncorrectPhone, nil
+		return enums.IncorrectPhone, uuid.Nil
 	}
 
 	status, phone := controller.Store.GetPhone(ctx, phoneValue)
 	if status != enums.Ok {
-		return status, nil
+		return status, uuid.Nil
 	}
 	if phone == nil {
-		return enums.PhoneNotFound, nil
+		return enums.PhoneNotFound, uuid.Nil
 	}
 
 	status, password := controller.Store.GetLatestPassword(ctx, phone.UserId)
 	if status != enums.Ok {
-		return status, nil
+		return status, uuid.Nil
 	}
 	if password == nil {
-		return enums.PasswordNotFound, nil
+		return enums.PasswordNotFound, uuid.Nil
 	}
 
 	passwordVerified := controller.VerifyPassword(ctx, passwordValue, password.Value)
 	if !passwordVerified {
-		return enums.IncorrectPassword, nil
+		return enums.IncorrectPassword, uuid.Nil
 	}
 
-	user := controller.Store.GetUser(ctx, phone.UserId)
-	if user == nil {
-		return enums.UserNotFound, nil
-	}
-
-	return enums.Ok, user
+	return enums.Ok, password.UserId
 }
 
-func (controller *LoginController) LoginByPhoneAndCode(ctx context.Context, phoneValue string, phoneCode string) (int, *models.User) {
+func (controller *LoginController) LoginByPhoneAndCode(ctx context.Context, phoneValue string, phoneCode string) (int, uuid.UUID) {
 	phoneValue = controller.NormalizePhone(ctx, phoneValue)
 	if phoneValue == "" {
-		return enums.IncorrectPhone, nil
+		return enums.IncorrectPhone, uuid.Nil
 	}
 
 	code := controller.Store.GetPhoneConfirmationCode(ctx, phoneValue)
 	if code == "" {
-		return enums.PhoneConfirmationCodeNotFound, nil
+		return enums.PhoneConfirmationCodeNotFound, uuid.Nil
 	} else if code != phoneCode {
-		return enums.IncorrectPhoneCode, nil
+		return enums.IncorrectPhoneCode, uuid.Nil
 	}
 
 	status, phone := controller.Store.GetPhone(ctx, phoneValue)
 	if status != enums.Ok {
-		return status, nil
+		return status, uuid.Nil
 	}
 	if phone == nil {
-		return enums.PhoneNotFound, nil
+		return enums.PhoneNotFound, uuid.Nil
 	}
 
-	user := controller.Store.GetUser(ctx, phone.UserId)
-	if user == nil {
-		return enums.UserNotFound, nil
-	}
-
-	return enums.Ok, user
+	return enums.Ok, phone.UserId
 }
 
-func (controller *LoginController) Login(ctx context.Context, credentials inout.CreateSessionRequestV1) (int, *models.User) {
+func (controller *LoginController) Login(ctx context.Context, credentials inout.CreateSessionRequestV1) (int, uuid.UUID) {
 	var status int
-	var user *models.User
+	var user uuid.UUID
 
 	switch credentials.Data.(type) {
 	case *inout.CreateSessionRequestV1_Tokens_:
 		tokens := credentials.GetTokens()
-		status, user = controller.LoginByTokens(ctx, tokens.RefreshToken, tokens.AccessToken, credentials.Fingerprint)
+		status, user = controller.LoginByTokens(ctx, tokens.AccessToken)
 	case *inout.CreateSessionRequestV1_EmailAndPassword_:
 		emailAndPassword := credentials.GetEmailAndPassword()
 		status, user = controller.LoginByEmailAndPassword(ctx, emailAndPassword.Email, emailAndPassword.Password)
@@ -336,7 +307,7 @@ func (controller *LoginController) Login(ctx context.Context, credentials inout.
 		phoneAndCode := credentials.GetPhoneAndCode()
 		status, user = controller.LoginByPhoneAndPassword(ctx, phoneAndCode.Phone, phoneAndCode.Code)
 	default:
-		return enums.CredentialsNotProvided, nil
+		return enums.CredentialsNotProvided, uuid.Nil
 	}
 
 	return status, user

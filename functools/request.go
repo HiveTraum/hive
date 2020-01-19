@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type Request struct {
@@ -29,7 +30,7 @@ func (request *Request) GetContentType() string {
 	return contentType
 }
 
-func (request *Request) IsContentTypeAllowed(allowedTypes *[]string, headers http.Header) bool {
+func (request *Request) IsContentTypeAllowed(allowedTypes *[]string) bool {
 	if allowedTypes == nil {
 		allowedTypes = &[]string{BinaryContentType, JSONContentType}
 	}
@@ -79,4 +80,20 @@ func (request *Request) GetLimit() int {
 	}
 
 	return limit
+}
+
+func (request *Request) GetAccessToken() string {
+	authHeader := request.Header.Get("Authorization")
+
+	if authHeader == "" {
+		return ""
+	}
+
+	parts := strings.Split(authHeader, " ")
+
+	if len(parts) < 2 {
+		return ""
+	}
+
+	return parts[1]
 }
