@@ -675,93 +675,18 @@ func (m *MockLoginControllerInterface) EXPECT() *MockLoginControllerInterfaceMoc
 }
 
 // Login mocks base method
-func (m *MockLoginControllerInterface) Login(ctx context.Context, credentials inout.CreateSessionRequestV1) (int, go_uuid.UUID) {
+func (m *MockLoginControllerInterface) Login(ctx context.Context, accessToken string) (int, *models.AccessTokenPayload) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Login", ctx, credentials)
+	ret := m.ctrl.Call(m, "Login", ctx, accessToken)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(go_uuid.UUID)
+	ret1, _ := ret[1].(*models.AccessTokenPayload)
 	return ret0, ret1
 }
 
 // Login indicates an expected call of Login
-func (mr *MockLoginControllerInterfaceMockRecorder) Login(ctx, credentials interface{}) *gomock.Call {
+func (mr *MockLoginControllerInterfaceMockRecorder) Login(ctx, accessToken interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*MockLoginControllerInterface)(nil).Login), ctx, credentials)
-}
-
-// LoginByTokens mocks base method
-func (m *MockLoginControllerInterface) LoginByTokens(ctx context.Context, accessToken string) (int, go_uuid.UUID) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LoginByTokens", ctx, accessToken)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(go_uuid.UUID)
-	return ret0, ret1
-}
-
-// LoginByTokens indicates an expected call of LoginByTokens
-func (mr *MockLoginControllerInterfaceMockRecorder) LoginByTokens(ctx, accessToken interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByTokens", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByTokens), ctx, accessToken)
-}
-
-// LoginByEmailAndCode mocks base method
-func (m *MockLoginControllerInterface) LoginByEmailAndCode(ctx context.Context, email, emailCode string) (int, go_uuid.UUID) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LoginByEmailAndCode", ctx, email, emailCode)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(go_uuid.UUID)
-	return ret0, ret1
-}
-
-// LoginByEmailAndCode indicates an expected call of LoginByEmailAndCode
-func (mr *MockLoginControllerInterfaceMockRecorder) LoginByEmailAndCode(ctx, email, emailCode interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByEmailAndCode", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByEmailAndCode), ctx, email, emailCode)
-}
-
-// LoginByEmailAndPassword mocks base method
-func (m *MockLoginControllerInterface) LoginByEmailAndPassword(ctx context.Context, email, password string) (int, go_uuid.UUID) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LoginByEmailAndPassword", ctx, email, password)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(go_uuid.UUID)
-	return ret0, ret1
-}
-
-// LoginByEmailAndPassword indicates an expected call of LoginByEmailAndPassword
-func (mr *MockLoginControllerInterfaceMockRecorder) LoginByEmailAndPassword(ctx, email, password interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByEmailAndPassword", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByEmailAndPassword), ctx, email, password)
-}
-
-// LoginByPhoneAndCode mocks base method
-func (m *MockLoginControllerInterface) LoginByPhoneAndCode(ctx context.Context, phone, phoneCode string) (int, go_uuid.UUID) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LoginByPhoneAndCode", ctx, phone, phoneCode)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(go_uuid.UUID)
-	return ret0, ret1
-}
-
-// LoginByPhoneAndCode indicates an expected call of LoginByPhoneAndCode
-func (mr *MockLoginControllerInterfaceMockRecorder) LoginByPhoneAndCode(ctx, phone, phoneCode interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByPhoneAndCode", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByPhoneAndCode), ctx, phone, phoneCode)
-}
-
-// LoginByPhoneAndPassword mocks base method
-func (m *MockLoginControllerInterface) LoginByPhoneAndPassword(ctx context.Context, phone, password string) (int, go_uuid.UUID) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LoginByPhoneAndPassword", ctx, phone, password)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(go_uuid.UUID)
-	return ret0, ret1
-}
-
-// LoginByPhoneAndPassword indicates an expected call of LoginByPhoneAndPassword
-func (mr *MockLoginControllerInterfaceMockRecorder) LoginByPhoneAndPassword(ctx, phone, password interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginByPhoneAndPassword", reflect.TypeOf((*MockLoginControllerInterface)(nil).LoginByPhoneAndPassword), ctx, phone, password)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*MockLoginControllerInterface)(nil).Login), ctx, accessToken)
 }
 
 // NormalizePhone mocks base method
