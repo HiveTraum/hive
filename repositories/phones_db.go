@@ -13,8 +13,8 @@ import (
 )
 
 func createPhoneSQL() string {
-	return `INSERT INTO phones (user_id, value) 
-			VALUES ($1, $2)
+	return `INSERT INTO phones (id, user_id, value) 
+			VALUES ($1, $2, $3)
 			ON CONFLICT (value) 
 			    DO UPDATE SET created=DEFAULT,
 			                  user_id=excluded.user_id
@@ -50,7 +50,7 @@ func scanPhone(row pgx.Row) (int, *models.Phone) {
 
 func CreatePhone(db DB, ctx context.Context, userId uuid.UUID, value string) (int, *models.Phone) {
 	sql := createPhoneSQL()
-	row := db.QueryRow(ctx, sql, userId, value)
+	row := db.QueryRow(ctx, sql, uuid.NewV4(), userId, value)
 	return scanPhone(row)
 }
 
