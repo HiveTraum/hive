@@ -3,6 +3,7 @@ package repositories
 import (
 	"auth/config"
 	"context"
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -24,4 +25,12 @@ func TestGetSecretFromDB(t *testing.T) {
 	secret := GetSecretFromDB(pool, ctx, createdSecret.Id)
 	require.NotNil(t, secret)
 	require.Equal(t, createdSecret, secret)
+}
+
+func TestGetSecretFromDBWithoutSecret(t *testing.T) {
+	pool := config.InitPool(nil)
+	ctx := context.Background()
+	PurgeSecrets(pool, ctx)
+	secret := GetSecretFromDB(pool, ctx, uuid.NewV4())
+	require.Nil(t, secret)
 }

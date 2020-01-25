@@ -13,8 +13,8 @@ import (
 )
 
 func createEmailSQL() string {
-	return `INSERT INTO emails (user_id, value) 
-			VALUES ($1, $2)
+	return `INSERT INTO emails (id, user_id, value) 
+			VALUES ($1, $2, $3)
 			ON CONFLICT (value)
 			    DO UPDATE SET created=DEFAULT,
 			                  user_id=excluded.user_id
@@ -29,7 +29,7 @@ func getEmailSQL() string {
 
 func unwrapEmailScanError(err error) int {
 	var e *pgconn.PgError
-	if errors.As(err, &e) && strings.Contains(e.Detail, "is not present in table \"users\"") || strings.Contains(e.Detail, "отсутствует в таблице \"users\"") {
+	if errors.As(err, &e) && (strings.Contains(e.Detail, "is not present in table \"users\"") || strings.Contains(e.Detail, "отсутствует в таблице \"users\"")) {
 		return enums.UserNotFound
 	} else if strings.Contains(err.Error(), "no rows") {
 		return enums.Ok
@@ -52,7 +52,7 @@ func scanEmail(row pgx.Row) (int, *models.Email) {
 
 func CreateEmail(db DB, ctx context.Context, userId uuid.UUID, value string) (int, *models.Email) {
 	sql := createEmailSQL()
-	row := db.QueryRow(ctx, sql, userId, value)
+	row := db.QueryRow(ctx, sql, uuid.NewV4(), userId, value)
 	return scanEmail(row)
 }
 

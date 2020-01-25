@@ -13,8 +13,8 @@ import (
 )
 
 func createPasswordSQL() string {
-	return `INSERT INTO passwords (user_id, value) 
-			VALUES ($1, $2) 
+	return `INSERT INTO passwords (id, user_id, value) 
+			VALUES ($1, $2, $3) 
 			RETURNING id, created, user_id, value;`
 }
 
@@ -65,7 +65,7 @@ func scanPasswords(rows pgx.Rows, limit int) []*models.Password {
 
 func CreatePassword(db DB, ctx context.Context, userId uuid.UUID, value string) (int, *models.Password) {
 	sql := createPasswordSQL()
-	row := db.QueryRow(ctx, sql, userId, value)
+	row := db.QueryRow(ctx, sql, uuid.NewV4(), userId, value)
 	return scanPassword(row)
 }
 

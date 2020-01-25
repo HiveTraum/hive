@@ -11,14 +11,14 @@ import (
 )
 
 func createUserSQL() string {
-	return "INSERT INTO users DEFAULT VALUES RETURNING id, created;"
+	return "INSERT INTO users (id, created) VALUES ($1, default) RETURNING id, created;"
 }
 
 func getUsersSQL() string {
 	return `
 		SELECT id, created
 		FROM users
-		WHERE (array_length($1::integer[], 1) IS NULL OR id = ANY ($1::bigint[]))
+		WHERE (array_length($1::uuid[], 1) IS NULL OR id = ANY ($1::uuid[]))
 		LIMIT $2;
 		`
 }
@@ -77,7 +77,7 @@ func convertGetUsersQueryToRaw(query GetUsersQuery) getUsersRawQuery {
 
 func CreateUser(db DB, ctx context.Context) *models.User {
 	sql := createUserSQL()
-	row := db.QueryRow(ctx, sql)
+	row := db.QueryRow(ctx, sql, uuid.NewV4())
 	return scanUser(row)
 }
 

@@ -68,3 +68,19 @@ func TestCreateOrUpdateUsersViewWithTheSamePhone(t *testing.T) {
 	require.Len(t, views[0].Phones, 0)
 	require.Len(t, views[1].Phones, 1)
 }
+
+func BenchmarkCreateOrUpdateUsersView(b *testing.B) {
+	pool := config.InitPool(nil)
+	ctx := context.Background()
+	PurgeUserViews(pool, ctx)
+	PurgeUsers(pool, ctx)
+	tx, _ := pool.Begin(ctx)
+
+	for i := 1; i < 10_000; i++ {
+		CreateUser(tx, ctx)
+	}
+
+	_ = tx.Commit(ctx)
+
+	CreateOrUpdateUsersView(pool, ctx, CreateOrUpdateUsersViewStoreQuery{})
+}

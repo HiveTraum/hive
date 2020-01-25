@@ -42,3 +42,13 @@ func TestGetEmail(t *testing.T) {
 	require.NotNil(t, email)
 	require.Equal(t, "mail@mail.com", email.Value)
 }
+
+func TestGetEmailWithEmptyResult(t *testing.T) {
+	pool := config.InitPool(nil)
+	ctx := context.Background()
+	PurgeUsers(pool, ctx)
+	PurgeEmails(pool, ctx)
+	status, email := GetEmail(pool, ctx, "mail@mail.com")
+	require.Equal(t, enums.Ok, status)
+	require.Nil(t, email)
+}

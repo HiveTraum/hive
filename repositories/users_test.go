@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"auth/config"
+	"context"
 	"fmt"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
@@ -74,4 +76,37 @@ func TestGetRawQueryWithId(t *testing.T) {
 	rw := convertGetUsersQueryToRaw(q)
 
 	require.True(t, rw.Id == fmt.Sprintf("{%s,%s,%s}", first.String(), second.String(), third.String()))
+}
+
+func TestGetUser(t *testing.T) {
+	pool := config.InitPool(nil)
+	ctx := context.Background()
+	PurgeUsers(pool, ctx)
+	user := CreateUser(pool, ctx)
+	userFromDB := GetUser(pool, ctx, user.Id)
+	require.NotNil(t, userFromDB)
+	require.Equal(t, user, userFromDB)
+}
+
+
+func TestGetUserWithoutUser(t *testing.T) {
+	pool := config.InitPool(nil)
+	ctx := context.Background()
+	PurgeUsers(pool, ctx)
+	userFromDB := GetUser(pool, ctx, uuid.NewV4())
+	require.Nil(t, userFromDB)
+}
+
+
+func BenchmarkCreateUser(b *testing.B) {
+	pool := config.InitPool(nil)
+	ctx := context.Background()
+	PurgeUsers(pool, ctx)
+	tx, _ := pool.Begin(ctx)
+
+	for i := 1; i < 10_000; i++ {
+		CreateUser(tx, ctx)
+	}
+
+	_ = tx.Commit(ctx)
 }
