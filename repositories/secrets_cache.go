@@ -43,8 +43,10 @@ func getSecretFromCache(cache *redis.Client, span opentracing.Span, key string) 
 	value, err := cache.Get(key).Bytes()
 
 	if err != nil {
-		span.LogFields(log.Error(err))
-		sentry.CaptureException(err)
+		if err != redis.Nil {
+			span.LogFields(log.Error(err))
+			sentry.CaptureException(err)
+		}
 		return nil
 	}
 

@@ -231,6 +231,14 @@ message CreateSessionResponseV1 {
     string accessToken = 2;
 }
 
+// Secrets API
+
+message GetSecretResponseV1 {
+    bytes id = 1;
+    int64 created = 2;
+    bytes value = 3;
+}
+
 // User Views API
 
 message GetUserViewResponseV1 {
