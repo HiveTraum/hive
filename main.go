@@ -85,8 +85,8 @@ func main() {
 		{pattern: "/api/v1/roles", h: rolesAPI, methods: CR},
 		{pattern: "/api/v1/roles/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: roleAPI, methods: R},
 
-		{pattern: "/api/v1/user_roles", h: userRolesAPI, methods: CR},
-		{pattern: "/api/v1/user_roles/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: userRoleAPI, methods: D},
+		{pattern: "/api/v1/userRoles", h: userRolesAPI, methods: CR},
+		{pattern: "/api/v1/userRoles/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: userRoleAPI, methods: D},
 
 		{pattern: "/api/v1/phoneConfirmations", h: phoneConfirmationsAPI, methods: C},
 		{pattern: "/api/v1/phones", h: phonesAPI, methods: C},
