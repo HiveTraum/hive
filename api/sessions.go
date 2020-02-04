@@ -52,6 +52,7 @@ func createSessionV1(r *functools.Request, app infrastructure.AppInterface) (int
 		return http.StatusCreated, &inout.CreateSessionResponseV1{
 			RefreshToken: session.RefreshToken,
 			AccessToken:  session.AccessToken,
+			Created:      session.Created,
 		}
 	case
 		enums.SessionNotFound,

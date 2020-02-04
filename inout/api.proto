@@ -238,6 +238,7 @@ message CreateSessionBadRequestResponseV1 {
 message CreateSessionResponseV1 {
     string refreshToken = 1;
     string accessToken = 2;
+    int64 created = 3;
 }
 
 // Secrets API
