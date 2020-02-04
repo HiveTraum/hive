@@ -16,8 +16,10 @@ import (
 
 func getUsersViewV1Query(r *functools.Request) repositories.GetUsersViewStoreQuery {
 	query := r.URL.Query()
+	pagination := functools.GetPagination(query)
 	return repositories.GetUsersViewStoreQuery{
-		Limit:  r.GetLimit(),
+		Limit:  pagination.Limit,
+		Page:   pagination.Page,
 		Id:     modelsFunctools.StringsSliceToUserIDSlice(query["id"]),
 		Roles:  modelsFunctools.StringsSliceToRoleIDSlice(query["roles"]),
 		Phones: query["phones"],
@@ -27,7 +29,7 @@ func getUsersViewV1Query(r *functools.Request) repositories.GetUsersViewStoreQue
 
 func getUsersViewV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.ListUserViewResponseV1) {
 	query := getUsersViewV1Query(r)
-	users := app.GetStore().GetUsersView(r.Context(), query)
+	users, pagination := app.GetStore().GetUsersView(r.Context(), query)
 
 	userViews := make([]*inout.GetUserViewResponseV1, len(users))
 
@@ -41,7 +43,11 @@ func getUsersViewV1(r *functools.Request, app infrastructure.AppInterface) (int,
 		}
 	}
 
-	return http.StatusOK, &inout.ListUserViewResponseV1{Data: userViews}
+	return http.StatusOK, &inout.ListUserViewResponseV1{Data: userViews, Pagination: &inout.Pagination{
+		HasPrevious: pagination.HasPrevious,
+		HasNext:     pagination.HasNext,
+		Count:       pagination.Count,
+	}}
 }
 
 func getUserViewV1(r *functools.Request, app infrastructure.AppInterface, id uuid.UUID) (int, *inout.GetUserViewResponseV1) {
@@ -73,7 +79,7 @@ func UserViewV1(app infrastructure.AppInterface) middlewares.ResponseControllerH
 		id, err := uuid.FromString(vars["id"])
 
 		if err != nil {
-			// Сознательно отправляем отчет об ошибке, т.к. в vars["id"] не должны попасть не числовые значения.
+			// Сознательно отправляем отчет об ошибке, т.к. в vars["id"] не должны попасть не uuid значения.
 			// Если такое произошло - что то пошло не так
 			sentry.CaptureException(err)
 			return http.StatusBadRequest, nil

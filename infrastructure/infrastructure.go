@@ -22,7 +22,7 @@ type StoreInterface interface {
 
 	// User Views
 
-	GetUsersView(context context.Context, query repositories.GetUsersViewStoreQuery) []*models.UserView
+	GetUsersView(context context.Context, query repositories.GetUsersViewStoreQuery) ([]*models.UserView, *models.PaginationResponse)
 	GetUserView(context context.Context, id uuid.UUID) *models.UserView
 	CreateOrUpdateUsersView(context context.Context, query repositories.CreateOrUpdateUsersViewStoreQuery) []*models.UserView
 	CreateOrUpdateUsersViewByUsersID(context context.Context, id []uuid.UUID) []*models.UserView

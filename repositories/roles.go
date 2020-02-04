@@ -68,7 +68,7 @@ func scanRoles(rows pgx.Rows, limit int) []*models.Role {
 }
 
 type GetRolesQuery struct {
-	Limit       int
+	Pagination  *models.PaginationRequest
 	Identifiers []string
 }
 
@@ -79,10 +79,10 @@ type getRolesRawQuery struct {
 
 func convertGetRolesQueryToRaw(query GetRolesQuery) getRolesRawQuery {
 
-	limit := query.Limit
+	limit := query.Pagination.Limit
 	if len(query.Identifiers) > 0 {
 		limit = int(math.Min(
-			float64(query.Limit),
+			float64(query.Pagination.Limit),
 			float64(len(query.Identifiers))))
 	}
 

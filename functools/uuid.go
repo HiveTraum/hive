@@ -31,3 +31,17 @@ func ByteArraySliceToUUIDSlice(bytes [][]byte) []uuid.UUID {
 
 	return identifiers
 }
+
+func UUIDListToStringList(id []uuid.UUID) []string {
+	identifiers := make([]string, len(id))
+
+	for i, v := range id {
+		identifiers[i] = v.String()
+	}
+
+	return identifiers
+}
+
+func UUIDListToPGArray(id []uuid.UUID) string {
+	return StringsToPGArray(UUIDListToStringList(id))
+}

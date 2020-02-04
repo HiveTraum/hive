@@ -3,6 +3,7 @@ package repositories
 import (
 	"auth/config"
 	"auth/enums"
+	"auth/functools"
 	"context"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
@@ -36,6 +37,7 @@ func TestCreateOrUpdateUsersViewOnUserCreation(t *testing.T) {
 	CreateUser(pool, ctx)
 	views = CreateOrUpdateUsersView(pool, ctx, CreateOrUpdateUsersViewStoreQuery{
 		Id: []uuid.UUID{user.Id}, Roles: nil,
+		Limit: 10,
 	})
 	require.Len(t, views, 1)
 	require.Equal(t, user.Id, views[0].Id)
@@ -69,6 +71,71 @@ func TestCreateOrUpdateUsersViewWithTheSamePhone(t *testing.T) {
 	require.Len(t, views[1].Phones, 1)
 }
 
+func TestDatabaseStore_GetUsersViewPagination(t *testing.T) {
+	pool := config.InitPool(nil)
+	ctx := context.Background()
+	config.PurgeUsers(pool, ctx)
+	config.PurgeUserViews(pool, ctx)
+
+	CreateUser(pool, ctx)
+	CreateUser(pool, ctx)
+	CreateOrUpdateUsersView(pool, ctx, CreateOrUpdateUsersViewStoreQuery{})
+
+	userViews, pagination := GetUsersView(pool, ctx, GetUsersViewStoreQuery{
+		Limit: 2,
+		Page:  0,
+	})
+
+	require.Len(t, userViews, 2)
+	require.Equal(t, int64(2), pagination.Count)
+	require.False(t, pagination.HasNext)
+	require.False(t, pagination.HasPrevious)
+}
+
+func TestDatabaseStore_GetUsersViewPaginationWithLimit(t *testing.T) {
+	pool := config.InitPool(nil)
+	ctx := context.Background()
+	config.PurgeUsers(pool, ctx)
+	config.PurgeUserViews(pool, ctx)
+
+	user := CreateUser(pool, ctx)
+	CreateUser(pool, ctx)
+	CreateOrUpdateUsersView(pool, ctx, CreateOrUpdateUsersViewStoreQuery{})
+
+	userViews, pagination := GetUsersView(pool, ctx, GetUsersViewStoreQuery{
+		Limit: 1,
+		Page:  1,
+	})
+
+	require.Len(t, userViews, 1)
+	require.Equal(t, int64(2), pagination.Count)
+	require.True(t, pagination.HasNext)
+	require.False(t, pagination.HasPrevious)
+	require.Equal(t, user.Id, userViews[0].Id)
+}
+
+func TestDatabaseStore_GetUsersViewPaginationWithLimitWithoutNext(t *testing.T) {
+	pool := config.InitPool(nil)
+	ctx := context.Background()
+	config.PurgeUsers(pool, ctx)
+	config.PurgeUserViews(pool, ctx)
+
+	CreateUser(pool, ctx)
+	user := CreateUser(pool, ctx)
+	CreateOrUpdateUsersView(pool, ctx, CreateOrUpdateUsersViewStoreQuery{})
+
+	userViews, pagination := GetUsersView(pool, ctx, GetUsersViewStoreQuery{
+		Limit: 1,
+		Page:  2,
+	})
+
+	require.Len(t, userViews, 1)
+	require.Equal(t, int64(2), pagination.Count)
+	require.False(t, pagination.HasNext)
+	require.True(t, pagination.HasPrevious)
+	require.Equal(t, user.Id, userViews[0].Id)
+}
+
 func BenchmarkCreateOrUpdateUsersView(b *testing.B) {
 	pool := config.InitPool(nil)
 	ctx := context.Background()
@@ -83,4 +150,34 @@ func BenchmarkCreateOrUpdateUsersView(b *testing.B) {
 	_ = tx.Commit(ctx)
 
 	CreateOrUpdateUsersView(pool, ctx, CreateOrUpdateUsersViewStoreQuery{})
+}
+
+func TestGetUsersViewIndexUsageFilteringByIdentifier(t *testing.T) {
+	pool := config.InitPool(nil)
+	ctx := context.Background()
+	SetSeqScan(pool, ctx, false)
+	PurgeUserViews(pool, ctx)
+	PurgeUsers(pool, ctx)
+	sql := getUsersViewSQL()
+	identifiers := []uuid.UUID{uuid.NewV4()}
+	rows := Explain(pool, ctx, sql, functools.UUIDListToPGArray(identifiers), "{}", "{}", "{}", 1, 1)
+	SetSeqScan(pool, ctx, true)
+	for _, v := range rows {
+		require.NotContains(t, v, "Seq Scan")
+	}
+}
+
+func TestGetUsersViewIndexUsageFilteringBy(t *testing.T) {
+	pool := config.InitPool(nil)
+	ctx := context.Background()
+	SetSeqScan(pool, ctx, false)
+	PurgeUserViews(pool, ctx)
+	PurgeUsers(pool, ctx)
+	sql := getUsersViewSQL()
+	identifiers := []uuid.UUID{uuid.NewV4()}
+	rows := Explain(pool, ctx, sql, "{}", functools.UUIDListToPGArray(identifiers), "{}", "{}", 1, 1)
+	SetSeqScan(pool, ctx, true)
+	for _, v := range rows {
+		require.NotContains(t, v, "Seq Scan")
+	}
 }

@@ -87,9 +87,9 @@ func scanUserRoles(rows pgx.Rows, limit int) []*models.UserRole {
 }
 
 type GetUserRoleQuery struct {
-	UserId []uuid.UUID
-	RoleId []uuid.UUID
-	Limit  int
+	UserId     []uuid.UUID
+	RoleId     []uuid.UUID
+	Pagination *models.PaginationRequest
 }
 
 type getUserRoleRawQuery struct {
@@ -100,7 +100,7 @@ type getUserRoleRawQuery struct {
 
 func convertGetUserRoleQueryToRaw(query GetUserRoleQuery) getUserRoleRawQuery {
 	return getUserRoleRawQuery{
-		Limit:  query.Limit,
+		Limit:  query.Pagination.Limit,
 		UserId: modelsFunctools.UserIDListToPGArray(query.UserId),
 		RoleId: modelsFunctools.RoleIDListToPGArray(query.RoleId),
 	}

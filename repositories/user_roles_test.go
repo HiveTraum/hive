@@ -3,6 +3,7 @@ package repositories
 import (
 	"auth/config"
 	"auth/enums"
+	"auth/models"
 	"context"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
@@ -83,9 +84,9 @@ func TestGetUserRolesWithTwoRoles(t *testing.T) {
 	CreateUserRole(pool, ctx, user.Id, role.Id)
 	CreateUserRole(pool, ctx, user.Id, adminRole.Id)
 	userRoles := GetUserRoles(pool, ctx, GetUserRoleQuery{
-		UserId: []uuid.UUID{user.Id},
-		RoleId: nil,
-		Limit:  10,
+		UserId:     []uuid.UUID{user.Id},
+		RoleId:     nil,
+		Pagination: &models.PaginationRequest{Limit: 10,},
 	})
 	require.Len(t, userRoles, 2)
 }
@@ -101,9 +102,9 @@ func TestDeleteUserRole(t *testing.T) {
 	_, userRole := CreateUserRole(pool, ctx, user.Id, role.Id)
 	DeleteUserRole(pool, ctx, userRole.Id)
 	userRoles := GetUserRoles(pool, ctx, GetUserRoleQuery{
-		UserId: []uuid.UUID{user.Id},
-		RoleId: nil,
-		Limit:  10,
+		UserId:     []uuid.UUID{user.Id},
+		RoleId:     nil,
+		Pagination: &models.PaginationRequest{Limit: 10,},
 	})
 
 	require.Len(t, userRoles, 0)

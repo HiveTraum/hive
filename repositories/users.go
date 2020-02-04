@@ -52,6 +52,7 @@ func scanUsers(rows pgx.Rows, limit int) []*models.User {
 
 type GetUsersQuery struct {
 	Limit int
+	Page  int
 	Id    []uuid.UUID
 }
 

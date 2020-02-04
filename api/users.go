@@ -88,9 +88,12 @@ func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 }
 
 func GetUsersV1Query(r *functools.Request) repositories.GetUsersQuery {
+	query := r.URL.Query()
+	pagination := functools.GetPagination(query)
 
 	return repositories.GetUsersQuery{
-		Limit: r.GetLimit(),
+		Limit: pagination.Limit,
+		Page:  pagination.Page,
 		Id:    modelsFunctools.StringsSliceToUserIDSlice(r.URL.Query()["id"]),
 	}
 }

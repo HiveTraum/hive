@@ -1,11 +1,14 @@
 package functools
 
 import (
+	"auth/config"
+	"auth/models"
 	"encoding/json"
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/protobuf/proto"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -66,20 +69,41 @@ func (request *Request) ParseBody(message proto.Message) error {
 	return err
 }
 
-const DefaultLimit = 100
-
-func (request *Request) GetLimit() int {
-	limitQuery := request.URL.Query().Get("limit")
+func GetLimit(values url.Values) int {
+	limitQuery := values.Get("limit")
 	if limitQuery == "" {
-		return DefaultLimit
+		env := config.GetEnvironment()
+		return env.DefaultPaginationLimit
 	}
 
 	limit, err := strconv.Atoi(limitQuery)
 	if err != nil {
-		limit = DefaultLimit
+		env := config.GetEnvironment()
+		return env.DefaultPaginationLimit
 	}
 
 	return limit
+}
+
+func GetPage(values url.Values) int {
+	pageQuery := values.Get("page")
+	if pageQuery == "" {
+		return 1
+	}
+
+	page, err := strconv.Atoi(pageQuery)
+	if err != nil {
+		return 1
+	}
+
+	return page
+}
+
+func GetPagination(values url.Values) *models.PaginationRequest {
+	return &models.PaginationRequest{
+		Page:  GetPage(values),
+		Limit: GetLimit(values),
+	}
 }
 
 func (request *Request) GetAccessToken() string {

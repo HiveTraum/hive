@@ -20,9 +20,9 @@ func GetUserRolesV1Query(r *functools.Request) repositories.GetUserRoleQuery {
 
 	query := r.URL.Query()
 	return repositories.GetUserRoleQuery{
-		Limit:  r.GetLimit(),
-		UserId: modelsFunctools.StringsSliceToUserIDSlice(query["users"]),
-		RoleId: modelsFunctools.StringsSliceToRoleIDSlice(query["roles"]),
+		Pagination: functools.GetPagination(query),
+		UserId:     modelsFunctools.StringsSliceToUserIDSlice(query["users"]),
+		RoleId:     modelsFunctools.StringsSliceToRoleIDSlice(query["roles"]),
 	}
 }
 

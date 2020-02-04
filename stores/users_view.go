@@ -7,7 +7,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func (store *DatabaseStore) GetUsersView(ctx context.Context, query repositories.GetUsersViewStoreQuery) []*models.UserView {
+func (store *DatabaseStore) GetUsersView(ctx context.Context, query repositories.GetUsersViewStoreQuery) ([]*models.UserView, *models.PaginationResponse) {
 	return repositories.GetUsersView(store.Db, ctx, query)
 }
 

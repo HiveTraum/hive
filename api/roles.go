@@ -17,9 +17,10 @@ import (
 )
 
 func GetRolesV1Query(r *functools.Request) repositories.GetRolesQuery {
+	query := r.URL.Query()
 	return repositories.GetRolesQuery{
-		Limit:       r.GetLimit(),
-		Identifiers: r.URL.Query()["id"],
+		Pagination:  functools.GetPagination(query),
+		Identifiers: query["id"],
 	}
 }
 

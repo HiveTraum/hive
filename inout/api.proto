@@ -1,6 +1,14 @@
 syntax = "proto3";
 package inout;
 
+// Common
+
+message Pagination {
+    bool hasPrevious = 1;
+    bool hasNext = 2;
+    int64 count = 3;
+}
+
 // Roles API
 
 message CreateRoleRequestV1 {
@@ -250,5 +258,6 @@ message GetUserViewResponseV1 {
 }
 
 message ListUserViewResponseV1 {
-    repeated GetUserViewResponseV1 data = 1;
+    Pagination pagination = 1;
+    repeated GetUserViewResponseV1 data = 2;
 }

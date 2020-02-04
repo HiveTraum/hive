@@ -3,6 +3,7 @@ package repositories
 import (
 	"auth/config"
 	"auth/enums"
+	"auth/models"
 	"context"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
@@ -17,7 +18,7 @@ func TestCreateRole(t *testing.T) {
 	require.Equal(t, enums.Ok, status)
 	require.NotNil(t, role)
 	roles := GetRoles(pool, ctx, GetRolesQuery{
-		Limit:       10,
+		Pagination: &models.PaginationRequest{Limit: 10,},
 		Identifiers: nil,
 	})
 	require.Len(t, roles, 1)
@@ -32,7 +33,7 @@ func TestCreateRoleThatAlreadyExist(t *testing.T) {
 	require.Equal(t, enums.RoleAlreadyExist, status)
 	require.Nil(t, role)
 	roles := GetRoles(pool, ctx, GetRolesQuery{
-		Limit:       10,
+		Pagination: &models.PaginationRequest{Limit: 10,},
 		Identifiers: nil,
 	})
 	require.Len(t, roles, 1)
@@ -43,7 +44,7 @@ func TestGetRolesWithEmptyTable(t *testing.T) {
 	ctx := context.Background()
 	PurgeRoles(pool, ctx)
 	roles := GetRoles(pool, ctx, GetRolesQuery{
-		Limit:       10,
+		Pagination: &models.PaginationRequest{Limit: 10,},
 		Identifiers: nil,
 	})
 	require.Len(t, roles, 0)

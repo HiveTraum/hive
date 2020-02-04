@@ -83,11 +83,12 @@ func (mr *MockStoreInterfaceMockRecorder) GetUsers(context, query interface{}) *
 }
 
 // GetUsersView mocks base method
-func (m *MockStoreInterface) GetUsersView(context context.Context, query repositories.GetUsersViewStoreQuery) []*models.UserView {
+func (m *MockStoreInterface) GetUsersView(context context.Context, query repositories.GetUsersViewStoreQuery) ([]*models.UserView, *models.PaginationResponse) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUsersView", context, query)
 	ret0, _ := ret[0].([]*models.UserView)
-	return ret0
+	ret1, _ := ret[1].(*models.PaginationResponse)
+	return ret0, ret1
 }
 
 // GetUsersView indicates an expected call of GetUsersView

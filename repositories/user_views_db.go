@@ -13,6 +13,7 @@ import (
 
 type GetUsersViewStoreQuery struct {
 	Limit      int
+	Page       int
 	Id         []uuid.UUID
 	Roles      []uuid.UUID
 	Phones     []string
@@ -29,6 +30,7 @@ type CreateOrUpdateUsersViewStoreQuery struct {
 
 type getUsersViewRepositoryQuery struct {
 	Limit  int
+	Offset int
 	Id     string
 	Roles  string
 	Emails string
@@ -45,13 +47,14 @@ type createOrUpdateUsersViewRepositoryQuery struct {
 
 func getUsersViewSQL() string {
 	return `
-		SELECT id, created, roles, phones, emails, role_id
+		SELECT id, created, roles, phones, emails, role_id, count(*) OVER() AS full_count
 		FROM users_view u
 		WHERE (array_length($1::uuid[], 1) IS NULL OR id = ANY ($1::uuid[])) AND 
 		      (array_length($2::uuid[], 1) IS NULL OR ($2::uuid[]) && role_id) AND
 		      (array_length($3::text[], 1) IS NULL OR ($3::text[]) && phones) AND
 		      (array_length($4::text[], 1) IS NULL OR ($4::text[]) && emails)
-		LIMIT $5;
+		LIMIT $5 
+		OFFSET $6;
 		`
 }
 
@@ -88,34 +91,37 @@ func updateUsersViewSQL() string {
 									   roles=excluded.roles,
 									   emails=excluded.emails,
 									   role_id=excluded.role_id
-		RETURNING id, created, roles, phones, emails, role_id;
+		RETURNING id, created, roles, phones, emails, role_id, 0;
     `
 }
 
-func scanUserView(row pgx.Row) *models.UserView {
+func scanUserView(row pgx.Row) (*models.UserView, int64) {
 	userView := &models.UserView{}
 	var bytes [][]byte
+	var count int64
 
-	err := row.Scan(&userView.Id, &userView.Created, &userView.Roles, &userView.Phones, &userView.Emails, &bytes)
+	err := row.Scan(&userView.Id, &userView.Created, &userView.Roles, &userView.Phones, &userView.Emails, &bytes, &count)
 	if err != nil {
 		sentry.CaptureException(err)
-		return nil
+		return nil, count
 	}
 
 	userView.RolesID = functools.ByteArraySliceToUUIDSlice(bytes)
 
-	return userView
+	return userView, count
 }
 
-func scanUsersView(rows pgx.Rows, limit int) []*models.UserView {
+func scanUsersView(rows pgx.Rows, limit int) ([]*models.UserView, int64) {
 
 	users := make([]*models.UserView, limit)
 
 	var i int
+	var count int64
 
 	for rows.Next() {
 
-		user := scanUserView(rows)
+		user, c := scanUserView(rows)
+		count = c
 
 		if len(users) <= i {
 			users = append(users, user)
@@ -127,7 +133,7 @@ func scanUsersView(rows pgx.Rows, limit int) []*models.UserView {
 	}
 
 	rows.Close()
-	return users[:i]
+	return users[:i], count
 }
 
 func convertGetUsersViewQueryToRaw(query GetUsersViewStoreQuery) getUsersViewRepositoryQuery {
@@ -141,8 +147,11 @@ func convertGetUsersViewQueryToRaw(query GetUsersViewStoreQuery) getUsersViewRep
 			float64(maxQueryLength)))
 	}
 
+	limit, offset := functools.LimitPageToLimitOffset(limit, query.Page)
+
 	return getUsersViewRepositoryQuery{
 		Limit:  limit,
+		Offset: offset,
 		Id:     modelsFunctools.UserIDListToPGArray(query.Id),
 		Roles:  modelsFunctools.RoleIDListToPGArray(query.Roles),
 		Phones: functools.StringsToPGArray(query.Phones),
@@ -166,23 +175,29 @@ func convertCreateOrUpdateUsersViewQueryToRaw(query CreateOrUpdateUsersViewStore
 	}
 }
 
-func GetUsersView(db DB, context context.Context, query GetUsersViewStoreQuery) []*models.UserView {
+func GetUsersView(db DB, context context.Context, query GetUsersViewStoreQuery) ([]*models.UserView, *models.PaginationResponse) {
 	sql := getUsersViewSQL()
 	rawQuery := convertGetUsersViewQueryToRaw(query)
 
-	rows, err := db.Query(context, sql, rawQuery.Id, rawQuery.Roles, rawQuery.Phones, rawQuery.Emails, rawQuery.Limit)
+	rows, err := db.Query(context, sql, rawQuery.Id, rawQuery.Roles, rawQuery.Phones, rawQuery.Emails, rawQuery.Limit, rawQuery.Offset)
 	if err != nil {
 		sentry.CaptureException(err)
-		return nil
+		return nil, nil
 	}
 
-	return scanUsersView(rows, rawQuery.Limit)
+	userViews, totalCount := scanUsersView(rows, rawQuery.Limit)
+
+	return userViews, &models.PaginationResponse{
+		HasNext:     functools.HasNext(totalCount, query.Limit, query.Page),
+		HasPrevious: functools.HasPrevious(query.Page),
+		Count:       totalCount,
+	}
 }
 
 func GetUserView(db DB, context context.Context, id uuid.UUID) *models.UserView {
 	sql := getUsersViewSQL()
 	row := db.QueryRow(context, sql, modelsFunctools.UserIDListToPGArray([]uuid.UUID{id}), "{}", "{}", "{}", 1)
-	userView := scanUserView(row)
+	userView, _ := scanUserView(row)
 	return userView
 }
 
@@ -195,5 +210,6 @@ func CreateOrUpdateUsersView(db DB, context context.Context, query CreateOrUpdat
 		return nil
 	}
 
-	return scanUsersView(rows, len(query.Id))
+	userViews, _ := scanUsersView(rows, len(query.Id))
+	return userViews
 }
