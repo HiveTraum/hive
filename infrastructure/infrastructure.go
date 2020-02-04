@@ -60,7 +60,7 @@ type StoreInterface interface {
 	// User Roles
 
 	CreateUserRole(ctx context.Context, userId uuid.UUID, roleId uuid.UUID) (int, *models.UserRole)
-	GetUserRoles(ctx context.Context, query repositories.GetUserRoleQuery) []*models.UserRole
+	GetUserRoles(ctx context.Context, query repositories.GetUserRoleQuery) ([]*models.UserRole, *models.PaginationResponse)
 	DeleteUserRole(ctx context.Context, id uuid.UUID) (int, *models.UserRole)
 
 	// Secrets

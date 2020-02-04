@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"auth/enums"
+	"auth/functools"
 	"auth/models"
 	"auth/modelsFunctools"
 	"context"
@@ -17,23 +18,24 @@ func createUserRoleSQL() string {
 	return `
 		INSERT INTO user_roles(user_id, role_id) 
 		VALUES ($1, $2) 
-		RETURNING id, created, user_id, role_id;
+		RETURNING id, created, user_id, role_id, 0;
 		`
 }
 
 func getUserRolesSQL() string {
 	return `
-		SELECT id, created, user_id, role_id 
+		SELECT id, created, user_id, role_id, count(*) OVER() AS full_count
 		FROM user_roles
 		WHERE (array_length($1::uuid[], 1) IS NULL OR user_id = ANY ($1::uuid[])) AND 
 		      (array_length($2::uuid[], 1) IS NULL OR role_id = ANY ($2::uuid[])) 
-		LIMIT $3;
+		LIMIT $3
+		OFFSET $4;
 		`
 }
 
 func deleteUserRoleSQL() string {
 	return `
-		DELETE FROM user_roles WHERE id = $1 RETURNING id, created, user_id, role_id;
+		DELETE FROM user_roles WHERE id = $1 RETURNING id, created, user_id, role_id, 0;
 		`
 }
 
@@ -58,32 +60,35 @@ func unwrapUserRoleScanError(err error) int {
 	return enums.NotOk
 }
 
-func scanUserRole(row pgx.Row) (int, *models.UserRole) {
+func scanUserRole(row pgx.Row) (int, *models.UserRole, int64) {
 	ur := &models.UserRole{}
+	var count int64
 
-	err := row.Scan(&ur.Id, &ur.Created, &ur.UserId, &ur.RoleId)
+	err := row.Scan(&ur.Id, &ur.Created, &ur.UserId, &ur.RoleId, &count)
 	if err != nil {
 		sentry.CaptureException(err)
-		return unwrapUserRoleScanError(err), nil
+		return unwrapUserRoleScanError(err), nil, 0
 	}
 
-	return enums.Ok, ur
+	return enums.Ok, ur, count
 }
 
-func scanUserRoles(rows pgx.Rows, limit int) []*models.UserRole {
+func scanUserRoles(rows pgx.Rows, limit int) ([]*models.UserRole, int64) {
 	userRoles := make([]*models.UserRole, limit)
 
 	var i int32
+	var count int64
 
 	for rows.Next() {
-		_, ur := scanUserRole(rows)
+		_, ur, c := scanUserRole(rows)
+		count = c
 		userRoles[i] = ur
 		i++
 	}
 
 	rows.Close()
 
-	return userRoles[0:i]
+	return userRoles[0:i], count
 }
 
 type GetUserRoleQuery struct {
@@ -93,14 +98,17 @@ type GetUserRoleQuery struct {
 }
 
 type getUserRoleRawQuery struct {
+	Offset int
 	Limit  int
 	UserId string
 	RoleId string
 }
 
 func convertGetUserRoleQueryToRaw(query GetUserRoleQuery) getUserRoleRawQuery {
+	limit, offset := functools.LimitPageToLimitOffset(query.Pagination.Limit, query.Pagination.Page)
 	return getUserRoleRawQuery{
-		Limit:  query.Pagination.Limit,
+		Limit:  limit,
+		Offset: offset,
 		UserId: modelsFunctools.UserIDListToPGArray(query.UserId),
 		RoleId: modelsFunctools.RoleIDListToPGArray(query.RoleId),
 	}
@@ -109,23 +117,31 @@ func convertGetUserRoleQueryToRaw(query GetUserRoleQuery) getUserRoleRawQuery {
 func CreateUserRole(db DB, ctx context.Context, userID uuid.UUID, roleID uuid.UUID) (int, *models.UserRole) {
 	sql := createUserRoleSQL()
 	row := db.QueryRow(ctx, sql, userID, roleID)
-	return scanUserRole(row)
+	status, userRole, _ := scanUserRole(row)
+	return status, userRole
 }
 
-func GetUserRoles(db DB, ctx context.Context, query GetUserRoleQuery) []*models.UserRole {
+func GetUserRoles(db DB, ctx context.Context, query GetUserRoleQuery) ([]*models.UserRole, *models.PaginationResponse) {
 	sql := getUserRolesSQL()
 	rawQuery := convertGetUserRoleQueryToRaw(query)
-	rows, err := db.Query(ctx, sql, rawQuery.UserId, rawQuery.RoleId, rawQuery.Limit)
+	rows, err := db.Query(ctx, sql, rawQuery.UserId, rawQuery.RoleId, rawQuery.Limit, rawQuery.Offset)
 	if err != nil {
 		sentry.CaptureException(err)
-		return nil
+		return nil, nil
 	}
 
-	return scanUserRoles(rows, rawQuery.Limit)
+	userRoles, totalCount := scanUserRoles(rows, rawQuery.Limit)
+
+	return userRoles, &models.PaginationResponse{
+		HasNext:     functools.HasNext(totalCount, query.Pagination.Limit, query.Pagination.Page),
+		HasPrevious: functools.HasPrevious(query.Pagination.Page),
+		Count:       totalCount,
+	}
 }
 
 func DeleteUserRole(db DB, ctx context.Context, id uuid.UUID) (int, *models.UserRole) {
 	sql := deleteUserRoleSQL()
 	row := db.QueryRow(ctx, sql, id)
-	return scanUserRole(row)
+	status, userRole, _ := scanUserRole(row)
+	return status, userRole
 }

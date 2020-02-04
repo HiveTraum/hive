@@ -58,7 +58,8 @@ message GetUserRoleResponseV1 {
 }
 
 message ListUserRolesResponseV1 {
-    repeated GetUserRoleResponseV1 data = 1;
+    Pagination pagination = 1;
+    repeated GetUserRoleResponseV1 data = 2;
 }
 
 // Emails API

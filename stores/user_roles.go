@@ -11,7 +11,7 @@ func (store *DatabaseStore) CreateUserRole(ctx context.Context, userId uuid.UUID
 	return repositories.CreateUserRole(store.Db, ctx, userId, roleId)
 }
 
-func (store *DatabaseStore) GetUserRoles(ctx context.Context, query repositories.GetUserRoleQuery) []*models.UserRole {
+func (store *DatabaseStore) GetUserRoles(ctx context.Context, query repositories.GetUserRoleQuery) ([]*models.UserRole, *models.PaginationResponse) {
 	return repositories.GetUserRoles(store.Db, ctx, query)
 }
 

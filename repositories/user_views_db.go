@@ -53,7 +53,8 @@ func getUsersViewSQL() string {
 		      (array_length($2::uuid[], 1) IS NULL OR ($2::uuid[]) && role_id) AND
 		      (array_length($3::text[], 1) IS NULL OR ($3::text[]) && phones) AND
 		      (array_length($4::text[], 1) IS NULL OR ($4::text[]) && emails)
-		LIMIT $5 
+		ORDER BY created
+		LIMIT $5
 		OFFSET $6;
 		`
 }

@@ -83,7 +83,7 @@ func TestGetUserRolesWithTwoRoles(t *testing.T) {
 	_, adminRole := CreateRole(pool, ctx, "admin")
 	CreateUserRole(pool, ctx, user.Id, role.Id)
 	CreateUserRole(pool, ctx, user.Id, adminRole.Id)
-	userRoles := GetUserRoles(pool, ctx, GetUserRoleQuery{
+	userRoles, _ := GetUserRoles(pool, ctx, GetUserRoleQuery{
 		UserId:     []uuid.UUID{user.Id},
 		RoleId:     nil,
 		Pagination: &models.PaginationRequest{Limit: 10,},
@@ -101,11 +101,67 @@ func TestDeleteUserRole(t *testing.T) {
 	_, role := CreateRole(pool, ctx, "role")
 	_, userRole := CreateUserRole(pool, ctx, user.Id, role.Id)
 	DeleteUserRole(pool, ctx, userRole.Id)
-	userRoles := GetUserRoles(pool, ctx, GetUserRoleQuery{
+	userRoles, _ := GetUserRoles(pool, ctx, GetUserRoleQuery{
 		UserId:     []uuid.UUID{user.Id},
 		RoleId:     nil,
 		Pagination: &models.PaginationRequest{Limit: 10,},
 	})
 
 	require.Len(t, userRoles, 0)
+}
+
+func TestGetUserRolesWithLimitedPagination(t *testing.T) {
+	pool := config.InitPool(nil)
+	ctx := context.Background()
+	PurgeUserRoles(pool, ctx)
+	PurgeRoles(pool, ctx)
+	PurgeUsers(pool, ctx)
+	user := CreateUser(pool, ctx)
+	_, role := CreateRole(pool, ctx, "role")
+	_, lore := CreateRole(pool, ctx, "lore")
+	_, userRole := CreateUserRole(pool, ctx, user.Id, role.Id)
+	CreateUserRole(pool, ctx, user.Id, lore.Id)
+	userRoles, _ := GetUserRoles(pool, ctx, GetUserRoleQuery{
+		Pagination: &models.PaginationRequest{Limit: 1,},
+	})
+
+	require.Len(t, userRoles, 1)
+	require.Equal(t, userRole.Id, userRoles[0].Id)
+}
+
+func TestGetUserRolesWithPagination(t *testing.T) {
+	pool := config.InitPool(nil)
+	ctx := context.Background()
+	PurgeUserRoles(pool, ctx)
+	PurgeRoles(pool, ctx)
+	PurgeUsers(pool, ctx)
+	user := CreateUser(pool, ctx)
+	_, role := CreateRole(pool, ctx, "role")
+	_, lore := CreateRole(pool, ctx, "lore")
+	CreateUserRole(pool, ctx, user.Id, role.Id)
+	CreateUserRole(pool, ctx, user.Id, lore.Id)
+	userRoles, _ := GetUserRoles(pool, ctx, GetUserRoleQuery{
+		Pagination: &models.PaginationRequest{Limit: 10,},
+	})
+
+	require.Len(t, userRoles, 2)
+}
+
+func TestGetUserRolesWithLimitedPaginationAndSecondPage(t *testing.T) {
+	pool := config.InitPool(nil)
+	ctx := context.Background()
+	PurgeUserRoles(pool, ctx)
+	PurgeRoles(pool, ctx)
+	PurgeUsers(pool, ctx)
+	user := CreateUser(pool, ctx)
+	_, role := CreateRole(pool, ctx, "role")
+	_, lore := CreateRole(pool, ctx, "lore")
+	CreateUserRole(pool, ctx, user.Id, role.Id)
+	_, userRole := CreateUserRole(pool, ctx, user.Id, lore.Id)
+	userRoles, _ := GetUserRoles(pool, ctx, GetUserRoleQuery{
+		Pagination: &models.PaginationRequest{Limit: 1, Page: 2},
+	})
+
+	require.Len(t, userRoles, 1)
+	require.Equal(t, userRole.Id, userRoles[0].Id)
 }

@@ -29,7 +29,7 @@ func GetUserRolesV1Query(r *functools.Request) repositories.GetUserRoleQuery {
 func getUserRolesV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.ListUserRolesResponseV1) {
 
 	query := GetUserRolesV1Query(r)
-	userRoles := app.GetStore().GetUserRoles(r.Context(), query)
+	userRoles, pagination := app.GetStore().GetUserRoles(r.Context(), query)
 	usersData := make([]*inout.GetUserRoleResponseV1, len(userRoles))
 
 	for i, userRole := range userRoles {
@@ -41,7 +41,11 @@ func getUserRolesV1(r *functools.Request, app infrastructure.AppInterface) (int,
 		}
 	}
 
-	return http.StatusOK, &inout.ListUserRolesResponseV1{Data: usersData}
+	return http.StatusOK, &inout.ListUserRolesResponseV1{Data: usersData, Pagination: &inout.Pagination{
+		HasPrevious: pagination.HasPrevious,
+		HasNext:     pagination.HasNext,
+		Count:       pagination.Count,
+	}}
 }
 
 func createUserRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {

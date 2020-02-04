@@ -413,11 +413,12 @@ func (mr *MockStoreInterfaceMockRecorder) CreateUserRole(ctx, userId, roleId int
 }
 
 // GetUserRoles mocks base method
-func (m *MockStoreInterface) GetUserRoles(ctx context.Context, query repositories.GetUserRoleQuery) []*models.UserRole {
+func (m *MockStoreInterface) GetUserRoles(ctx context.Context, query repositories.GetUserRoleQuery) ([]*models.UserRole, *models.PaginationResponse) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserRoles", ctx, query)
 	ret0, _ := ret[0].([]*models.UserRole)
-	return ret0
+	ret1, _ := ret[1].(*models.PaginationResponse)
+	return ret0, ret1
 }
 
 // GetUserRoles indicates an expected call of GetUserRoles
