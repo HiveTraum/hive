@@ -1,10 +1,13 @@
 package stores
 
 import (
+	"auth/config"
 	"auth/models"
 	"auth/repositories"
 	"context"
 	uuid "github.com/satori/go.uuid"
+	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -22,4 +25,16 @@ func (store *DatabaseStore) CreatePhoneConfirmationCode(ctx context.Context, pho
 
 func (store *DatabaseStore) GetPhoneConfirmationCode(ctx context.Context, phone string) string {
 	return repositories.GetPhoneConfirmationCode(store.Cache, ctx, phone)
+}
+
+func (store *DatabaseStore) GetRandomCodeForPhoneConfirmation() string {
+
+	if !config.GetEnvironment().IsTestEnvironment {
+		rand.Seed(time.Now().UnixNano())
+		min := 100000
+		max := 999999
+		return strconv.Itoa(rand.Intn(max-min+1) + min)
+	} else {
+		return "111111"
+	}
 }

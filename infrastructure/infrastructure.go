@@ -37,6 +37,7 @@ type StoreInterface interface {
 	GetEmail(ctx context.Context, email string) (int, *models.Email)
 	CreateEmailConfirmationCode(ctx context.Context, email string, code string, duration time.Duration) *models.EmailConfirmation
 	GetEmailConfirmationCode(ctx context.Context, email string) string
+	GetRandomCodeForEmailConfirmation() string
 
 	// Passwords
 
@@ -50,6 +51,7 @@ type StoreInterface interface {
 	GetPhone(ctx context.Context, phone string) (int, *models.Phone)
 	CreatePhoneConfirmationCode(ctx context.Context, phone string, code string, duration time.Duration) *models.PhoneConfirmation
 	GetPhoneConfirmationCode(ctx context.Context, phone string) string
+	GetRandomCodeForPhoneConfirmation() string
 
 	// Roles
 

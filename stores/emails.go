@@ -1,6 +1,8 @@
 package stores
 
 import (
+	"auth/config"
+	"auth/functools"
 	"auth/models"
 	"auth/repositories"
 	"context"
@@ -22,4 +24,12 @@ func (store *DatabaseStore) CreateEmailConfirmationCode(_ context.Context, email
 
 func (store *DatabaseStore) GetEmailConfirmationCode(_ context.Context, email string) string {
 	return repositories.GetEmailConfirmationCode(store.Cache, email)
+}
+
+func (store *DatabaseStore) GetRandomCodeForEmailConfirmation() string {
+	if !config.GetEnvironment().IsTestEnvironment {
+		return functools.GetRandomString(6)
+	} else {
+		return "111111"
+	}
 }

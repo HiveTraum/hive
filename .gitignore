@@ -3,3 +3,4 @@ vendor
 .vscode
 coverage.out
 .DS_Store
+.env

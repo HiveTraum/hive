@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"auth/enums"
-	"auth/functools"
 	"auth/infrastructure"
 	"auth/models"
 	"context"
@@ -21,10 +20,6 @@ func getEmail(email string) string {
 	}
 
 	return email
-}
-
-func getRandomStringCode() string {
-	return functools.GetRandomString(6)
 }
 
 func checkEmailConfirmationCode(ctx context.Context, store infrastructure.StoreInterface, email string, code string) int {
@@ -78,7 +73,7 @@ func CreateEmailConfirmation(ctx context.Context, store infrastructure.StoreInte
 		return enums.IncorrectEmail, nil
 	}
 
-	code := getRandomStringCode()
+	code := store.GetRandomCodeForEmailConfirmation()
 	emailConfirmation := store.CreateEmailConfirmationCode(ctx, email, code, time.Minute*15)
 	esb.OnEmailCodeConfirmationCreated(email, code)
 	return enums.Ok, emailConfirmation

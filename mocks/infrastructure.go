@@ -499,6 +499,34 @@ func (mr *MockStoreInterfaceMockRecorder) GetSession(ctx, fingerprint, refreshTo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSession", reflect.TypeOf((*MockStoreInterface)(nil).GetSession), ctx, fingerprint, refreshToken, userID)
 }
 
+// GetRandomCodeForEmailConfirmation mocks base method
+func (m *MockStoreInterface) GetRandomCodeForEmailConfirmation() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRandomCodeForEmailConfirmation")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetRandomCodeForEmailConfirmation indicates an expected call of GetRandomCodeForEmailConfirmation
+func (mr *MockStoreInterfaceMockRecorder) GetRandomCodeForEmailConfirmation() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRandomCodeForEmailConfirmation", reflect.TypeOf((*MockStoreInterface)(nil).GetRandomCodeForEmailConfirmation))
+}
+
+// GetRandomCodeForPhoneConfirmation mocks base method
+func (m *MockStoreInterface) GetRandomCodeForPhoneConfirmation() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRandomCodeForPhoneConfirmation")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetRandomCodeForPhoneConfirmation indicates an expected call of GetRandomCodeForPhoneConfirmation
+func (mr *MockStoreInterfaceMockRecorder) GetRandomCodeForPhoneConfirmation() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRandomCodeForPhoneConfirmation", reflect.TypeOf((*MockStoreInterface)(nil).GetRandomCodeForPhoneConfirmation))
+}
+
 // MockESBInterface is a mock of ESBInterface interface
 type MockESBInterface struct {
 	ctrl     *gomock.Controller

@@ -8,8 +8,6 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/nyaruka/phonenumbers"
 	uuid "github.com/satori/go.uuid"
-	"math/rand"
-	"strconv"
 	"time"
 )
 
@@ -72,13 +70,6 @@ func CreatePhone(store infrastructure.StoreInterface, esb infrastructure.ESBInte
 	return status, phoneObject
 }
 
-func getRandomCode() string {
-	rand.Seed(time.Now().UnixNano())
-	min := 100000
-	max := 999999
-	return strconv.Itoa(rand.Intn(max-min+1) + min)
-}
-
 func CreatePhoneConfirmation(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, phone string) (int, *models.PhoneConfirmation) {
 
 	phone = getPhone(phone)
@@ -87,7 +78,7 @@ func CreatePhoneConfirmation(store infrastructure.StoreInterface, esb infrastruc
 		return enums.IncorrectPhone, nil
 	}
 
-	code := getRandomCode()
+	code := store.GetRandomCodeForPhoneConfirmation()
 	phoneConfirmation := store.CreatePhoneConfirmationCode(ctx, phone, code, time.Minute*15)
 	esb.OnPhoneCodeConfirmationCreated(phone, code)
 	return enums.Ok, phoneConfirmation

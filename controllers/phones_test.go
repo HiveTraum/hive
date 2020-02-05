@@ -17,6 +17,13 @@ func TestCreatePhoneConfirmation(t *testing.T) {
 	defer ctrl.Finish()
 	_, store, esb, _ := mocks.InitMockApp(ctrl)
 	ctx := context.Background()
+
+	store.
+		EXPECT().
+		GetRandomCodeForPhoneConfirmation().
+		Return("123456").
+		Times(1)
+
 	store.
 		EXPECT().
 		CreatePhoneConfirmationCode(ctx, "+71234567890", gomock.Any(), time.Minute*15).
