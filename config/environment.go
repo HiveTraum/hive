@@ -21,6 +21,9 @@ type Environment struct {
 	ActualSecretLifetime   int64  `env:"ACTUAL_SECRET_LIFETIME" envDefault:"1440"` // Minutes
 	DefaultPaginationLimit int    `env:"DEFAULT_PAGINATION_LIMIT" envDefault:"50"`
 	IsTestEnvironment      bool   `env:"IS_TEST_ENVIRONMENT" envDefault:"false"`
+	TestConfirmationCode   string `env:"TEST_CONFIRMATION_CODE" envDefault:"111111"`
+	InitialAdmin           string `env:"INITIAL_ADMIN"`
+	AdminRole              string `env:"ADMIN_ROLE" envDefault:"admin"`
 }
 
 var cfg Environment

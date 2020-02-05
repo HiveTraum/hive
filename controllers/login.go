@@ -90,7 +90,7 @@ func (controller *LoginController) EncodeAccessToken(_ context.Context, userID u
 	claims := models.AccessTokenPayload{
 		UserID:   userID,
 		Roles:    roles,
-		IsAdmin:  functools.Contains(config.AdminRole, roles),
+		IsAdmin:  functools.Contains(config.GetEnvironment().AdminRole, roles),
 		SecretID: secret.Id,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expires.Unix(),

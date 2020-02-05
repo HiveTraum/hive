@@ -35,6 +35,6 @@ func (store *DatabaseStore) GetRandomCodeForPhoneConfirmation() string {
 		max := 999999
 		return strconv.Itoa(rand.Intn(max-min+1) + min)
 	} else {
-		return "111111"
+		return config.GetEnvironment().TestConfirmationCode
 	}
 }

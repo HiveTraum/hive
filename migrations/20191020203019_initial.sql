@@ -88,8 +88,10 @@ CREATE INDEX ON passwords (user_id);
 CREATE INDEX ON sessions (user_id);
 CREATE INDEX ON sessions (secret_id);
 
+
 CREATE INDEX user_views_role_id_idx on users_view USING GIN (role_id);
 CREATE INDEX user_views_phones_idx on users_view USING GIN (phones);
+CREATE INDEX user_views_idx on users_view (id, created, updated, phones, roles, emails, role_id);
 CREATE INDEX sessions_fingerprint_idx on sessions (fingerprint);
 CREATE INDEX sessions_refresh_token_idx on sessions (refresh_token);
 CREATE UNIQUE INDEX user_roles_idx ON user_roles (user_id, role_id);

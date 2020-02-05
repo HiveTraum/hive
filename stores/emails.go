@@ -30,6 +30,6 @@ func (store *DatabaseStore) GetRandomCodeForEmailConfirmation() string {
 	if !config.GetEnvironment().IsTestEnvironment {
 		return functools.GetRandomString(6)
 	} else {
-		return "111111"
+		return config.GetEnvironment().TestConfirmationCode
 	}
 }

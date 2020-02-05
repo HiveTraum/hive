@@ -60,6 +60,9 @@ func getUsersViewSQL() string {
 }
 
 func updateUsersViewSQL() string {
+
+	// TODO https://habr.com/ru/post/481610/ оптимизировать в соответствии со статье по ссылке
+
 	return `
 		INSERT
 		INTO users_view(id, created, roles, phones, emails, role_id)

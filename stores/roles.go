@@ -1,6 +1,8 @@
 package stores
 
 import (
+	"auth/config"
+	"auth/enums"
 	"auth/models"
 	"auth/repositories"
 	"context"
@@ -17,4 +19,24 @@ func (store *DatabaseStore) GetRole(ctx context.Context, id uuid.UUID) (int, *mo
 
 func (store *DatabaseStore) GetRoles(ctx context.Context, query repositories.GetRolesQuery) []*models.Role {
 	return repositories.GetRoles(store.Db, ctx, query)
+}
+
+func (store *DatabaseStore) GetRoleByTitle(ctx context.Context, title string) (int, *models.Role) {
+	roles := store.GetRoles(ctx, repositories.GetRolesQuery{
+		Pagination: &models.PaginationRequest{
+			Page:  1,
+			Limit: 1,
+		},
+		Titles: []string{title},
+	})
+
+	if len(roles) > 0 {
+		return enums.Ok, roles[0]
+	} else {
+		return enums.Ok, nil
+	}
+}
+
+func (store *DatabaseStore) GetAdminRole(ctx context.Context) (int, *models.Role) {
+	return store.GetRoleByTitle(ctx, config.GetEnvironment().AdminRole)
 }

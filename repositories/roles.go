@@ -18,8 +18,9 @@ func getRolesSQL() string {
 	return `
 		SELECT id, created, title
 		FROM roles
-		WHERE (array_length($1::uuid[], 1) IS NULL OR id = ANY ($1::uuid[]))
-		LIMIT $2;
+		WHERE (array_length($1::uuid[], 1) IS NULL OR id = ANY ($1::uuid[])) AND
+		      (array_length($2::text[], 1) IS NULL OR title = ANY ($2::text[]))
+		LIMIT $3;
 		`
 }
 
@@ -70,11 +71,13 @@ func scanRoles(rows pgx.Rows, limit int) []*models.Role {
 type GetRolesQuery struct {
 	Pagination  *models.PaginationRequest
 	Identifiers []string
+	Titles      []string
 }
 
 type getRolesRawQuery struct {
 	Limit       int
 	Identifiers string
+	Titles      string
 }
 
 func convertGetRolesQueryToRaw(query GetRolesQuery) getRolesRawQuery {
@@ -89,6 +92,7 @@ func convertGetRolesQueryToRaw(query GetRolesQuery) getRolesRawQuery {
 	return getRolesRawQuery{
 		Limit:       limit,
 		Identifiers: functools.StringListToPGArray(query.Identifiers),
+		Titles:      functools.StringListToPGArray(query.Titles),
 	}
 }
 
@@ -109,7 +113,7 @@ func GetRoles(db DB, context context.Context, query GetRolesQuery) []*models.Rol
 	sql := getRolesSQL()
 	rawQuery := convertGetRolesQueryToRaw(query)
 
-	rows, err := db.Query(context, sql, rawQuery.Identifiers, rawQuery.Limit)
+	rows, err := db.Query(context, sql, rawQuery.Identifiers, rawQuery.Titles, rawQuery.Limit)
 	if err != nil {
 		sentry.CaptureException(err)
 		return nil

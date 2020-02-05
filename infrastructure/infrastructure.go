@@ -58,6 +58,8 @@ type StoreInterface interface {
 	CreateRole(context context.Context, title string) (int, *models.Role)
 	GetRole(context context.Context, id uuid.UUID) (int, *models.Role)
 	GetRoles(context context.Context, query repositories.GetRolesQuery) []*models.Role
+	GetRoleByTitle(ctx context.Context, title string) (int, *models.Role)
+	GetAdminRole(ctx context.Context) (int, *models.Role)
 
 	// User Roles
 
