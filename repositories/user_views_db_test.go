@@ -8,6 +8,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestCreateOrUpdateAllUsersViewOnUserCreation(t *testing.T) {
@@ -121,6 +122,10 @@ func TestDatabaseStore_GetUsersViewPaginationWithLimitWithoutNext(t *testing.T) 
 	config.PurgeUserViews(pool, ctx)
 
 	CreateUser(pool, ctx)
+
+	// TODO для стабильности тестов ожидаем миллисекунду, т.к. сортировка идет по полю created, которое иногда может быть одинаковым ввиду того что пользователи создаются почти в один момент
+	time.Sleep(time.Millisecond)
+
 	user := CreateUser(pool, ctx)
 	CreateOrUpdateUsersView(pool, ctx, CreateOrUpdateUsersViewStoreQuery{})
 
