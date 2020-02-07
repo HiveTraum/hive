@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"auth/enums"
+	"auth/functools"
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/models"
@@ -32,9 +33,16 @@ func CreateUser(
 	}
 
 	if len(body.Phone) > 0 {
-		phoneStatus, phone := validatePhone(store, ctx, body.Phone, body.PhoneCode)
-		if phoneStatus != enums.Ok {
-			return phoneStatus, nil
+		phone := functools.NormalizePhone(body.Phone, body.PhoneCountryCode)
+		if phone == "" {
+			return enums.IncorrectPhone, nil
+		}
+
+		cachedCode := store.GetPhoneConfirmationCode(ctx, phone)
+		if cachedCode == "" {
+			return enums.PhoneNotFound, nil
+		} else if cachedCode != body.PhoneCode {
+			return enums.IncorrectPhoneCode, nil
 		}
 
 		body.Phone = phone

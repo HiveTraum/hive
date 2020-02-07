@@ -14,14 +14,14 @@ import (
 )
 
 func createPhoneV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
-	body := inout.CreatePhoneRequestV1{}
-	err := r.ParseBody(&body)
+	b := inout.CreatePhoneRequestV1{}
+	err := r.ParseBody(&b)
 
 	if err != nil {
 		return http.StatusBadRequest, nil
 	}
 
-	status, phone := controllers.CreatePhone(app.GetStore(), app.GetESB(), r.Context(), body.Phone, body.Code, uuid.FromBytesOrNil(body.UserID))
+	status, phone := controllers.CreatePhone(app.GetStore(), app.GetESB(), r.Context(), b.Phone, b.Code, uuid.FromBytesOrNil(b.UserID), b.PhoneCountryCode)
 
 	switch status {
 	case enums.Ok:
@@ -73,7 +73,7 @@ func createPhoneConfirmationV1(r *functools.Request, app infrastructure.AppInter
 		return http.StatusBadRequest, nil
 	}
 
-	status, phoneConfirmation := controllers.CreatePhoneConfirmation(app.GetStore(), app.GetESB(), r.Context(), body.Phone)
+	status, phoneConfirmation := controllers.CreatePhoneConfirmation(app.GetStore(), app.GetESB(), r.Context(), body.Phone, body.PhoneCountryCode)
 
 	switch status {
 	case enums.Ok:

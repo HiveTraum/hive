@@ -2,59 +2,26 @@ package controllers
 
 import (
 	"auth/enums"
+	"auth/functools"
 	"auth/infrastructure"
 	"auth/models"
 	"context"
-	"github.com/getsentry/sentry-go"
-	"github.com/nyaruka/phonenumbers"
 	uuid "github.com/satori/go.uuid"
 	"time"
 )
 
-func getPhone(phone string) string {
-	num, err := phonenumbers.Parse(phone, "RU")
+func CreatePhone(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, phone string, code string, userId uuid.UUID, phoneCountryCode string) (int, *models.Phone) {
 
-	if err != nil {
-		sentry.CaptureException(err)
-		return ""
+	phone = functools.NormalizePhone(phone, phoneCountryCode)
+	if phone == "" {
+		return enums.IncorrectPhone, nil
 	}
 
-	if num == nil || !phonenumbers.IsPossibleNumber(num) {
-		return ""
-	}
-
-	return phonenumbers.Format(num, phonenumbers.E164)
-}
-
-func checkPhoneConfirmationCode(store infrastructure.StoreInterface, ctx context.Context, phone string, code string) int {
 	cachedCode := store.GetPhoneConfirmationCode(ctx, phone)
 	if cachedCode == "" {
-		return enums.PhoneNotFound
+		return enums.PhoneNotFound, nil
 	} else if cachedCode != code {
-		return enums.IncorrectPhoneCode
-	}
-
-	return enums.Ok
-}
-
-func validatePhone(store infrastructure.StoreInterface, ctx context.Context, phone string, code string) (int, string) {
-	phone = getPhone(phone)
-
-	if phone == "" {
-		return enums.IncorrectPhone, ""
-	}
-
-	status := checkPhoneConfirmationCode(store, ctx, phone, code)
-
-	return status, phone
-}
-
-func CreatePhone(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, phone string, code string, userId uuid.UUID) (int, *models.Phone) {
-
-	status, phone := validatePhone(store, ctx, phone, code)
-
-	if status != enums.Ok {
-		return status, nil
+		return enums.IncorrectPhoneCode, nil
 	}
 
 	_, oldPhone := store.GetPhone(ctx, phone)
@@ -70,10 +37,9 @@ func CreatePhone(store infrastructure.StoreInterface, esb infrastructure.ESBInte
 	return status, phoneObject
 }
 
-func CreatePhoneConfirmation(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, phone string) (int, *models.PhoneConfirmation) {
+func CreatePhoneConfirmation(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, phone string, countryCode string) (int, *models.PhoneConfirmation) {
 
-	phone = getPhone(phone)
-
+	phone = functools.NormalizePhone(phone, countryCode)
 	if phone == "" {
 		return enums.IncorrectPhone, nil
 	}

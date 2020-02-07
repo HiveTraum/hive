@@ -40,7 +40,7 @@ func TestCreatePhoneConfirmation(t *testing.T) {
 		Times(1)
 
 	phone := "71234567890"
-	status, confirmation := CreatePhoneConfirmation(store, esb, ctx, phone)
+	status, confirmation := CreatePhoneConfirmation(store, esb, ctx, phone, "RU")
 	require.Equal(t, "+71234567890", confirmation.Phone)
 	require.NotNil(t, confirmation)
 	require.Equal(t, enums.Ok, status)
@@ -53,7 +53,7 @@ func TestCreatePhoneConfirmationWithIncorrectPhone(t *testing.T) {
 	_, store, esb, _ := mocks.InitMockApp(ctrl)
 	ctx := context.Background()
 	phone := "qwerty"
-	status, confirmation := CreatePhoneConfirmation(store, esb, ctx, phone)
+	status, confirmation := CreatePhoneConfirmation(store, esb, ctx, phone, "RU")
 	require.Nil(t, confirmation)
 	require.Equal(t, enums.IncorrectPhone, status)
 }

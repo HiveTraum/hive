@@ -42,7 +42,7 @@ func TestCreateUser(t *testing.T) {
 
 	store.
 		EXPECT().
-		GetEmailConfirmationCode(ctx,"email@email.com").
+		GetEmailConfirmationCode(ctx, "email@email.com").
 		Return("654321")
 
 	store.
@@ -56,11 +56,12 @@ func TestCreateUser(t *testing.T) {
 		})
 
 	body := inout.CreateUserRequestV1{
-		Password:  "hello",
-		Phone:     "71234567890",
-		Email:     "email@email.com",
-		PhoneCode: "123456",
-		EmailCode: "654321",
+		Password:         "hello",
+		Phone:            "71234567890",
+		Email:            "email@email.com",
+		PhoneCode:        "123456",
+		EmailCode:        "654321",
+		PhoneCountryCode: "RU",
 	}
 
 	store.
@@ -71,6 +72,7 @@ func TestCreateUser(t *testing.T) {
 			Email:     body.Email,
 			PhoneCode: body.PhoneCode,
 			EmailCode: body.EmailCode,
+			PhoneCountryCode: "RU",
 		}).
 		Return(enums.Ok, &models.User{
 			Id:      thirdUserID,
@@ -92,5 +94,4 @@ func TestCreateUser(t *testing.T) {
 	}, user)
 
 	require.Equal(t, enums.Ok, status)
-
 }
