@@ -69,13 +69,14 @@ func main() {
 
 	// Methods Middleware
 	CR := []string{http.MethodGet, http.MethodPost, http.MethodOptions}
+	RD := []string{http.MethodGet, http.MethodDelete, http.MethodOptions}
 	R := []string{http.MethodGet, http.MethodOptions}
 	C := []string{http.MethodPost, http.MethodOptions}
 	D := []string{http.MethodDelete, http.MethodOptions}
 
 	handlers := []handler{
 		{pattern: "/views/v1/users", h: usersView, methods: R},
-		{pattern: "/views/v1/users/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: userView, methods: R},
+		{pattern: "/views/v1/users/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: userView, methods: RD},
 
 		{pattern: "/api/v1/users", h: usersAPI, methods: CR},
 		{pattern: "/api/v1/users/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: userAPI, methods: R},

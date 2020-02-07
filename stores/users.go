@@ -11,8 +11,8 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func createPhoneForUser(tx repositories.DB, ctx context.Context, phone string, userId uuid.UUID) int {
-	status, _ := repositories.CreatePhone(tx, ctx, userId, phone)
+func createPhoneForUser(tx repositories.DB, ctx context.Context, phone string, userId uuid.UUID, countryCode string) int {
+	status, _ := repositories.CreatePhone(tx, ctx, userId, phone, countryCode)
 	return status
 }
 
@@ -47,7 +47,7 @@ func (store *DatabaseStore) CreateUser(ctx context.Context, query *inout.CreateU
 	var statuses []int
 
 	if query.Phone != "" {
-		statuses = append(statuses, createPhoneForUser(tx, ctx, query.Phone, user.Id))
+		statuses = append(statuses, createPhoneForUser(tx, ctx, query.Phone, user.Id, query.PhoneCountryCode))
 	}
 
 	if query.Email != "" {
@@ -78,4 +78,8 @@ func (store *DatabaseStore) GetUser(context context.Context, id uuid.UUID) *mode
 
 func (store *DatabaseStore) GetUsers(context context.Context, query repositories.GetUsersQuery) []*models.User {
 	return repositories.GetUsers(store.Db, context, query)
+}
+
+func (store *DatabaseStore) DeleteUser(ctx context.Context, id uuid.UUID) (int, *models.User) {
+	return repositories.DeleteUser(store.Db, ctx, id)
 }

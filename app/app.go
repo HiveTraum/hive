@@ -34,7 +34,7 @@ func InitApp(tracer opentracing.Tracer) *App {
 	store := &stores.DatabaseStore{Db: pool, Cache: redis, InMemoryCache: inMemoryCache}
 	loginController := &controllers.LoginController{Store: store}
 	esb := InitESB(store)
-	InitialAdmin(store)
 	InitialAdminRole(store)
+	InitialAdmin(store)
 	return &App{ESB: esb, Store: store, LoginController: loginController}
 }

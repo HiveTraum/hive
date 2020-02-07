@@ -82,6 +82,21 @@ func (mr *MockStoreInterfaceMockRecorder) GetUsers(context, query interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockStoreInterface)(nil).GetUsers), context, query)
 }
 
+// DeleteUser mocks base method
+func (m *MockStoreInterface) DeleteUser(ctx context.Context, id go_uuid.UUID) (int, *models.User) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteUser", ctx, id)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(*models.User)
+	return ret0, ret1
+}
+
+// DeleteUser indicates an expected call of DeleteUser
+func (mr *MockStoreInterfaceMockRecorder) DeleteUser(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockStoreInterface)(nil).DeleteUser), ctx, id)
+}
+
 // GetUsersView mocks base method
 func (m *MockStoreInterface) GetUsersView(context context.Context, query repositories.GetUsersViewStoreQuery) ([]*models.UserView, *models.PaginationResponse) {
 	m.ctrl.T.Helper()
@@ -310,18 +325,18 @@ func (mr *MockStoreInterfaceMockRecorder) GetLatestPassword(ctx, userId interfac
 }
 
 // CreatePhone mocks base method
-func (m *MockStoreInterface) CreatePhone(ctx context.Context, userId go_uuid.UUID, value string) (int, *models.Phone) {
+func (m *MockStoreInterface) CreatePhone(ctx context.Context, userId go_uuid.UUID, value, countryCode string) (int, *models.Phone) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreatePhone", ctx, userId, value)
+	ret := m.ctrl.Call(m, "CreatePhone", ctx, userId, value, countryCode)
 	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(*models.Phone)
 	return ret0, ret1
 }
 
 // CreatePhone indicates an expected call of CreatePhone
-func (mr *MockStoreInterfaceMockRecorder) CreatePhone(ctx, userId, value interface{}) *gomock.Call {
+func (mr *MockStoreInterfaceMockRecorder) CreatePhone(ctx, userId, value, countryCode interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePhone", reflect.TypeOf((*MockStoreInterface)(nil).CreatePhone), ctx, userId, value)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePhone", reflect.TypeOf((*MockStoreInterface)(nil).CreatePhone), ctx, userId, value, countryCode)
 }
 
 // GetPhone mocks base method

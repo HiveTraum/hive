@@ -12,7 +12,7 @@ CREATE TABLE passwords
     created BIGINT DEFAULT extract(epoch from now()) * 1000,
     user_id UUID,
     value   varchar(255),
-    FOREIGN KEY (user_id) REFERENCES users
+    FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE
 );
 
 CREATE TABLE emails
@@ -21,7 +21,7 @@ CREATE TABLE emails
     created BIGINT DEFAULT extract(epoch from now()) * 1000,
     user_id UUID,
     value   varchar(255) UNIQUE,
-    FOREIGN KEY (user_id) REFERENCES users
+    FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE
 );
 
 CREATE TABLE phones
@@ -31,7 +31,7 @@ CREATE TABLE phones
     user_id      UUID,
     value        varchar(50) UNIQUE,
     country_code varchar(4),
-    FOREIGN KEY (user_id) REFERENCES users
+    FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE
 );
 
 CREATE TABLE roles
@@ -47,8 +47,8 @@ CREATE TABLE user_roles
     created BIGINT DEFAULT extract(epoch from now()) * 1000,
     user_id UUID,
     role_id UUID,
-    FOREIGN KEY (user_id) REFERENCES users,
-    FOREIGN KEY (role_id) REFERENCES roles
+    FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES roles ON DELETE CASCADE
 );
 
 CREATE TABLE users_view
@@ -77,8 +77,8 @@ CREATE TABLE sessions
     secret_id     UUID,
     created       BIGINT DEFAULT extract(epoch from now()) * 1000,
     user_agent    TEXT,
-    FOREIGN KEY (user_id) REFERENCES users,
-    FOREIGN KEY (secret_id) REFERENCES secrets
+    FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE,
+    FOREIGN KEY (secret_id) REFERENCES secrets ON DELETE CASCADE
 );
 
 CREATE INDEX ON phones (user_id);

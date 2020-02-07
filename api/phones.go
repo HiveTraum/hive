@@ -26,10 +26,11 @@ func createPhoneV1(r *functools.Request, app infrastructure.AppInterface) (int, 
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.CreatePhoneResponseV1{
-			Id:      phone.Id.Bytes(),
-			Created: phone.Created,
-			UserID:  phone.UserId.Bytes(),
-			Phone:   phone.Value,
+			Id:               phone.Id.Bytes(),
+			Created:          phone.Created,
+			UserID:           phone.UserId.Bytes(),
+			Phone:            phone.Value,
+			PhoneCountryCode: phone.CountryCode,
 		}
 	case enums.IncorrectPhoneCode:
 		return http.StatusBadRequest, &inout.CreatePhoneBadRequestV1{

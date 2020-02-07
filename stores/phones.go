@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-func (store *DatabaseStore) CreatePhone(ctx context.Context, userId uuid.UUID, value string) (int, *models.Phone) {
-	return repositories.CreatePhone(store.Db, ctx, userId, value)
+func (store *DatabaseStore) CreatePhone(ctx context.Context, userId uuid.UUID, value string, countryCode string) (int, *models.Phone) {
+	return repositories.CreatePhone(store.Db, ctx, userId, value, countryCode)
 }
 
 func (store *DatabaseStore) GetPhone(ctx context.Context, phone string) (int, *models.Phone) {

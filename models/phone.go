@@ -3,10 +3,11 @@ package models
 import uuid "github.com/satori/go.uuid"
 
 type Phone struct {
-	Id      uuid.UUID
-	Created int64
-	UserId  uuid.UUID
-	Value   string
+	Id          uuid.UUID
+	Created     int64
+	UserId      uuid.UUID
+	Value       string
+	CountryCode string
 }
 
 type PhoneConfirmation struct {

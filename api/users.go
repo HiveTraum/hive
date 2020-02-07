@@ -127,6 +127,19 @@ func getUserV1(r *functools.Request, app infrastructure.AppInterface, id uuid.UU
 	}
 }
 
+func deleteUserV1(r *functools.Request, app infrastructure.AppInterface, id uuid.UUID) (int, *inout.GetUserResponseV1) {
+	_, deletedUser := app.GetStore().DeleteUser(r.Context(), id)
+
+	if deletedUser == nil {
+		return http.StatusNotFound, nil
+	}
+
+	return http.StatusNoContent, &inout.GetUserResponseV1{
+		Id:      deletedUser.Id.Bytes(),
+		Created: deletedUser.Created,
+	}
+}
+
 func UsersAPIV1(app infrastructure.AppInterface) middlewares.ResponseControllerHandler {
 	return func(r *functools.Request) (int, proto.Message) {
 		if r.Method == "GET" {
@@ -150,6 +163,10 @@ func UserAPIV1(app infrastructure.AppInterface) middlewares.ResponseControllerHa
 			return http.StatusBadRequest, nil
 		}
 
-		return getUserV1(request, app, id)
+		if request.Method == "DELETE" {
+			return deleteUserV1(request, app, id)
+		} else {
+			return getUserV1(request, app, id)
+		}
 	}
 }

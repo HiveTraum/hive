@@ -19,6 +19,7 @@ type StoreInterface interface {
 	CreateUser(ctx context.Context, query *inout.CreateUserRequestV1) (int, *models.User)
 	GetUser(context context.Context, id uuid.UUID) *models.User
 	GetUsers(context context.Context, query repositories.GetUsersQuery) []*models.User
+	DeleteUser(ctx context.Context, id uuid.UUID) (int, *models.User)
 
 	// User Views
 
@@ -47,7 +48,7 @@ type StoreInterface interface {
 
 	// Phones
 
-	CreatePhone(ctx context.Context, userId uuid.UUID, value string) (int, *models.Phone)
+	CreatePhone(ctx context.Context, userId uuid.UUID, value string, countryCode string) (int, *models.Phone)
 	GetPhone(ctx context.Context, phone string) (int, *models.Phone)
 	CreatePhoneConfirmationCode(ctx context.Context, phone string, code string, duration time.Duration) *models.PhoneConfirmation
 	GetPhoneConfirmationCode(ctx context.Context, phone string) string

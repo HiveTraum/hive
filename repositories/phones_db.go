@@ -13,16 +13,16 @@ import (
 )
 
 func createPhoneSQL() string {
-	return `INSERT INTO phones (id, user_id, value) 
-			VALUES ($1, $2, $3)
+	return `INSERT INTO phones (id, user_id, value, country_code) 
+			VALUES ($1, $2, $3, $4)
 			ON CONFLICT (value) 
 			    DO UPDATE SET created=DEFAULT,
 			                  user_id=excluded.user_id
-			RETURNING id, created, user_id, value;`
+			RETURNING id, created, user_id, value, country_code;`
 }
 
 func getPhoneSQL() string {
-	return `SELECT id, created, user_id, value FROM phones WHERE value = $1;`
+	return `SELECT id, created, user_id, value, country_code FROM phones WHERE value = $1;`
 }
 
 func unwrapPhoneScanError(err error) int {
@@ -40,7 +40,7 @@ func unwrapPhoneScanError(err error) int {
 func scanPhone(row pgx.Row) (int, *models.Phone) {
 	phone := &models.Phone{}
 
-	err := row.Scan(&phone.Id, &phone.Created, &phone.UserId, &phone.Value)
+	err := row.Scan(&phone.Id, &phone.Created, &phone.UserId, &phone.Value, &phone.CountryCode)
 	if err != nil {
 		return unwrapPhoneScanError(err), nil
 	}
@@ -48,9 +48,9 @@ func scanPhone(row pgx.Row) (int, *models.Phone) {
 	return enums.Ok, phone
 }
 
-func CreatePhone(db DB, ctx context.Context, userId uuid.UUID, value string) (int, *models.Phone) {
+func CreatePhone(db DB, ctx context.Context, userId uuid.UUID, value string, countryCode string) (int, *models.Phone) {
 	sql := createPhoneSQL()
-	row := db.QueryRow(ctx, sql, uuid.NewV4(), userId, value)
+	row := db.QueryRow(ctx, sql, uuid.NewV4(), userId, value, countryCode)
 	return scanPhone(row)
 }
 

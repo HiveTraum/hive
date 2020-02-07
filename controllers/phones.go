@@ -32,7 +32,7 @@ func CreatePhone(store infrastructure.StoreInterface, esb infrastructure.ESBInte
 		identifiers = append(identifiers, oldPhone.UserId)
 	}
 
-	status, phoneObject := store.CreatePhone(ctx, userId, phone)
+	status, phoneObject := store.CreatePhone(ctx, userId, phone, phoneCountryCode)
 	esb.OnPhoneChanged(identifiers)
 	return status, phoneObject
 }
