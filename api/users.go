@@ -128,8 +128,18 @@ func getUserV1(r *functools.Request, app infrastructure.AppInterface, id uuid.UU
 }
 
 func deleteUserV1(r *functools.Request, app infrastructure.AppInterface, id uuid.UUID) (int, *inout.GetUserResponseV1) {
-	_, deletedUser := app.GetStore().DeleteUser(r.Context(), id)
 
+	ctx := r.Context()
+
+	status, payload := app.GetLoginController().Login(ctx, r.GetAccessToken())
+	if status != enums.Ok {
+		return http.StatusUnauthorized, nil
+	}
+	if id != payload.UserID || payload.IsAdmin {
+		return http.StatusForbidden, nil
+	}
+
+	_, deletedUser := app.GetStore().DeleteUser(ctx, id)
 	if deletedUser == nil {
 		return http.StatusNotFound, nil
 	}
