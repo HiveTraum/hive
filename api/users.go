@@ -131,14 +131,6 @@ func deleteUserV1(r *functools.Request, app infrastructure.AppInterface, id uuid
 
 	ctx := r.Context()
 
-	status, payload := app.GetLoginController().Login(ctx, r.GetAccessToken())
-	if status != enums.Ok {
-		return http.StatusUnauthorized, nil
-	}
-	if id != payload.UserID || payload.IsAdmin {
-		return http.StatusForbidden, nil
-	}
-
 	_, deletedUser := app.GetStore().DeleteUser(ctx, id)
 	if deletedUser == nil {
 		return http.StatusNotFound, nil
@@ -171,6 +163,14 @@ func UserAPIV1(app infrastructure.AppInterface) middlewares.ResponseControllerHa
 			// Если такое произошло - что то пошло не так
 			sentry.CaptureException(err)
 			return http.StatusBadRequest, nil
+		}
+
+		status, payload := app.GetLoginController().Login(request.Context(), request.GetAccessToken())
+		if status != enums.Ok {
+			return http.StatusUnauthorized, nil
+		}
+		if id != payload.UserID || payload.IsAdmin {
+			return http.StatusForbidden, nil
 		}
 
 		if request.Method == "DELETE" {
