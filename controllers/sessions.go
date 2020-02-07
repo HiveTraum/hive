@@ -3,6 +3,7 @@ package controllers
 import (
 	"auth/config"
 	"auth/enums"
+	"auth/functools"
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/models"
@@ -25,9 +26,9 @@ func getUserFromTokens(store infrastructure.StoreInterface, controller infrastru
 	return enums.Ok, &payload.UserID
 }
 
-func getUserFromEmailAndCode(store infrastructure.StoreInterface, controller infrastructure.LoginControllerInterface, ctx context.Context, emailValue string, emailCode string) (int, *uuid.UUID) {
+func getUserFromEmailAndCode(store infrastructure.StoreInterface, ctx context.Context, emailValue string, emailCode string) (int, *uuid.UUID) {
 
-	emailValue = controller.NormalizeEmail(ctx, emailValue)
+	emailValue = functools.NormalizeEmail(emailValue)
 	if emailValue == "" {
 		return enums.IncorrectEmail, nil
 	}
@@ -52,7 +53,7 @@ func getUserFromEmailAndCode(store infrastructure.StoreInterface, controller inf
 
 func getUserFromEmailAndPassword(store infrastructure.StoreInterface, controller infrastructure.LoginControllerInterface, ctx context.Context, emailValue string, passwordValue string) (int, *uuid.UUID) {
 
-	emailValue = controller.NormalizeEmail(ctx, emailValue)
+	emailValue = functools.NormalizeEmail(emailValue)
 	if emailValue == "" {
 		return enums.IncorrectEmail, nil
 	}
@@ -81,8 +82,8 @@ func getUserFromEmailAndPassword(store infrastructure.StoreInterface, controller
 	return enums.Ok, &password.UserId
 }
 
-func getUserFromPhoneAndPassword(store infrastructure.StoreInterface, controller infrastructure.LoginControllerInterface, ctx context.Context, phoneValue string, passwordValue string) (int, *uuid.UUID) {
-	phoneValue = controller.NormalizePhone(ctx, phoneValue)
+func getUserFromPhoneAndPassword(store infrastructure.StoreInterface, controller infrastructure.LoginControllerInterface, ctx context.Context, phoneValue string, passwordValue string, phoneCountryCode string) (int, *uuid.UUID) {
+	phoneValue = functools.NormalizePhone(phoneValue, phoneCountryCode)
 	if phoneValue == "" {
 		return enums.IncorrectPhone, nil
 	}
@@ -111,8 +112,8 @@ func getUserFromPhoneAndPassword(store infrastructure.StoreInterface, controller
 	return enums.Ok, &password.UserId
 }
 
-func getUserFromPhoneAndCode(store infrastructure.StoreInterface, controller infrastructure.LoginControllerInterface, ctx context.Context, phoneValue string, phoneCode string) (int, *uuid.UUID) {
-	phoneValue = controller.NormalizePhone(ctx, phoneValue)
+func getUserFromPhoneAndCode(store infrastructure.StoreInterface, ctx context.Context, phoneValue string, phoneCode string, phoneCountryCode string) (int, *uuid.UUID) {
+	phoneValue = functools.NormalizePhone(phoneValue, phoneCountryCode)
 	if phoneValue == "" {
 		return enums.IncorrectPhone, nil
 	}
@@ -148,13 +149,13 @@ func getUserByCredentials(store infrastructure.StoreInterface, controller infras
 		status, userID = getUserFromEmailAndPassword(store, controller, ctx, emailAndPassword.Email, emailAndPassword.Password)
 	case *inout.CreateSessionRequestV1_EmailAndCode_:
 		emailAndCode := credentials.GetEmailAndCode()
-		status, userID = getUserFromEmailAndCode(store, controller, ctx, emailAndCode.Email, emailAndCode.Code)
+		status, userID = getUserFromEmailAndCode(store, ctx, emailAndCode.Email, emailAndCode.Code)
 	case *inout.CreateSessionRequestV1_PhoneAndPassword_:
 		phoneAndPassword := credentials.GetPhoneAndPassword()
-		status, userID = getUserFromPhoneAndPassword(store, controller, ctx, phoneAndPassword.Phone, phoneAndPassword.Password)
+		status, userID = getUserFromPhoneAndPassword(store, controller, ctx, phoneAndPassword.Phone, phoneAndPassword.Password, phoneAndPassword.PhoneCountryCode)
 	case *inout.CreateSessionRequestV1_PhoneAndCode_:
 		phoneAndCode := credentials.GetPhoneAndCode()
-		status, userID = getUserFromPhoneAndCode(store, controller, ctx, phoneAndCode.Phone, phoneAndCode.Code)
+		status, userID = getUserFromPhoneAndCode(store, ctx, phoneAndCode.Phone, phoneAndCode.Code, phoneAndCode.PhoneCountryCode)
 	default:
 		return enums.CredentialsNotProvided, nil
 	}

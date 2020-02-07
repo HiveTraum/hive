@@ -96,9 +96,6 @@ type ESBDispatcherInterface interface {
 type LoginControllerInterface interface {
 	Login(ctx context.Context, accessToken string) (int, *models.AccessTokenPayload)
 
-	NormalizePhone(ctx context.Context, phone string) string
-	NormalizeEmail(ctx context.Context, email string) string
-
 	DecodeAccessToken(ctx context.Context, token string, secret uuid.UUID) (int, *models.AccessTokenPayload)
 	DecodeAccessTokenWithoutValidation(ctx context.Context, tokenValue string) (int, *models.AccessTokenPayload)
 	EncodeAccessToken(ctx context.Context, userID uuid.UUID, roles []string, secret *models.Secret, expire time.Time) string

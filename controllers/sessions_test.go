@@ -120,12 +120,6 @@ func TestCreateSessionFromEmailAndPassword(t *testing.T) {
 	email := "mail@mail.com"
 	userID := uuid.NewV4()
 
-	loginController.
-		EXPECT().
-		NormalizeEmail(ctx, email).
-		Times(1).
-		Return(email)
-
 	store.
 		EXPECT().
 		GetEmail(ctx, email).
@@ -167,13 +161,7 @@ func TestCreateSessionFromEmailAndPasswordWithIncorrectEmail(t *testing.T) {
 	_, store, _, loginController := mocks.InitMockApp(ctrl)
 
 	password := "123"
-	email := "mail@mail.com"
-
-	loginController.
-		EXPECT().
-		NormalizeEmail(ctx, email).
-		Times(1).
-		Return("")
+	email := "mail"
 
 	status, loggedUserID := getUserFromEmailAndPassword(store, loginController, ctx, email, password)
 	require.Equal(t, enums.IncorrectEmail, status)
@@ -189,12 +177,6 @@ func TestCreateSessionFromEmailAndPasswordWithoutEmail(t *testing.T) {
 
 	password := "123"
 	email := "mail@mail.com"
-
-	loginController.
-		EXPECT().
-		NormalizeEmail(ctx, email).
-		Times(1).
-		Return(email)
 
 	store.
 		EXPECT().
@@ -217,12 +199,6 @@ func TestCreateSessionFromEmailAndPasswordWithoutPassword(t *testing.T) {
 	password := "123"
 	email := "mail@mail.com"
 	userID := uuid.NewV4()
-
-	loginController.
-		EXPECT().
-		NormalizeEmail(ctx, email).
-		Times(1).
-		Return(email)
 
 	store.
 		EXPECT().
@@ -257,12 +233,6 @@ func TestCreateSessionFromEmailAndPasswordWithIncorrectPassword(t *testing.T) {
 	encodedPassword := "321"
 	email := "mail@mail.com"
 	userID := uuid.NewV4()
-
-	loginController.
-		EXPECT().
-		NormalizeEmail(ctx, email).
-		Times(1).
-		Return(email)
 
 	store.
 		EXPECT().
@@ -304,17 +274,11 @@ func TestCreateSessionFromEmailAndCode(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	email := "mail@mail.com"
 	userID := uuid.NewV4()
-
-	loginController.
-		EXPECT().
-		NormalizeEmail(ctx, email).
-		Times(1).
-		Return(email)
 
 	store.
 		EXPECT().
@@ -333,7 +297,7 @@ func TestCreateSessionFromEmailAndCode(t *testing.T) {
 		Times(1).
 		Return(code)
 
-	status, loggedUserID := getUserFromEmailAndCode(store, loginController, ctx, email, code)
+	status, loggedUserID := getUserFromEmailAndCode(store, ctx, email, code)
 	require.Equal(t, enums.Ok, status)
 	require.Equal(t, userID, *loggedUserID)
 }
@@ -343,18 +307,12 @@ func TestCreateSessionFromEmailAndCodeWithIncorrectEmail(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
-	email := "mail@mail.com"
+	email := "mail"
 
-	loginController.
-		EXPECT().
-		NormalizeEmail(ctx, email).
-		Times(1).
-		Return("")
-
-	status, loggedUserID := getUserFromEmailAndCode(store, loginController, ctx, email, code)
+	status, loggedUserID := getUserFromEmailAndCode(store, ctx, email, code)
 	require.Equal(t, enums.IncorrectEmail, status)
 	require.Nil(t, loggedUserID)
 }
@@ -364,16 +322,10 @@ func TestCreateSessionFromEmailAndCodeWithoutCode(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	email := "mail@mail.com"
-
-	loginController.
-		EXPECT().
-		NormalizeEmail(ctx, email).
-		Times(1).
-		Return(email)
 
 	store.
 		EXPECT().
@@ -381,7 +333,7 @@ func TestCreateSessionFromEmailAndCodeWithoutCode(t *testing.T) {
 		Times(1).
 		Return("")
 
-	status, loggedUserID := getUserFromEmailAndCode(store, loginController, ctx, email, code)
+	status, loggedUserID := getUserFromEmailAndCode(store, ctx, email, code)
 	require.Equal(t, enums.EmailConfirmationCodeNotFound, status)
 	require.Nil(t, loggedUserID)
 }
@@ -391,24 +343,17 @@ func TestCreateSessionFromEmailAndCodeWithIncorrectCode(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	email := "mail@mail.com"
-
-	loginController.
-		EXPECT().
-		NormalizeEmail(ctx, email).
-		Times(1).
-		Return(email)
-
 	store.
 		EXPECT().
 		GetEmailConfirmationCode(ctx, email).
 		Times(1).
 		Return("321")
 
-	status, loggedUserID := getUserFromEmailAndCode(store, loginController, ctx, email, code)
+	status, loggedUserID := getUserFromEmailAndCode(store, ctx, email, code)
 	require.Equal(t, enums.IncorrectEmailCode, status)
 	require.Nil(t, loggedUserID)
 }
@@ -418,16 +363,10 @@ func TestCreateSessionFromEmailAndCodeWithoutEmail(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	email := "mail@mail.com"
-
-	loginController.
-		EXPECT().
-		NormalizeEmail(ctx, email).
-		Times(1).
-		Return(email)
 
 	store.
 		EXPECT().
@@ -441,7 +380,7 @@ func TestCreateSessionFromEmailAndCodeWithoutEmail(t *testing.T) {
 		Times(1).
 		Return(enums.Ok, nil)
 
-	status, loggedUserID := getUserFromEmailAndCode(store, loginController, ctx, email, code)
+	status, loggedUserID := getUserFromEmailAndCode(store, ctx, email, code)
 	require.Equal(t, enums.EmailNotFound, status)
 	require.Nil(t, loggedUserID)
 }
@@ -459,12 +398,6 @@ func TestCreateSessionFromPhoneAndPassword(t *testing.T) {
 	encodedPassword := "321"
 	phone := "+71234567890"
 	userID := uuid.NewV4()
-
-	loginController.
-		EXPECT().
-		NormalizePhone(ctx, phone).
-		Times(1).
-		Return(phone)
 
 	store.
 		EXPECT().
@@ -494,7 +427,7 @@ func TestCreateSessionFromPhoneAndPassword(t *testing.T) {
 		Times(1).
 		Return(true)
 
-	status, loggedUserID := getUserFromPhoneAndPassword(store, loginController, ctx, phone, password)
+	status, loggedUserID := getUserFromPhoneAndPassword(store, loginController, ctx, phone, password, "RU")
 	require.Equal(t, enums.Ok, status)
 	require.Equal(t, userID, *loggedUserID)
 }
@@ -509,13 +442,7 @@ func TestCreateSessionFromPhoneAndPasswordWithIncorrectEmail(t *testing.T) {
 	password := "123"
 	phone := "phone"
 
-	loginController.
-		EXPECT().
-		NormalizePhone(ctx, phone).
-		Times(1).
-		Return("")
-
-	status, loggedUserID := getUserFromPhoneAndPassword(store, loginController, ctx, phone, password)
+	status, loggedUserID := getUserFromPhoneAndPassword(store, loginController, ctx, phone, password, "RU")
 	require.Equal(t, enums.IncorrectPhone, status)
 	require.Nil(t, loggedUserID)
 }
@@ -530,19 +457,13 @@ func TestCreateSessionFromPhoneAndPasswordWithoutEmail(t *testing.T) {
 	password := "123"
 	phone := "+71234567890"
 
-	loginController.
-		EXPECT().
-		NormalizePhone(ctx, phone).
-		Times(1).
-		Return(phone)
-
 	store.
 		EXPECT().
 		GetPhone(ctx, phone).
 		Times(1).
 		Return(enums.Ok, nil)
 
-	status, loggedUserID := getUserFromPhoneAndPassword(store, loginController, ctx, phone, password)
+	status, loggedUserID := getUserFromPhoneAndPassword(store, loginController, ctx, phone, password, "RU")
 	require.Equal(t, enums.PhoneNotFound, status)
 	require.Nil(t, loggedUserID)
 }
@@ -557,12 +478,6 @@ func TestCreateSessionFromPhoneAndPasswordWithoutPassword(t *testing.T) {
 	password := "123"
 	phone := "+71234567890"
 	userID := uuid.NewV4()
-
-	loginController.
-		EXPECT().
-		NormalizePhone(ctx, phone).
-		Times(1).
-		Return(phone)
 
 	store.
 		EXPECT().
@@ -581,7 +496,7 @@ func TestCreateSessionFromPhoneAndPasswordWithoutPassword(t *testing.T) {
 		Times(1).
 		Return(enums.Ok, nil)
 
-	status, loggedUserID := getUserFromPhoneAndPassword(store, loginController, ctx, phone, password)
+	status, loggedUserID := getUserFromPhoneAndPassword(store, loginController, ctx, phone, password, "RU")
 	require.Equal(t, enums.PasswordNotFound, status)
 	require.Nil(t, loggedUserID)
 }
@@ -597,12 +512,6 @@ func TestCreateSessionFromPhoneAndPasswordWithIncorrectPassword(t *testing.T) {
 	encodedPassword := "321"
 	phone := "+71234567890"
 	userID := uuid.NewV4()
-
-	loginController.
-		EXPECT().
-		NormalizePhone(ctx, phone).
-		Times(1).
-		Return(phone)
 
 	store.
 		EXPECT().
@@ -632,7 +541,7 @@ func TestCreateSessionFromPhoneAndPasswordWithIncorrectPassword(t *testing.T) {
 		Times(1).
 		Return(false)
 
-	status, loggedUserID := getUserFromPhoneAndPassword(store, loginController, ctx, phone, password)
+	status, loggedUserID := getUserFromPhoneAndPassword(store, loginController, ctx, phone, password, "RU")
 	require.Equal(t, enums.IncorrectPassword, status)
 	require.Nil(t, loggedUserID)
 }
@@ -644,17 +553,11 @@ func TestCreateSessionFromPhoneAndCode(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	phone := "+71234567890"
 	userID := uuid.NewV4()
-
-	loginController.
-		EXPECT().
-		NormalizePhone(ctx, phone).
-		Times(1).
-		Return(phone)
 
 	store.
 		EXPECT().
@@ -673,7 +576,7 @@ func TestCreateSessionFromPhoneAndCode(t *testing.T) {
 		Times(1).
 		Return(code)
 
-	status, loggedUserID := getUserFromPhoneAndCode(store, loginController, ctx, phone, code)
+	status, loggedUserID := getUserFromPhoneAndCode(store, ctx, phone, code, "RU")
 	require.Equal(t, enums.Ok, status)
 	require.Equal(t, userID, *loggedUserID)
 }
@@ -683,18 +586,12 @@ func TestCreateSessionFromPhoneAndCodeWithIncorrectPhone(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
-	phone := "+71234567890"
+	phone := "1"
 
-	loginController.
-		EXPECT().
-		NormalizePhone(ctx, phone).
-		Times(1).
-		Return("")
-
-	status, loggedUserID := getUserFromPhoneAndCode(store, loginController, ctx, phone, code)
+	status, loggedUserID := getUserFromPhoneAndCode(store, ctx, phone, code, "RU")
 	require.Equal(t, enums.IncorrectPhone, status)
 	require.Nil(t, loggedUserID)
 }
@@ -704,16 +601,10 @@ func TestCreateSessionFromPhoneAndCodeWithoutCode(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	phone := "+71234567890"
-
-	loginController.
-		EXPECT().
-		NormalizePhone(ctx, phone).
-		Times(1).
-		Return(phone)
 
 	store.
 		EXPECT().
@@ -721,7 +612,7 @@ func TestCreateSessionFromPhoneAndCodeWithoutCode(t *testing.T) {
 		Times(1).
 		Return("")
 
-	status, loggedUserID := getUserFromPhoneAndCode(store, loginController, ctx, phone, code)
+	status, loggedUserID := getUserFromPhoneAndCode(store, ctx, phone, code, "RU")
 	require.Equal(t, enums.PhoneConfirmationCodeNotFound, status)
 	require.Nil(t, loggedUserID)
 }
@@ -731,16 +622,10 @@ func TestCreateSessionFromPhoneAndCodeWithIncorrectCode(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	phone := "+71234567890"
-
-	loginController.
-		EXPECT().
-		NormalizePhone(ctx, phone).
-		Times(1).
-		Return(phone)
 
 	store.
 		EXPECT().
@@ -748,7 +633,7 @@ func TestCreateSessionFromPhoneAndCodeWithIncorrectCode(t *testing.T) {
 		Times(1).
 		Return("321")
 
-	status, loggedUserID := getUserFromPhoneAndCode(store, loginController, ctx, phone, code)
+	status, loggedUserID := getUserFromPhoneAndCode(store, ctx, phone, code, "RU")
 	require.Equal(t, enums.IncorrectPhoneCode, status)
 	require.Nil(t, loggedUserID)
 }
@@ -758,16 +643,10 @@ func TestCreateSessionFromPhoneAndCodeWithoutPhone(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	phone := "+71234567890"
-
-	loginController.
-		EXPECT().
-		NormalizePhone(ctx, phone).
-		Times(1).
-		Return(phone)
 
 	store.
 		EXPECT().
@@ -781,7 +660,7 @@ func TestCreateSessionFromPhoneAndCodeWithoutPhone(t *testing.T) {
 		Times(1).
 		Return(enums.Ok, nil)
 
-	status, loggedUserID := getUserFromPhoneAndCode(store, loginController, ctx, phone, code)
+	status, loggedUserID := getUserFromPhoneAndCode(store, ctx, phone, code, "RU")
 	require.Equal(t, enums.PhoneNotFound, status)
 	require.Nil(t, loggedUserID)
 }

@@ -103,14 +103,16 @@ message CreateEmailConfirmationResponseV1 {
 
 message CreatePhoneRequestV1 {
     string phone = 1;
-    string code = 2;
-    bytes userID = 3;
+    string phoneCountryCode = 2;
+    string code = 3;
+    bytes userID = 4;
 }
 
 message CreatePhoneBadRequestV1 {
     repeated string phone = 1;
-    repeated string code = 2;
-    repeated string userID = 3;
+    repeated string phoneCountryCode = 2;
+    repeated string code = 3;
+    repeated string userID = 4;
 }
 
 message CreatePhoneResponseV1 {
@@ -118,22 +120,26 @@ message CreatePhoneResponseV1 {
     int64 created = 2;
     bytes userID = 3;
     string phone = 4;
+    string phoneCountryCode = 5;
 }
 
 // Phones Confirmation API
 
 message CreatePhoneConfirmationRequestV1 {
     string phone = 1;
+    string phoneCountryCode = 2;
 }
 
 message CreatePhoneConfirmationBadRequestV1 {
     repeated string phone = 1;
+    repeated string phoneCountryCode = 2;
 }
 
 message CreatePhoneConfirmationResponseV1 {
     int64 created = 1;
     int64 expire = 2;
     string phone = 3;
+    string phoneCountryCode = 4;
 }
 
 // Passwords API
@@ -159,18 +165,20 @@ message CreatePasswordResponseV1 {
 message CreateUserRequestV1 {
     string password = 1;
     string phone = 2;
-    string email = 3;
-    string phoneCode = 4;
-    string emailCode = 5;
+    string phoneCountryCode = 3;
+    string email = 4;
+    string phoneCode = 5;
+    string emailCode = 6;
 }
 
 message CreateUserBadRequestV1 {
     repeated string password = 1;
     repeated string phone = 2;
-    repeated string email = 3;
-    repeated string phoneCode = 4;
-    repeated string emailCode = 5;
-    repeated string errors = 6;
+    repeated string phoneCountryCode = 3;
+    repeated string email = 4;
+    repeated string phoneCode = 5;
+    repeated string emailCode = 6;
+    repeated string errors = 7;
 }
 
 message GetUserResponseV1 {
@@ -201,12 +209,14 @@ message CreateSessionRequestV1 {
 
     message PhoneAndPassword {
         string phone = 1;
-        string password = 2;
+        string phoneCountryCode = 2;
+        string password = 3;
     }
 
     message PhoneAndCode {
         string phone = 1;
-        string code = 2;
+        string phoneCountryCode = 2;
+        string code = 3;
     }
 
     message EmailAndPassword {
@@ -230,9 +240,10 @@ message CreateSessionBadRequestResponseV1 {
     repeated string emailCode = 2;
     repeated string phone = 3;
     repeated string phoneCode = 4;
-    repeated string password = 5;
-    repeated string fingerprint = 6;
-    repeated string userAgent = 7;
+    repeated string phoneCountryCode = 5;
+    repeated string password = 6;
+    repeated string fingerprint = 7;
+    repeated string userAgent = 8;
 }
 
 message CreateSessionResponseV1 {

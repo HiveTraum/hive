@@ -251,6 +251,20 @@ func (mr *MockStoreInterfaceMockRecorder) GetEmailConfirmationCode(ctx, email in
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEmailConfirmationCode", reflect.TypeOf((*MockStoreInterface)(nil).GetEmailConfirmationCode), ctx, email)
 }
 
+// GetRandomCodeForEmailConfirmation mocks base method
+func (m *MockStoreInterface) GetRandomCodeForEmailConfirmation() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRandomCodeForEmailConfirmation")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetRandomCodeForEmailConfirmation indicates an expected call of GetRandomCodeForEmailConfirmation
+func (mr *MockStoreInterfaceMockRecorder) GetRandomCodeForEmailConfirmation() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRandomCodeForEmailConfirmation", reflect.TypeOf((*MockStoreInterface)(nil).GetRandomCodeForEmailConfirmation))
+}
+
 // CreatePassword mocks base method
 func (m *MockStoreInterface) CreatePassword(ctx context.Context, userId go_uuid.UUID, value string) (int, *models.Password) {
 	m.ctrl.T.Helper()
@@ -353,6 +367,20 @@ func (mr *MockStoreInterfaceMockRecorder) GetPhoneConfirmationCode(ctx, phone in
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPhoneConfirmationCode", reflect.TypeOf((*MockStoreInterface)(nil).GetPhoneConfirmationCode), ctx, phone)
 }
 
+// GetRandomCodeForPhoneConfirmation mocks base method
+func (m *MockStoreInterface) GetRandomCodeForPhoneConfirmation() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRandomCodeForPhoneConfirmation")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetRandomCodeForPhoneConfirmation indicates an expected call of GetRandomCodeForPhoneConfirmation
+func (mr *MockStoreInterfaceMockRecorder) GetRandomCodeForPhoneConfirmation() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRandomCodeForPhoneConfirmation", reflect.TypeOf((*MockStoreInterface)(nil).GetRandomCodeForPhoneConfirmation))
+}
+
 // CreateRole mocks base method
 func (m *MockStoreInterface) CreateRole(context context.Context, title string) (int, *models.Role) {
 	m.ctrl.T.Helper()
@@ -395,6 +423,36 @@ func (m *MockStoreInterface) GetRoles(context context.Context, query repositorie
 func (mr *MockStoreInterfaceMockRecorder) GetRoles(context, query interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoles", reflect.TypeOf((*MockStoreInterface)(nil).GetRoles), context, query)
+}
+
+// GetRoleByTitle mocks base method
+func (m *MockStoreInterface) GetRoleByTitle(ctx context.Context, title string) (int, *models.Role) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRoleByTitle", ctx, title)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(*models.Role)
+	return ret0, ret1
+}
+
+// GetRoleByTitle indicates an expected call of GetRoleByTitle
+func (mr *MockStoreInterfaceMockRecorder) GetRoleByTitle(ctx, title interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoleByTitle", reflect.TypeOf((*MockStoreInterface)(nil).GetRoleByTitle), ctx, title)
+}
+
+// GetAdminRole mocks base method
+func (m *MockStoreInterface) GetAdminRole(ctx context.Context) (int, *models.Role) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAdminRole", ctx)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(*models.Role)
+	return ret0, ret1
+}
+
+// GetAdminRole indicates an expected call of GetAdminRole
+func (mr *MockStoreInterfaceMockRecorder) GetAdminRole(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAdminRole", reflect.TypeOf((*MockStoreInterface)(nil).GetAdminRole), ctx)
 }
 
 // CreateUserRole mocks base method
@@ -497,34 +555,6 @@ func (m *MockStoreInterface) GetSession(ctx context.Context, fingerprint, refres
 func (mr *MockStoreInterfaceMockRecorder) GetSession(ctx, fingerprint, refreshToken, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSession", reflect.TypeOf((*MockStoreInterface)(nil).GetSession), ctx, fingerprint, refreshToken, userID)
-}
-
-// GetRandomCodeForEmailConfirmation mocks base method
-func (m *MockStoreInterface) GetRandomCodeForEmailConfirmation() string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRandomCodeForEmailConfirmation")
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// GetRandomCodeForEmailConfirmation indicates an expected call of GetRandomCodeForEmailConfirmation
-func (mr *MockStoreInterfaceMockRecorder) GetRandomCodeForEmailConfirmation() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRandomCodeForEmailConfirmation", reflect.TypeOf((*MockStoreInterface)(nil).GetRandomCodeForEmailConfirmation))
-}
-
-// GetRandomCodeForPhoneConfirmation mocks base method
-func (m *MockStoreInterface) GetRandomCodeForPhoneConfirmation() string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRandomCodeForPhoneConfirmation")
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// GetRandomCodeForPhoneConfirmation indicates an expected call of GetRandomCodeForPhoneConfirmation
-func (mr *MockStoreInterfaceMockRecorder) GetRandomCodeForPhoneConfirmation() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRandomCodeForPhoneConfirmation", reflect.TypeOf((*MockStoreInterface)(nil).GetRandomCodeForPhoneConfirmation))
 }
 
 // MockESBInterface is a mock of ESBInterface interface
@@ -717,34 +747,6 @@ func (m *MockLoginControllerInterface) Login(ctx context.Context, accessToken st
 func (mr *MockLoginControllerInterfaceMockRecorder) Login(ctx, accessToken interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*MockLoginControllerInterface)(nil).Login), ctx, accessToken)
-}
-
-// NormalizePhone mocks base method
-func (m *MockLoginControllerInterface) NormalizePhone(ctx context.Context, phone string) string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "NormalizePhone", ctx, phone)
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// NormalizePhone indicates an expected call of NormalizePhone
-func (mr *MockLoginControllerInterfaceMockRecorder) NormalizePhone(ctx, phone interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NormalizePhone", reflect.TypeOf((*MockLoginControllerInterface)(nil).NormalizePhone), ctx, phone)
-}
-
-// NormalizeEmail mocks base method
-func (m *MockLoginControllerInterface) NormalizeEmail(ctx context.Context, email string) string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "NormalizeEmail", ctx, email)
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// NormalizeEmail indicates an expected call of NormalizeEmail
-func (mr *MockLoginControllerInterfaceMockRecorder) NormalizeEmail(ctx, email interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NormalizeEmail", reflect.TypeOf((*MockLoginControllerInterface)(nil).NormalizeEmail), ctx, email)
 }
 
 // DecodeAccessToken mocks base method

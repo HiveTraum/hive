@@ -8,10 +8,8 @@ import (
 	"auth/models"
 	"context"
 	"errors"
-	"github.com/badoux/checkmail"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/getsentry/sentry-go"
-	"github.com/nyaruka/phonenumbers"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
 	uuid "github.com/satori/go.uuid"
@@ -53,34 +51,6 @@ func (controller *LoginController) VerifyPassword(ctx context.Context, password 
 	}
 
 	return true
-}
-
-// Input Normalization
-
-func (controller *LoginController) NormalizeEmail(_ context.Context, email string) string {
-	err := checkmail.ValidateFormat(email)
-
-	if err != nil {
-		sentry.CaptureException(err)
-		return ""
-	}
-
-	return email
-}
-
-func (controller *LoginController) NormalizePhone(_ context.Context, phone string) string {
-	num, err := phonenumbers.Parse(phone, "RU")
-
-	if err != nil {
-		sentry.CaptureException(err)
-		return ""
-	}
-
-	if num == nil || !phonenumbers.IsPossibleNumber(num) {
-		return ""
-	}
-
-	return phonenumbers.Format(num, phonenumbers.E164)
 }
 
 // Access Token

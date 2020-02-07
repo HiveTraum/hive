@@ -33,48 +33,6 @@ func TestLoginController_VerifyPassword(t *testing.T) {
 	require.True(t, isVerified)
 }
 
-func TestLoginController_NormalizeEmail(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-	controller := LoginController{Store: nil}
-	email := "mail@mail.com"
-	normalizedEmail := controller.NormalizeEmail(ctx, email)
-	require.NotEmpty(t, normalizedEmail)
-	require.Equal(t, email, normalizedEmail)
-}
-
-func TestLoginController_NormalizeIncorrectEmail(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-	controller := LoginController{Store: nil}
-	incorrectEmail := "mail"
-	normalizedEmail := controller.NormalizeEmail(ctx, incorrectEmail)
-	require.Empty(t, normalizedEmail)
-	require.NotEqual(t, incorrectEmail, normalizedEmail)
-	require.Equal(t, "", normalizedEmail)
-}
-
-func TestLoginController_NormalizePhone(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-	controller := LoginController{Store: nil}
-	phone := "+71234567890"
-	normalizedPhone := controller.NormalizePhone(ctx, phone)
-	require.NotEmpty(t, normalizedPhone)
-	require.Equal(t, phone, normalizedPhone)
-}
-
-func TestLoginController_NormalizeIncorrectPhone(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-	controller := LoginController{Store: nil}
-	phone := "+123"
-	normalizedPhone := controller.NormalizePhone(ctx, phone)
-	require.Empty(t, normalizedPhone)
-	require.NotEqual(t, phone, normalizedPhone)
-	require.Equal(t, "", normalizedPhone)
-}
-
 func TestLoginController_EncodeAccessToken(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
