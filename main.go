@@ -76,10 +76,10 @@ func main() {
 
 	handlers := []handler{
 		{pattern: "/views/v1/users", h: usersView, methods: R},
-		{pattern: "/views/v1/users/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: userView, methods: RD},
+		{pattern: "/views/v1/users/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: userView, methods: R},
 
 		{pattern: "/api/v1/users", h: usersAPI, methods: CR},
-		{pattern: "/api/v1/users/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: userAPI, methods: R},
+		{pattern: "/api/v1/users/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: userAPI, methods: RD},
 
 		{pattern: "/api/v1/passwords", h: passwordsAPI, methods: C},
 

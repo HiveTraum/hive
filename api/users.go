@@ -136,10 +136,7 @@ func deleteUserV1(r *functools.Request, app infrastructure.AppInterface, id uuid
 		return http.StatusNotFound, nil
 	}
 
-	return http.StatusNoContent, &inout.GetUserResponseV1{
-		Id:      deletedUser.Id.Bytes(),
-		Created: deletedUser.Created,
-	}
+	return http.StatusNoContent, nil
 }
 
 func UsersAPIV1(app infrastructure.AppInterface) middlewares.ResponseControllerHandler {

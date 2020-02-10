@@ -18,6 +18,11 @@ func NormalizeEmail(email string) string {
 }
 
 func NormalizePhone(phone string, countryCode string) string {
+
+	if countryCode == "" {
+		return ""
+	}
+
 	num, err := phonenumbers.Parse(phone, countryCode)
 
 	if err != nil {
