@@ -131,12 +131,19 @@ func deleteUserV1(r *functools.Request, app infrastructure.AppInterface, id uuid
 
 	ctx := r.Context()
 
-	_, deletedUser := app.GetStore().DeleteUser(ctx, id)
-	if deletedUser == nil {
-		return http.StatusNotFound, nil
-	}
+	status, deletedUser := controllers.DeleteUser(app.GetStore(), app.GetESB(), ctx, id)
 
-	return http.StatusNoContent, nil
+	switch status {
+	case enums.Ok:
+		return http.StatusOK, &inout.GetUserResponseV1{
+			Id:      deletedUser.Id.Bytes(),
+			Created: deletedUser.Created,
+		}
+	case enums.UserNotFound:
+		return http.StatusNotFound, nil
+	default:
+		return http.StatusInternalServerError, nil
+	}
 }
 
 func UsersAPIV1(app infrastructure.AppInterface) middlewares.ResponseControllerHandler {

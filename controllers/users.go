@@ -70,3 +70,12 @@ func CreateUser(
 	esb.OnUserChanged(identifiers)
 	return status, user
 }
+
+func DeleteUser(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, id uuid.UUID) (int, *models.User) {
+	status, deletedUser := store.DeleteUser(ctx, id)
+	if status == enums.Ok {
+		esb.OnUserChanged([]uuid.UUID{deletedUser.Id})
+	}
+
+	return status, deletedUser
+}

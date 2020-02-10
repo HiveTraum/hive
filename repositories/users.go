@@ -109,5 +109,10 @@ func GetUsers(db DB, context context.Context, query GetUsersQuery) []*models.Use
 func DeleteUser(db DB, ctx context.Context, id uuid.UUID) (int, *models.User) {
 	sql := deleteUserSQL()
 	row := db.QueryRow(ctx, sql, id)
-	return enums.Ok, scanUser(row)
+	deletedUser := scanUser(row)
+	if deletedUser == nil {
+		return enums.UserNotFound, nil
+	} else {
+		return enums.Ok, deletedUser
+	}
 }

@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"auth/config"
+	"auth/enums"
 	"context"
 	"fmt"
 	uuid "github.com/satori/go.uuid"
@@ -95,6 +96,25 @@ func TestGetUserWithoutUser(t *testing.T) {
 	PurgeUsers(pool, ctx)
 	userFromDB := GetUser(pool, ctx, uuid.NewV4())
 	require.Nil(t, userFromDB)
+}
+
+func TestDeleteUser(t *testing.T) {
+	pool := config.InitPool(nil)
+	ctx := context.Background()
+	PurgeUsers(pool, ctx)
+	user := CreateUser(pool, ctx)
+	status, deletedUser := DeleteUser(pool, ctx, user.Id)
+	require.Equal(t, enums.Ok, status)
+	require.Equal(t, user, deletedUser)
+}
+
+func TestDeleteUserWithoutUser(t *testing.T) {
+	pool := config.InitPool(nil)
+	ctx := context.Background()
+	PurgeUsers(pool, ctx)
+	status, deletedUser := DeleteUser(pool, ctx, uuid.NewV4())
+	require.Equal(t, enums.UserNotFound, status)
+	require.Nil(t, deletedUser)
 }
 
 
