@@ -4,7 +4,6 @@ import (
 	"auth/enums"
 	"auth/functools"
 	"auth/models"
-	"auth/modelsFunctools"
 	"context"
 	"errors"
 	"github.com/getsentry/sentry-go"
@@ -109,8 +108,8 @@ func convertGetUserRoleQueryToRaw(query GetUserRoleQuery) getUserRoleRawQuery {
 	return getUserRoleRawQuery{
 		Limit:  limit,
 		Offset: offset,
-		UserId: modelsFunctools.UserIDListToPGArray(query.UserId),
-		RoleId: modelsFunctools.RoleIDListToPGArray(query.RoleId),
+		UserId: functools.UUIDListToPGArray(query.UserId),
+		RoleId: functools.UUIDListToPGArray(query.RoleId),
 	}
 }
 

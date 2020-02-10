@@ -7,7 +7,6 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
-	"auth/modelsFunctools"
 	"auth/repositories"
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/protobuf/proto"
@@ -94,7 +93,7 @@ func GetUsersV1Query(r *functools.Request) repositories.GetUsersQuery {
 	return repositories.GetUsersQuery{
 		Limit: pagination.Limit,
 		Page:  pagination.Page,
-		Id:    modelsFunctools.StringsSliceToUserIDSlice(r.URL.Query()["id"]),
+		Id:    functools.StringsSliceToUUIDSlice(r.URL.Query()["id"]),
 	}
 }
 

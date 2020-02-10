@@ -91,8 +91,8 @@ func convertGetRolesQueryToRaw(query GetRolesQuery) getRolesRawQuery {
 
 	return getRolesRawQuery{
 		Limit:       limit,
-		Identifiers: functools.StringListToPGArray(query.Identifiers),
-		Titles:      functools.StringListToPGArray(query.Titles),
+		Identifiers: functools.StringsToPGArray(query.Identifiers),
+		Titles:      functools.StringsToPGArray(query.Titles),
 	}
 }
 
@@ -104,7 +104,7 @@ func CreateRole(db DB, context context.Context, title string) (int, *models.Role
 
 func GetRole(db DB, context context.Context, id uuid.UUID) (int, *models.Role) {
 	sql := getRolesSQL()
-	row := db.QueryRow(context, sql, functools.StringListToPGArray([]string{id.String()}), "{}", 1)
+	row := db.QueryRow(context, sql, functools.StringsToPGArray([]string{id.String()}), "{}", 1)
 	return scanRole(row)
 }
 

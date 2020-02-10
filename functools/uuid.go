@@ -3,6 +3,7 @@ package functools
 import (
 	"github.com/getsentry/sentry-go"
 	uuid "github.com/satori/go.uuid"
+	"strings"
 )
 
 func UUIDSliceToByteArraySlice(identifiers []uuid.UUID) [][]byte {
@@ -42,6 +43,20 @@ func UUIDListToStringList(id []uuid.UUID) []string {
 	return identifiers
 }
 
+func UUIDListToString(id []uuid.UUID, delimiter string) string {
+	return strings.Join(UUIDListToStringList(id), delimiter)
+}
+
 func UUIDListToPGArray(id []uuid.UUID) string {
 	return StringsToPGArray(UUIDListToStringList(id))
+}
+
+func StringsSliceToUUIDSlice(id []string) []uuid.UUID {
+	identifiers := make([]uuid.UUID, len(id))
+
+	for i, v := range id {
+		identifiers[i] = uuid.FromStringOrNil(v)
+	}
+
+	return identifiers
 }

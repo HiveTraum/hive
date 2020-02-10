@@ -3,7 +3,6 @@ package repositories
 import (
 	"auth/functools"
 	"auth/models"
-	"auth/modelsFunctools"
 	"context"
 	"github.com/getsentry/sentry-go"
 	"github.com/jackc/pgx/v4"
@@ -156,8 +155,8 @@ func convertGetUsersViewQueryToRaw(query GetUsersViewStoreQuery) getUsersViewRep
 	return getUsersViewRepositoryQuery{
 		Limit:  limit,
 		Offset: offset,
-		Id:     modelsFunctools.UserIDListToPGArray(query.Id),
-		Roles:  modelsFunctools.RoleIDListToPGArray(query.Roles),
+		Id:     functools.UUIDListToPGArray(query.Id),
+		Roles:  functools.UUIDListToPGArray(query.Roles),
 		Phones: functools.StringsToPGArray(query.Phones),
 		Emails: functools.StringsToPGArray(query.Emails),
 	}
@@ -173,9 +172,9 @@ func convertCreateOrUpdateUsersViewQueryToRaw(query CreateOrUpdateUsersViewStore
 	}
 
 	return createOrUpdateUsersViewRepositoryQuery{
-		Id:    modelsFunctools.UserIDListToPGArray(query.Id),
+		Id:    functools.UUIDListToPGArray(query.Id),
 		Limit: limit,
-		Roles: modelsFunctools.RoleIDListToPGArray(query.Roles),
+		Roles: functools.UUIDListToPGArray(query.Roles),
 	}
 }
 
@@ -200,7 +199,7 @@ func GetUsersView(db DB, context context.Context, query GetUsersViewStoreQuery) 
 
 func GetUserView(db DB, context context.Context, id uuid.UUID) *models.UserView {
 	sql := getUsersViewSQL()
-	row := db.QueryRow(context, sql, modelsFunctools.UserIDListToPGArray([]uuid.UUID{id}), "{}", "{}", "{}", 1)
+	row := db.QueryRow(context, sql, functools.UUIDListToPGArray([]uuid.UUID{id}), "{}", "{}", "{}", 1)
 	userView, _ := scanUserView(row)
 	return userView
 }

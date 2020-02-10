@@ -124,7 +124,7 @@ func BenchmarkCreateUser(b *testing.B) {
 	PurgeUsers(pool, ctx)
 	tx, _ := pool.Begin(ctx)
 
-	for i := 1; i < 1_000_000; i++ {
+	for i := 1; i < 1_000; i++ {
 		CreateUser(tx, ctx)
 	}
 

@@ -1,10 +1,10 @@
 package controllers
 
 import (
+	"auth/functools"
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/models"
-	"auth/modelsFunctools"
 	"context"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
@@ -25,7 +25,7 @@ func (esb *ESB) onUserChanged(userId []uuid.UUID) {
 	ctx := context.Background()
 	span, ctx := opentracing.StartSpanFromContext(ctx, "OnUserChanged")
 	CreateOrUpdateUsersView(esb.Store, esb, ctx, userId)
-	span.LogFields(log.String("user_id", strings.Join(modelsFunctools.UserIDListToStringList(userId), ", ")))
+	span.LogFields(log.String("user_id", strings.Join(functools.UUIDListToStringList(userId), ", ")))
 	span.Finish()
 	ctx.Done()
 }
@@ -34,7 +34,7 @@ func (esb *ESB) onPhoneChanged(userId []uuid.UUID) {
 	ctx := context.Background()
 	span, ctx := opentracing.StartSpanFromContext(ctx, "OnPhoneChanged")
 	CreateOrUpdateUsersView(esb.Store, esb, ctx, userId)
-	span.LogFields(log.String("user_id", strings.Join(modelsFunctools.UserIDListToStringList(userId), ", ")))
+	span.LogFields(log.String("user_id", strings.Join(functools.UUIDListToStringList(userId), ", ")))
 	span.Finish()
 	ctx.Done()
 }
@@ -43,7 +43,7 @@ func (esb *ESB) onEmailChanged(userId []uuid.UUID) {
 	ctx := context.Background()
 	span, ctx := opentracing.StartSpanFromContext(ctx, "OnEmailChanged")
 	CreateOrUpdateUsersView(esb.Store, esb, ctx, userId)
-	span.LogFields(log.String("user_id", strings.Join(modelsFunctools.UserIDListToStringList(userId), ", ")))
+	span.LogFields(log.String("user_id", strings.Join(functools.UUIDListToStringList(userId), ", ")))
 	span.Finish()
 	ctx.Done()
 }
@@ -52,7 +52,7 @@ func (esb *ESB) onRoleChanged(roleId []uuid.UUID) {
 	ctx := context.Background()
 	span, ctx := opentracing.StartSpanFromContext(ctx, "OnRoleChanged")
 	CreateOrUpdateUsersViewByRoles(esb.Store, esb, ctx, roleId)
-	span.LogFields(log.String("role_id", strings.Join(modelsFunctools.RoleIDListToStringList(roleId), "")))
+	span.LogFields(log.String("role_id", strings.Join(functools.UUIDListToStringList(roleId), "")))
 	span.Finish()
 	ctx.Done()
 }
@@ -69,7 +69,7 @@ func (esb *ESB) onUsersViewChanged(usersView []*models.UserView) {
 	esb.Store.CacheUserView(ctx, usersView)
 	event := esb.getUserViewChangedEvent(identifiers)
 	esb.Dispatcher.Send(event)
-	span.LogFields(log.String("user_id", modelsFunctools.UserIDListToString(identifiers, ", ")))
+	span.LogFields(log.String("user_id", functools.UUIDListToString(identifiers, ", ")))
 	span.Finish()
 	ctx.Done()
 }
@@ -86,8 +86,6 @@ func (esb *ESB) onEmailCodeConfirmationCreated(email string, code string) {
 
 func (esb *ESB) getUserViewChangedEvent(userId []uuid.UUID) inout.Event {
 
-	int64list := modelsFunctools.UserIDListToStringList(userId)
-
 	return inout.Event{
 		Sender:       SENDER,
 		Object:       "user",
@@ -96,7 +94,7 @@ func (esb *ESB) getUserViewChangedEvent(userId []uuid.UUID) inout.Event {
 		DataVersion:  "1",
 		Data: &inout.Event_ChangedUserViewsEvent{
 			ChangedUserViewsEvent: &inout.ChangedUserViewsEventV1{
-				Identifiers: int64list,
+				Identifiers: functools.UUIDListToStringList(userId),
 			}},
 	}
 }

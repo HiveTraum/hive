@@ -5,7 +5,6 @@ import (
 	"auth/functools"
 	"auth/inout"
 	"auth/models"
-	"auth/modelsFunctools"
 	"context"
 	"fmt"
 	"github.com/getsentry/sentry-go"
@@ -73,12 +72,12 @@ func CacheUserView(cache *redis.Client, ctx context.Context, userViews []*models
 
 	for i, uv := range userViews {
 		userViewsCache[i] = &inout.UserViewCache{
-			Id:                   uv.Id.Bytes(),
-			Created:              uv.Created,
-			Roles:                uv.Roles,
-			Phones:               uv.Phones,
-			Emails:               uv.Emails,
-			RolesID:              functools.UUIDSliceToByteArraySlice(uv.RolesID),
+			Id:      uv.Id.Bytes(),
+			Created: uv.Created,
+			Roles:   uv.Roles,
+			Phones:  uv.Phones,
+			Emails:  uv.Emails,
+			RolesID: functools.UUIDSliceToByteArraySlice(uv.RolesID),
 		}
 	}
 
@@ -106,6 +105,6 @@ func CacheUserView(cache *redis.Client, ctx context.Context, userViews []*models
 		sentry.CaptureException(err)
 	}
 
-	span.LogFields(log.String("user_id", modelsFunctools.UserIDListToString(identifiers, ", ")))
+	span.LogFields(log.String("user_id", functools.UUIDListToString(identifiers, ", ")))
 	span.Finish()
 }

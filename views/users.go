@@ -5,7 +5,6 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
-	"auth/modelsFunctools"
 	"auth/repositories"
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/protobuf/proto"
@@ -20,8 +19,8 @@ func getUsersViewV1Query(r *functools.Request) repositories.GetUsersViewStoreQue
 	return repositories.GetUsersViewStoreQuery{
 		Limit:  pagination.Limit,
 		Page:   pagination.Page,
-		Id:     modelsFunctools.StringsSliceToUserIDSlice(query["id"]),
-		Roles:  modelsFunctools.StringsSliceToRoleIDSlice(query["roles"]),
+		Id:     functools.StringsSliceToUUIDSlice(query["id"]),
+		Roles:  functools.StringsSliceToUUIDSlice(query["roles"]),
 		Phones: query["phones"],
 		Emails: query["emails"],
 	}

@@ -2,8 +2,8 @@ package repositories
 
 import (
 	"auth/enums"
+	"auth/functools"
 	"auth/models"
-	"auth/modelsFunctools"
 	"context"
 	"github.com/getsentry/sentry-go"
 	"github.com/jackc/pgx/v4"
@@ -77,7 +77,7 @@ func convertGetUsersQueryToRaw(query GetUsersQuery) getUsersRawQuery {
 
 	return getUsersRawQuery{
 		Limit: limit,
-		Id:    modelsFunctools.UserIDListToPGArray(query.Id),
+		Id:    functools.UUIDListToPGArray(query.Id),
 	}
 }
 
@@ -89,7 +89,7 @@ func CreateUser(db DB, ctx context.Context) *models.User {
 
 func GetUser(db DB, context context.Context, id uuid.UUID) *models.User {
 	sql := getUsersSQL()
-	row := db.QueryRow(context, sql, modelsFunctools.UserIDListToPGArray([]uuid.UUID{id}), 1)
+	row := db.QueryRow(context, sql, functools.UUIDListToPGArray([]uuid.UUID{id}), 1)
 	return scanUser(row)
 }
 

@@ -7,7 +7,6 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
-	"auth/modelsFunctools"
 	"auth/repositories"
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/protobuf/proto"
@@ -21,8 +20,8 @@ func GetUserRolesV1Query(r *functools.Request) repositories.GetUserRoleQuery {
 	query := r.URL.Query()
 	return repositories.GetUserRoleQuery{
 		Pagination: functools.GetPagination(query),
-		UserId:     modelsFunctools.StringsSliceToUserIDSlice(query["users"]),
-		RoleId:     modelsFunctools.StringsSliceToRoleIDSlice(query["roles"]),
+		UserId:     functools.StringsSliceToUUIDSlice(query["users"]),
+		RoleId:     functools.StringsSliceToUUIDSlice(query["roles"]),
 	}
 }
 
