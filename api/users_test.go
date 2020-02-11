@@ -6,6 +6,7 @@ import (
 	"auth/inout"
 	"auth/mocks"
 	"auth/models"
+	"auth/repositories"
 	"bytes"
 	"github.com/golang/mock/gomock"
 	uuid "github.com/satori/go.uuid"
@@ -219,4 +220,38 @@ func TestSuccessfulCreateUserWithEmail(t *testing.T) {
 	v, ok := message.(*inout.GetUserResponseV1)
 	require.True(t, ok)
 	require.NotNil(t, v)
+}
+
+func TestGetUsersV1QueryForAdminUser(t *testing.T) {
+	t.Parallel()
+
+	adminUserID := uuid.NewV4()
+	requestedIdentifiers := []string{uuid.NewV4().String(), adminUserID.String()}
+	require.Equal(t, repositories.GetUsersQuery{
+		Limit: 50,
+		Page:  1,
+		Id:    functools.StringsSliceToUUIDSlice(requestedIdentifiers),
+	}, GetUsersV1Query(map[string][]string{
+		"id": requestedIdentifiers,
+	}, &models.AccessTokenPayload{
+		IsAdmin: true,
+		UserID:  adminUserID,
+	}))
+}
+
+func TestGetUsersV1QueryForRegularUser(t *testing.T) {
+	t.Parallel()
+
+	userID := uuid.NewV4()
+	requestedIdentifiers := []string{uuid.NewV4().String(), userID.String()}
+	require.Equal(t, repositories.GetUsersQuery{
+		Limit: 50,
+		Page:  1,
+		Id:    []uuid.UUID{userID},
+	}, GetUsersV1Query(map[string][]string{
+		"id": requestedIdentifiers,
+	}, &models.AccessTokenPayload{
+		IsAdmin: false,
+		UserID:  userID,
+	}))
 }

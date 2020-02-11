@@ -7,12 +7,14 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
+	"auth/models"
 	"auth/repositories"
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/mux"
 	uuid "github.com/satori/go.uuid"
 	"net/http"
+	"net/url"
 )
 
 func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
@@ -86,20 +88,31 @@ func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 	}
 }
 
-func GetUsersV1Query(r *functools.Request) repositories.GetUsersQuery {
-	query := r.URL.Query()
+func GetUsersV1Query(query url.Values, payload *models.AccessTokenPayload) repositories.GetUsersQuery {
 	pagination := functools.GetPagination(query)
+
+	var requestedUserIdentifiers []uuid.UUID
+	if payload.IsAdmin {
+		requestedUserIdentifiers = functools.StringsSliceToUUIDSlice(query["id"])
+	} else {
+		requestedUserIdentifiers = []uuid.UUID{payload.UserID}
+	}
 
 	return repositories.GetUsersQuery{
 		Limit: pagination.Limit,
 		Page:  pagination.Page,
-		Id:    functools.StringsSliceToUUIDSlice(r.URL.Query()["id"]),
+		Id:    requestedUserIdentifiers,
 	}
 }
 
 func getUsersV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.ListUserResponseV1) {
 
-	query := GetUsersV1Query(r)
+	status, payload := app.GetLoginController().Login(r.Context(), r.GetAccessToken())
+	if status != enums.Ok {
+		return http.StatusUnauthorized, nil
+	}
+
+	query := GetUsersV1Query(r.URL.Query(), payload)
 	users := app.GetStore().GetUsers(r.Context(), query)
 	usersData := make([]*inout.GetUserResponseV1, len(users))
 
