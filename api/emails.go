@@ -48,12 +48,7 @@ func createEmailV1(r *functools.Request, app infrastructure.AppInterface) (int, 
 			Email: []string{"Некорректный email"},
 		}
 	default:
-		return http.StatusCreated, &inout.CreateEmailResponseV1{
-			Id:      email.Id.Bytes(),
-			Created: email.Created,
-			UserID:  email.UserId.Bytes(),
-			Email:   email.Value,
-		}
+		return unhandledStatus(r, status)
 	}
 }
 
@@ -87,11 +82,7 @@ func createEmailConfirmationV1(r *functools.Request, app infrastructure.AppInter
 			Email: []string{"Некорректный email"},
 		}
 	default:
-		return http.StatusCreated, &inout.CreateEmailConfirmationResponseV1{
-			Created: emailConfirmation.Created,
-			Expire:  emailConfirmation.Expire,
-			Email:   emailConfirmation.Email,
-		}
+		return unhandledStatus(r, status)
 	}
 }
 

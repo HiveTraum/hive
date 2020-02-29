@@ -53,6 +53,7 @@ func createSessionV1(r *functools.Request, app infrastructure.AppInterface) (int
 			RefreshToken: session.RefreshToken,
 			AccessToken:  session.AccessToken,
 			Created:      session.Created,
+			Expired:      session.Expires,
 		}
 	case
 		enums.SessionNotFound,
@@ -102,7 +103,7 @@ func createSessionV1(r *functools.Request, app infrastructure.AppInterface) (int
 			PhoneCode: []string{"Не найден код подтверждения для данного телефона"},
 		}
 	default:
-		return http.StatusInternalServerError, nil
+		return unhandledStatus(r, status)
 	}
 }
 

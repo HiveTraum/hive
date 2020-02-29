@@ -24,7 +24,7 @@ func GetRolesV1Query(r *functools.Request) repositories.GetRolesQuery {
 	}
 }
 
-func getRoleV1(r *functools.Request, app *app.App, id uuid.UUID) (int, *inout.GetRoleResponseV1) {
+func getRoleV1(r *functools.Request, app *app.App, id uuid.UUID) (int, proto.Message) {
 	status, role := app.Store.GetRole(r.Context(), id)
 
 	switch status {
@@ -37,11 +37,7 @@ func getRoleV1(r *functools.Request, app *app.App, id uuid.UUID) (int, *inout.Ge
 	case enums.RoleNotFound:
 		return http.StatusNotFound, nil
 	default:
-		return http.StatusOK, &inout.GetRoleResponseV1{
-			Id:      role.Id.Bytes(),
-			Created: role.Created,
-			Title:   role.Title,
-		}
+		return unhandledStatus(r, status)
 	}
 }
 
@@ -86,11 +82,7 @@ func createRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 			Title: []string{"Роль с таким названием уже существует"},
 		}
 	default:
-		return http.StatusCreated, &inout.GetRoleResponseV1{
-			Id:      role.Id.Bytes(),
-			Created: role.Created,
-			Title:   role.Title,
-		}
+		return unhandledStatus(r, status)
 	}
 }
 

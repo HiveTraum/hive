@@ -36,7 +36,7 @@ func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 		}
 	case enums.MinimumOneFieldRequired:
 		return http.StatusBadRequest, &inout.CreateUserBadRequestV1{
-			Errors: []string{"Необходимо указать телефон или почту",},
+			Errors: []string{"Необходимо указать телефон или почту"},
 		}
 
 	// Password validations
@@ -81,10 +81,7 @@ func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 		}
 
 	default:
-		return http.StatusCreated, &inout.GetUserResponseV1{
-			Id:      user.Id.Bytes(),
-			Created: user.Created,
-		}
+		return unhandledStatus(r, status)
 	}
 }
 
@@ -139,7 +136,7 @@ func getUserV1(r *functools.Request, app infrastructure.AppInterface, id uuid.UU
 	}
 }
 
-func deleteUserV1(r *functools.Request, app infrastructure.AppInterface, id uuid.UUID) (int, *inout.GetUserResponseV1) {
+func deleteUserV1(r *functools.Request, app infrastructure.AppInterface, id uuid.UUID) (int, proto.Message) {
 
 	ctx := r.Context()
 
@@ -154,7 +151,7 @@ func deleteUserV1(r *functools.Request, app infrastructure.AppInterface, id uuid
 	case enums.UserNotFound:
 		return http.StatusNotFound, nil
 	default:
-		return http.StatusInternalServerError, nil
+		return unhandledStatus(r, status)
 	}
 }
 

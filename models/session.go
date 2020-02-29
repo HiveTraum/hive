@@ -8,6 +8,7 @@ type Session struct {
 	UserID       uuid.UUID
 	SecretID     uuid.UUID
 	Created      int64
+	Expires      int64
 	UserAgent    string
 	AccessToken  string
 }

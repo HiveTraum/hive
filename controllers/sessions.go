@@ -179,7 +179,9 @@ func CreateSession(
 		return enums.UserNotFound, nil
 	}
 	env := config.GetEnvironment()
-	session.AccessToken = loginController.EncodeAccessToken(ctx, *userID, userView.Roles, secret, time.Now().Add(time.Minute*time.Duration(env.AccessTokenLifetime)))
+	expires := time.Now().Add(time.Minute*time.Duration(env.AccessTokenLifetime))
+	session.Expires = expires.Unix()
+	session.AccessToken = loginController.EncodeAccessToken(ctx, *userID, userView.Roles, secret, expires)
 
 	return status, session
 }

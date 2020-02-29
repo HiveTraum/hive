@@ -49,12 +49,7 @@ func createPhoneV1(r *functools.Request, app infrastructure.AppInterface) (int, 
 			Phone: []string{"Некорректный номер телефона"},
 		}
 	default:
-		return http.StatusCreated, &inout.CreatePhoneResponseV1{
-			Id:      phone.Id.Bytes(),
-			Created: phone.Created,
-			UserID:  phone.UserId.Bytes(),
-			Phone:   phone.Value,
-		}
+		return unhandledStatus(r, status)
 	}
 }
 
@@ -88,11 +83,7 @@ func createPhoneConfirmationV1(r *functools.Request, app infrastructure.AppInter
 			Phone: []string{"Некорректный номер телефона"},
 		}
 	default:
-		return http.StatusCreated, &inout.CreatePhoneConfirmationResponseV1{
-			Created: phoneConfirmation.Created,
-			Expire:  phoneConfirmation.Expire,
-			Phone:   phoneConfirmation.Phone,
-		}
+		return unhandledStatus(r, status)
 	}
 }
 
