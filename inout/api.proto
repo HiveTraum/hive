@@ -9,31 +9,49 @@ message Pagination {
     int64 count = 3;
 }
 
+message Error {
+    enum ErrorType {
+        Unauthenticated = 0;
+        Unauthorized = 1;
+    }
+
+    string message = 1;
+    ErrorType type = 2;
+}
+
+// Models
+
+message Role {
+    bytes id = 1;
+    int64 created = 2;
+    string title = 3;
+}
+
 // Roles API
 
 message CreateRoleRequestV1 {
     string title = 1;
 }
 
-message CreateRoleBadRequestResponseV1 {
-    repeated string title = 1;
-}
-
-message GetRoleOkResponseV1 {
-    bytes id = 1;
-    int64 created = 2;
-    string title = 3;
-}
-
 message GetRoleResponseV1 {
-    oneof response {
-        GetRoleOkResponseV1 ok = 1;
-        CreateRoleBadRequestResponseV1 badRequest = 2;
+    Role data = 1;
+}
+
+message CreateRoleResponseV1 {
+
+    message ValidationError {
+        repeated string title = 1;
+    }
+
+    oneof data {
+        Role ok = 1;
+        ValidationError validationError = 2;
+        Error error = 3;
     }
 }
 
 message ListRoleResponseV1 {
-    repeated GetRoleResponseV1 data = 1;
+    repeated Role data = 1;
 }
 
 // User Roles API
