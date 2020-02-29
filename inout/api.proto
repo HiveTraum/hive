@@ -15,14 +15,21 @@ message CreateRoleRequestV1 {
     string title = 1;
 }
 
-message CreateRoleBadRequestV1 {
+message CreateRoleBadRequestResponseV1 {
     repeated string title = 1;
 }
 
-message GetRoleResponseV1 {
+message GetRoleOkResponseV1 {
     bytes id = 1;
     int64 created = 2;
     string title = 3;
+}
+
+message GetRoleResponseV1 {
+    oneof response {
+        GetRoleOkResponseV1 ok = 1;
+        CreateRoleBadRequestResponseV1 badRequest = 2;
+    }
 }
 
 message ListRoleResponseV1 {
