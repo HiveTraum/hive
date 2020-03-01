@@ -126,6 +126,10 @@ func (controller *LoginController) DecodeAccessToken(_ context.Context, tokenVal
 // Login
 
 func (controller *LoginController) Login(ctx context.Context, accessToken string) (int, *models.AccessTokenPayload) {
+	if accessToken == "" {
+		return enums.Ok, nil
+	}
+
 	status, unverifiedPayload := controller.DecodeAccessTokenWithoutValidation(ctx, accessToken)
 	if status != enums.Ok {
 		return status, nil

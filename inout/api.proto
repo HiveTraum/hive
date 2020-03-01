@@ -27,6 +27,13 @@ message Role {
     string title = 3;
 }
 
+message Session {
+    string refreshToken = 1;
+    string accessToken = 2;
+    int64 created = 3;
+    int64 expired = 4;
+}
+
 // Roles API
 
 message CreateRoleRequestV1 {
@@ -217,12 +224,10 @@ message ListUserResponseV1 {
 
 // Sessions API
 
-
 message CreateSessionRequestV1 {
 
     string fingerprint = 1;
     string userAgent = 2;
-
 
     oneof data {
         PhoneAndPassword phoneAndPassword = 3;
@@ -260,22 +265,23 @@ message CreateSessionRequestV1 {
     }
 }
 
-message CreateSessionBadRequestResponseV1 {
-    repeated string email = 1;
-    repeated string emailCode = 2;
-    repeated string phone = 3;
-    repeated string phoneCode = 4;
-    repeated string phoneCountryCode = 5;
-    repeated string password = 6;
-    repeated string fingerprint = 7;
-    repeated string userAgent = 8;
-}
-
 message CreateSessionResponseV1 {
-    string refreshToken = 1;
-    string accessToken = 2;
-    int64 created = 3;
-    int64 expired = 4;
+
+    message ValidationError {
+        repeated string email = 1;
+        repeated string emailCode = 2;
+        repeated string phone = 3;
+        repeated string phoneCode = 4;
+        repeated string phoneCountryCode = 5;
+        repeated string password = 6;
+        repeated string fingerprint = 7;
+        repeated string userAgent = 8;
+    }
+
+    oneof data {
+        Session ok = 1;
+        ValidationError validationError = 2;
+    }
 }
 
 // Secrets API

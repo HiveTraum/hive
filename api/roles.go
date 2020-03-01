@@ -30,12 +30,14 @@ func getRoleV1(r *functools.Request, app *app.App, id uuid.UUID) (int, proto.Mes
 	switch status {
 	case enums.Ok:
 		return http.StatusOK, &inout.GetRoleResponseV1{
-			Id:      role.Id.Bytes(),
-			Created: role.Created,
-			Title:   role.Title,
+			Data: &inout.Role{
+				Id:      role.Id.Bytes(),
+				Created: role.Created,
+				Title:   role.Title,
+			},
 		}
 	case enums.RoleNotFound:
-		return http.StatusNotFound, nil
+		return http.StatusNotFound, &inout.GetRoleResponseV1{}
 	default:
 		return unhandledStatus(r, status)
 	}
@@ -45,10 +47,10 @@ func getRolesV1(r *functools.Request, app *app.App) (int, *inout.ListRoleRespons
 
 	query := GetRolesV1Query(r)
 	roles := app.Store.GetRoles(r.Context(), query)
-	rolesData := make([]*inout.GetRoleResponseV1, len(roles))
+	rolesData := make([]*inout.Role, len(roles))
 
 	for i, role := range roles {
-		rolesData[i] = &inout.GetRoleResponseV1{
+		rolesData[i] = &inout.Role{
 			Id:      role.Id.Bytes(),
 			Created: role.Created,
 			Title:   role.Title,
@@ -68,19 +70,44 @@ func createRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 		return http.StatusBadRequest, nil
 	}
 
-	status, role := controllers.CreateRole(app.GetStore(), app.GetESB(), r.Context(), body.Title)
+	ctx := r.Context()
+
+	status, payload := app.GetLoginController().Login(ctx, r.GetAccessToken())
+	if status != enums.Ok || payload == nil {
+		return http.StatusUnauthorized, &inout.CreateRoleResponseV1{
+			Data: &inout.CreateRoleResponseV1_Error{
+				Error: &inout.Error{
+					Message: "Необходима аутентификация",
+					Type:    inout.Error_Unauthenticated,
+				}}}
+	}
+
+	if payload.IsAdmin == false {
+		return http.StatusForbidden, &inout.CreateRoleResponseV1{
+			Data: &inout.CreateRoleResponseV1_Error{
+				Error: &inout.Error{
+					Message: "Недостаточно прав",
+					Type:    inout.Error_Unauthorized,
+				}}}
+	}
+
+	status, role := controllers.CreateRole(app.GetStore(), app.GetESB(), ctx, body.Title)
 
 	switch status {
 	case enums.Ok:
-		return http.StatusCreated, &inout.GetRoleResponseV1{
-			Id:      role.Id.Bytes(),
-			Created: role.Created,
-			Title:   role.Title,
-		}
+		return http.StatusCreated, &inout.CreateRoleResponseV1{
+			Data: &inout.CreateRoleResponseV1_Ok{
+				Ok: &inout.Role{
+					Id:      role.Id.Bytes(),
+					Created: role.Created,
+					Title:   role.Title,
+				}}}
 	case enums.RoleAlreadyExist:
-		return http.StatusBadRequest, &inout.CreateRoleBadRequestV1{
-			Title: []string{"Роль с таким названием уже существует"},
-		}
+		return http.StatusBadRequest, &inout.CreateRoleResponseV1{
+			Data: &inout.CreateRoleResponseV1_ValidationError_{
+				ValidationError: &inout.CreateRoleResponseV1_ValidationError{
+					Title: []string{"Роль с таким названием уже существует"},
+				}}}
 	default:
 		return unhandledStatus(r, status)
 	}

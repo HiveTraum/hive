@@ -50,11 +50,13 @@ func createSessionV1(r *functools.Request, app infrastructure.AppInterface) (int
 			HttpOnly: true,
 		})
 		return http.StatusCreated, &inout.CreateSessionResponseV1{
-			RefreshToken: session.RefreshToken,
-			AccessToken:  session.AccessToken,
-			Created:      session.Created,
-			Expired:      session.Expires,
-		}
+			Data: &inout.CreateSessionResponseV1_Ok{
+				Ok: &inout.Session{
+					RefreshToken: session.RefreshToken,
+					AccessToken:  session.AccessToken,
+					Created:      session.Created,
+					Expired:      session.Expires,
+				}}}
 	case
 		enums.SessionNotFound,
 		enums.UserNotFound,
@@ -63,45 +65,65 @@ func createSessionV1(r *functools.Request, app infrastructure.AppInterface) (int
 		enums.SecretNotFound:
 		return http.StatusUnauthorized, nil
 	case enums.IncorrectPassword:
-		return http.StatusBadRequest, &inout.CreateSessionBadRequestResponseV1{
-			Password: []string{"Некорректный пароль"},
-		}
+		return http.StatusBadRequest, &inout.CreateSessionResponseV1{
+			Data: &inout.CreateSessionResponseV1_ValidationError_{
+				ValidationError: &inout.CreateSessionResponseV1_ValidationError{
+					Password: []string{"Некорректный пароль"},
+				}}}
 	case enums.PasswordNotFound:
-		return http.StatusBadRequest, &inout.CreateSessionBadRequestResponseV1{
-			Password: []string{"Не установлен пароль"},
-		}
+		return http.StatusBadRequest, &inout.CreateSessionResponseV1{
+			Data: &inout.CreateSessionResponseV1_ValidationError_{
+				ValidationError: &inout.CreateSessionResponseV1_ValidationError{
+					Password: []string{"Не установлен пароль"},
+				}}}
 	case enums.EmailNotFound:
-		return http.StatusBadRequest, &inout.CreateSessionBadRequestResponseV1{
-			Email: []string{"Email не найден"},
-		}
+		return http.StatusBadRequest, &inout.CreateSessionResponseV1{
+			Data: &inout.CreateSessionResponseV1_ValidationError_{
+				ValidationError: &inout.CreateSessionResponseV1_ValidationError{
+					Email: []string{"Email не найден"},
+				}}}
 	case enums.IncorrectEmail:
-		return http.StatusBadRequest, &inout.CreateSessionBadRequestResponseV1{
-			Email: []string{"Некорректный email"},
-		}
+		return http.StatusBadRequest, &inout.CreateSessionResponseV1{
+			Data: &inout.CreateSessionResponseV1_ValidationError_{
+				ValidationError: &inout.CreateSessionResponseV1_ValidationError{
+					Email: []string{"Некорректный email"},
+				}}}
 	case enums.IncorrectEmailCode:
-		return http.StatusBadRequest, &inout.CreateSessionBadRequestResponseV1{
-			EmailCode: []string{"Некорректный код подтверждения"},
-		}
+		return http.StatusBadRequest, &inout.CreateSessionResponseV1{
+			Data: &inout.CreateSessionResponseV1_ValidationError_{
+				ValidationError: &inout.CreateSessionResponseV1_ValidationError{
+					EmailCode: []string{"Некорректный код подтверждения"},
+				}}}
 	case enums.EmailConfirmationCodeNotFound:
-		return http.StatusBadRequest, &inout.CreateSessionBadRequestResponseV1{
-			EmailCode: []string{"Не найден код подтверждения для данного email"},
-		}
+		return http.StatusBadRequest, &inout.CreateSessionResponseV1{
+			Data: &inout.CreateSessionResponseV1_ValidationError_{
+				ValidationError: &inout.CreateSessionResponseV1_ValidationError{
+					EmailCode: []string{"Не найден код подтверждения для данного email"},
+				}}}
 	case enums.PhoneNotFound:
-		return http.StatusBadRequest, &inout.CreateSessionBadRequestResponseV1{
-			Phone: []string{"Телефон не найден"},
-		}
+		return http.StatusBadRequest, &inout.CreateSessionResponseV1{
+			Data: &inout.CreateSessionResponseV1_ValidationError_{
+				ValidationError: &inout.CreateSessionResponseV1_ValidationError{
+					Phone: []string{"Телефон не найден"},
+				}}}
 	case enums.IncorrectPhone:
-		return http.StatusBadRequest, &inout.CreateSessionBadRequestResponseV1{
-			Phone: []string{"Некорректный телефон"},
-		}
+		return http.StatusBadRequest, &inout.CreateSessionResponseV1{
+			Data: &inout.CreateSessionResponseV1_ValidationError_{
+				ValidationError: &inout.CreateSessionResponseV1_ValidationError{
+					Phone: []string{"Некорректный телефон"},
+				}}}
 	case enums.IncorrectPhoneCode:
-		return http.StatusBadRequest, &inout.CreateSessionBadRequestResponseV1{
-			PhoneCode: []string{"Некорректный код подтверждения"},
-		}
+		return http.StatusBadRequest, &inout.CreateSessionResponseV1{
+			Data: &inout.CreateSessionResponseV1_ValidationError_{
+				ValidationError: &inout.CreateSessionResponseV1_ValidationError{
+					PhoneCode: []string{"Некорректный код подтверждения"},
+				}}}
 	case enums.PhoneConfirmationCodeNotFound:
-		return http.StatusBadRequest, &inout.CreateSessionBadRequestResponseV1{
-			PhoneCode: []string{"Не найден код подтверждения для данного телефона"},
-		}
+		return http.StatusBadRequest, &inout.CreateSessionResponseV1{
+			Data: &inout.CreateSessionResponseV1_ValidationError_{
+				ValidationError: &inout.CreateSessionResponseV1_ValidationError{
+					PhoneCode: []string{"Не найден код подтверждения для данного телефона"},
+				}}}
 	default:
 		return unhandledStatus(r, status)
 	}
