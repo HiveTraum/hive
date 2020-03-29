@@ -17,7 +17,7 @@ import (
 
 func createSessionV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
 
-	body := inout.CreateSessionRequestV1{}
+	body := inout.CreateSessionResponseV1_Request{}
 	err := r.ParseBody(&body)
 
 	if err != nil {
@@ -32,7 +32,7 @@ func createSessionV1(r *functools.Request, app infrastructure.AppInterface) (int
 			sentry.CaptureException(err)
 		} else {
 			tokens.RefreshToken = cookie.Value
-			body.Data = &inout.CreateSessionRequestV1_Tokens_{Tokens: tokens}
+			body.Data = &inout.CreateSessionResponseV1_Request_Tokens_{Tokens: tokens}
 		}
 	}
 

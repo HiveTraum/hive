@@ -136,24 +136,24 @@ func getUserFromPhoneAndCode(store infrastructure.StoreInterface, ctx context.Co
 	return enums.Ok, &phone.UserId
 }
 
-func getUserByCredentials(store infrastructure.StoreInterface, controller infrastructure.LoginControllerInterface, ctx context.Context, credentials inout.CreateSessionRequestV1) (int, *uuid.UUID) {
+func getUserByCredentials(store infrastructure.StoreInterface, controller infrastructure.LoginControllerInterface, ctx context.Context, credentials inout.CreateSessionResponseV1_Request) (int, *uuid.UUID) {
 	var status int
 	var userID *uuid.UUID
 
 	switch credentials.Data.(type) {
-	case *inout.CreateSessionRequestV1_Tokens_:
+	case *inout.CreateSessionResponseV1_Request_Tokens_:
 		tokens := credentials.GetTokens()
 		status, userID = getUserFromTokens(store, controller, ctx, tokens.AccessToken, credentials.Fingerprint, tokens.RefreshToken)
-	case *inout.CreateSessionRequestV1_EmailAndPassword_:
+	case *inout.CreateSessionResponseV1_Request_EmailAndPassword_:
 		emailAndPassword := credentials.GetEmailAndPassword()
 		status, userID = getUserFromEmailAndPassword(store, controller, ctx, emailAndPassword.Email, emailAndPassword.Password)
-	case *inout.CreateSessionRequestV1_EmailAndCode_:
+	case *inout.CreateSessionResponseV1_Request_EmailAndCode_:
 		emailAndCode := credentials.GetEmailAndCode()
 		status, userID = getUserFromEmailAndCode(store, ctx, emailAndCode.Email, emailAndCode.Code)
-	case *inout.CreateSessionRequestV1_PhoneAndPassword_:
+	case *inout.CreateSessionResponseV1_Request_PhoneAndPassword_:
 		phoneAndPassword := credentials.GetPhoneAndPassword()
 		status, userID = getUserFromPhoneAndPassword(store, controller, ctx, phoneAndPassword.Phone, phoneAndPassword.Password, phoneAndPassword.PhoneCountryCode)
-	case *inout.CreateSessionRequestV1_PhoneAndCode_:
+	case *inout.CreateSessionResponseV1_Request_PhoneAndCode_:
 		phoneAndCode := credentials.GetPhoneAndCode()
 		status, userID = getUserFromPhoneAndCode(store, ctx, phoneAndCode.Phone, phoneAndCode.Code, phoneAndCode.PhoneCountryCode)
 	default:
@@ -167,7 +167,7 @@ func CreateSession(
 	store infrastructure.StoreInterface,
 	loginController infrastructure.LoginControllerInterface,
 	ctx context.Context,
-	credentials inout.CreateSessionRequestV1) (int, *models.Session) {
+	credentials inout.CreateSessionResponseV1_Request) (int, *models.Session) {
 	status, userID := getUserByCredentials(store, loginController, ctx, credentials)
 	secret := store.GetActualSecret(ctx)
 	status, session := store.CreateSession(ctx, credentials.Fingerprint, *userID, secret.Id, credentials.UserAgent)

@@ -3,8 +3,8 @@ package repositories
 import (
 	"auth/enums"
 	"auth/models"
+	"context"
 	"fmt"
-	"github.com/getsentry/sentry-go"
 	"github.com/go-redis/redis/v7"
 	"time"
 )
@@ -13,13 +13,10 @@ func getEmailConfirmationCodeKey(email string) string {
 	return fmt.Sprintf("%s:%s", enums.EmailConfirmationCode, email)
 }
 
-func CreateEmailConfirmationCode(cache *redis.Client, email string, code string, duration time.Duration) *models.EmailConfirmation {
+func CreateEmailConfirmationCode(ctx context.Context, cache *redis.Client, email string, code string, duration time.Duration) *models.EmailConfirmation {
 	key := getEmailConfirmationCodeKey(email)
-	cmd := cache.Set(key, code, duration)
-	err := cmd.Err()
-
-	if err != nil {
-		sentry.CaptureException(err)
+	cmd := cache.WithContext(ctx).Set(key, code, duration)
+	if err := cmd.Err(); err != nil {
 		return nil
 	}
 
@@ -32,15 +29,11 @@ func CreateEmailConfirmationCode(cache *redis.Client, email string, code string,
 	}
 }
 
-func GetEmailConfirmationCode(cache *redis.Client, email string) string {
+func GetEmailConfirmationCode(ctx context.Context, cache *redis.Client, email string) string {
 	key := getEmailConfirmationCodeKey(email)
-	code, err := cache.Get(key).Result()
+	code, err := cache.WithContext(ctx).Get(key).Result()
 
 	if err != nil {
-		if err != redis.Nil {
-			sentry.CaptureException(err)
-		}
-
 		return ""
 	}
 

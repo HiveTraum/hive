@@ -10,6 +10,7 @@ import (
 	"github.com/opentracing-contrib/go-gorilla/gorilla"
 	"github.com/opentracing/opentracing-go"
 	jaegerConfig "github.com/uber/jaeger-client-go/config"
+	"go.elastic.co/apm/module/apmgorilla"
 	"log"
 	"net/http"
 )
@@ -119,6 +120,8 @@ func main() {
 	// Init Routing
 
 	router := mux.NewRouter().StrictSlash(false)
+
+	apmgorilla.Instrument(router)
 
 	for _, h := range handlers {
 		router.HandleFunc(h.pattern, h.h).Methods(h.methods...)

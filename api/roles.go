@@ -62,7 +62,7 @@ func getRolesV1(r *functools.Request, app *app.App) (int, *inout.ListRoleRespons
 
 func createRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
 
-	body := inout.CreateRoleRequestV1{}
+	body := inout.CreateRoleResponseV1_Request{}
 
 	err := r.ParseBody(&body)
 

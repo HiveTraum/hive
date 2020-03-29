@@ -105,7 +105,7 @@ func GetUsersV1Query(query url.Values, payload *models.AccessTokenPayload) repos
 func getUsersV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.ListUserResponseV1) {
 
 	status, payload := app.GetLoginController().Login(r.Context(), r.GetAccessToken())
-	if status != enums.Ok {
+	if status != enums.Ok || payload == nil {
 		return http.StatusUnauthorized, nil
 	}
 

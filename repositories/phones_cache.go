@@ -5,9 +5,7 @@ import (
 	"auth/models"
 	"context"
 	"fmt"
-	"github.com/getsentry/sentry-go"
 	"github.com/go-redis/redis/v7"
-	"github.com/opentracing/opentracing-go"
 	"time"
 )
 
@@ -17,19 +15,14 @@ func getPhoneConfirmationCodeKey(phone string) string {
 
 func CreatePhoneConfirmationCode(cache *redis.Client, ctx context.Context, phone string, code string, duration time.Duration) *models.PhoneConfirmation {
 
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Create phone confirmation code")
-
 	key := getPhoneConfirmationCodeKey(phone)
-	cmd := cache.Set(key, code, duration)
+	cmd := cache.WithContext(ctx).Set(key, code, duration)
 	err := cmd.Err()
 	if err != nil {
-		sentry.CaptureException(err)
 		return nil
 	}
 
 	created := time.Now()
-
-	span.Finish()
 
 	return &models.PhoneConfirmation{
 		Created: created.Unix(),
@@ -42,19 +35,11 @@ func CreatePhoneConfirmationCode(cache *redis.Client, ctx context.Context, phone
 
 func GetPhoneConfirmationCode(cache *redis.Client, ctx context.Context, phone string) string {
 
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Get phone confirmation code")
-
 	key := getPhoneConfirmationCodeKey(phone)
-	code, err := cache.Get(key).Result()
+	code, err := cache.WithContext(ctx).Get(key).Result()
 	if err != nil {
-		if redis.Nil != err {
-			sentry.CaptureException(err)
-		}
-
 		return ""
 	}
-
-	span.Finish()
 
 	return code
 }
