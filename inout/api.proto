@@ -69,6 +69,12 @@ message PhoneConfirmation {
     string phoneCountryCode = 4;
 }
 
+message Password {
+    bytes id = 1;
+    int64 created = 2;
+    bytes userID = 3;
+}
+
 // Roles API
 
 message GetRoleResponseV1 {
@@ -214,20 +220,24 @@ message CreatePhoneConfirmationResponseV1 {
 
 // Passwords API
 
-message CreatePasswordRequestV1 {
-    bytes userID = 1;
-    string value = 2;
-}
-
-message CreatePasswordBadRequestResponseV1 {
-    repeated string userID = 1;
-    repeated string value = 2;
-}
-
 message CreatePasswordResponseV1 {
-    bytes id = 1;
-    int64 created = 2;
-    bytes userID = 3;
+
+    message Request {
+        bytes userID = 1;
+        string value = 2;
+    }
+
+    message ValidationError {
+        repeated string userID = 1;
+        repeated string value = 2;
+    }
+
+    oneof data {
+        Password ok = 1;
+        ValidationError validationError = 2;
+        Error error = 3;
+    }
+
 }
 
 // Users API
