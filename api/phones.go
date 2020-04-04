@@ -69,9 +69,9 @@ func PhonesAPIV1(app *app.App) middlewares.ResponseControllerHandler {
 	}
 }
 
-func createPhoneConfirmationV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
+func createPhoneConfirmationV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.CreatePhoneConfirmationResponseV1) {
 
-	body := inout.CreatePhoneConfirmationRequestV1{}
+	body := inout.CreatePhoneConfirmationResponseV1_Request{}
 
 	err := r.ParseBody(&body)
 
@@ -84,14 +84,18 @@ func createPhoneConfirmationV1(r *functools.Request, app infrastructure.AppInter
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.CreatePhoneConfirmationResponseV1{
-			Created: phoneConfirmation.Created,
-			Expire:  phoneConfirmation.Expire,
-			Phone:   phoneConfirmation.Phone,
-		}
+			Data: &inout.CreatePhoneConfirmationResponseV1_Ok{
+				Ok: &inout.PhoneConfirmation{
+					Created: phoneConfirmation.Created,
+					Expire:  phoneConfirmation.Expire,
+					Phone:   phoneConfirmation.Phone,
+				}}}
 	case enums.IncorrectPhone:
-		return http.StatusBadRequest, &inout.CreatePhoneConfirmationBadRequestV1{
-			Phone: []string{"Некорректный номер телефона"},
-		}
+		return http.StatusBadRequest, &inout.CreatePhoneConfirmationResponseV1{
+			Data: &inout.CreatePhoneConfirmationResponseV1_ValidationError_{
+				ValidationError: &inout.CreatePhoneConfirmationResponseV1_ValidationError{
+					Phone: []string{"Некорректный номер телефона"},
+				}}}
 	default:
 		return unhandledStatus(r, status), nil
 	}

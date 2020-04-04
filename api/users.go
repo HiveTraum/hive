@@ -80,7 +80,7 @@ func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 		}
 
 	default:
-		return unhandledStatus(r, status)
+		return unhandledStatus(r, status), nil
 	}
 }
 
@@ -150,7 +150,7 @@ func deleteUserV1(r *functools.Request, app infrastructure.AppInterface, id uuid
 	case enums.UserNotFound:
 		return http.StatusNotFound, nil
 	default:
-		return unhandledStatus(r, status)
+		return unhandledStatus(r, status), nil
 	}
 }
 

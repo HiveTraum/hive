@@ -47,7 +47,7 @@ func getUserRolesV1(r *functools.Request, app infrastructure.AppInterface) (int,
 	}}
 }
 
-func createUserRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
+func createUserRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.CreateUserRoleResponseV1) {
 
 	body := inout.CreateUserRoleResponseV1_Request{}
 
@@ -89,14 +89,7 @@ func createUserRoleV1(r *functools.Request, app infrastructure.AppInterface) (in
 					Errors: []string{"Данная роль уже есть у пользователя"},
 				}}}
 	default:
-		return http.StatusCreated, &inout.CreateUserRoleResponseV1{
-			Data: &inout.CreateUserRoleResponseV1_Ok{Ok: &inout.UserRole{
-				Id:      userRole.Id.Bytes(),
-				Created: userRole.Created,
-				UserID:  userRole.UserId.Bytes(),
-				RoleID:  userRole.RoleId.Bytes(),
-			}},
-		}
+		return unhandledStatus(r, status), nil
 	}
 }
 

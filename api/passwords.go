@@ -41,7 +41,7 @@ func createPasswordV1(r *functools.Request, app infrastructure.AppInterface) (in
 			Value: []string{"Не удалось обработать полученный пароль, попробуйте другой"},
 		}
 	default:
-		return unhandledStatus(r, status)
+		return unhandledStatus(r, status), nil
 	}
 }
 

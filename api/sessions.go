@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-func createSessionV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
+func createSessionV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.CreateSessionResponseV1) {
 
 	body := inout.CreateSessionResponseV1_Request{}
 	err := r.ParseBody(&body)
@@ -125,7 +125,7 @@ func createSessionV1(r *functools.Request, app infrastructure.AppInterface) (int
 					PhoneCode: []string{"Не найден код подтверждения для данного телефона"},
 				}}}
 	default:
-		return unhandledStatus(r, status)
+		return unhandledStatus(r, status), nil
 	}
 }
 

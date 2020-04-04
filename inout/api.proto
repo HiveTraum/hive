@@ -62,6 +62,13 @@ message Phone {
     string phoneCountryCode = 5;
 }
 
+message PhoneConfirmation {
+    int64 created = 1;
+    int64 expire = 2;
+    string phone = 3;
+    string phoneCountryCode = 4;
+}
+
 // Roles API
 
 message GetRoleResponseV1 {
@@ -188,21 +195,21 @@ message CreatePhoneResponseV1 {
 
 // Phones Confirmation API
 
-message CreatePhoneConfirmationRequestV1 {
-    string phone = 1;
-    string phoneCountryCode = 2;
-}
-
-message CreatePhoneConfirmationBadRequestV1 {
-    repeated string phone = 1;
-    repeated string phoneCountryCode = 2;
-}
-
 message CreatePhoneConfirmationResponseV1 {
-    int64 created = 1;
-    int64 expire = 2;
-    string phone = 3;
-    string phoneCountryCode = 4;
+    message Request {
+        string phone = 1;
+        string phoneCountryCode = 2;
+    }
+
+    message ValidationError {
+        repeated string phone = 1;
+        repeated string phoneCountryCode = 2;
+    }
+
+    oneof data {
+        PhoneConfirmation ok = 1;
+        ValidationError validationError = 2;
+    }
 }
 
 // Passwords API

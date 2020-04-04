@@ -39,7 +39,7 @@ func getRoleV1(r *functools.Request, app *app.App, id uuid.UUID) (int, proto.Mes
 	case enums.RoleNotFound:
 		return http.StatusNotFound, &inout.GetRoleResponseV1{}
 	default:
-		return unhandledStatus(r, status)
+		return unhandledStatus(r, status), nil
 	}
 }
 
@@ -113,7 +113,7 @@ func createRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 					Title: []string{"Роль с таким названием уже существует"},
 				}}}
 	default:
-		return unhandledStatus(r, status)
+		return unhandledStatus(r, status), nil
 	}
 }
 
