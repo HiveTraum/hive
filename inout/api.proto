@@ -65,7 +65,8 @@ message CreateRoleResponseV1 {
 }
 
 message ListRoleResponseV1 {
-    repeated Role data = 1;
+    Pagination pagination = 1;
+    repeated Role data = 2;
 }
 
 // User Roles API

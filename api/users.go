@@ -7,7 +7,6 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
-	"auth/models"
 	"auth/repositories"
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/protobuf/proto"
@@ -26,7 +25,7 @@ func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 		return http.StatusBadRequest, nil
 	}
 
-	status, user := controllers.CreateUser(app.GetStore(), app.GetESB(), app.GetLoginController(), r.Context(), body)
+	status, user := controllers.CreateUser(app.GetStore(), app.GetESB(), app.GetPasswordProcessor(), r.Context(), body)
 
 	switch status {
 	case enums.Ok:
@@ -85,14 +84,14 @@ func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 	}
 }
 
-func GetUsersV1Query(query url.Values, payload *models.AccessTokenPayload) repositories.GetUsersQuery {
+func GetUsersV1Query(query url.Values, payload infrastructure.AuthenticationBackendUser) repositories.GetUsersQuery {
 	pagination := functools.GetPagination(query)
 
 	var requestedUserIdentifiers []uuid.UUID
-	if payload.IsAdmin {
+	if payload.GetIsAdmin() {
 		requestedUserIdentifiers = functools.StringsSliceToUUIDSlice(query["id"])
 	} else {
-		requestedUserIdentifiers = []uuid.UUID{payload.UserID}
+		requestedUserIdentifiers = []uuid.UUID{payload.GetUserID()}
 	}
 
 	return repositories.GetUsersQuery{
@@ -104,7 +103,7 @@ func GetUsersV1Query(query url.Values, payload *models.AccessTokenPayload) repos
 
 func getUsersV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.ListUserResponseV1) {
 
-	status, payload := app.GetLoginController().Login(r.Context(), r.GetAccessToken())
+	status, payload := app.GetLoginController().Login(r.Context(), r.GetAuthorizationHeader())
 	if status != enums.Ok || payload == nil {
 		return http.StatusUnauthorized, nil
 	}
@@ -178,11 +177,11 @@ func UserAPIV1(app infrastructure.AppInterface) middlewares.ResponseControllerHa
 			return http.StatusBadRequest, nil
 		}
 
-		status, payload := app.GetLoginController().Login(request.Context(), request.GetAccessToken())
+		status, payload := app.GetLoginController().Login(request.Context(), request.GetAuthorizationHeader())
 		if status != enums.Ok {
 			return http.StatusUnauthorized, nil
 		}
-		if id != payload.UserID || payload.IsAdmin {
+		if id != payload.GetUserID() || payload.GetIsAdmin() {
 			return http.StatusForbidden, nil
 		}
 

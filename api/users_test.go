@@ -1,6 +1,7 @@
 package api
 
 import (
+	"auth/backends"
 	"auth/enums"
 	"auth/functools"
 	"auth/inout"
@@ -21,7 +22,7 @@ func TestCreateUserEmptyBody(t *testing.T) {
 	body := "{}"
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, _, _ := mocks.InitMockApp(ctrl)
+	app, store, _, _, _:= mocks.InitMockApp(ctrl)
 
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
 
@@ -43,7 +44,7 @@ func TestCreateUserWithOnlyPassword(t *testing.T) {
 	body := "{\"password\": \"hello\"}"
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, _, _ := mocks.InitMockApp(ctrl)
+	app, store, _, _, _ := mocks.InitMockApp(ctrl)
 
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
 
@@ -68,7 +69,7 @@ func TestCreateUserWithOnlyEmail(t *testing.T) {
 
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
 
-	app, store, _, passwordProcessor := mocks.InitMockApp(ctrl)
+	app, store, _, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	passwordProcessor.
 		EXPECT().
@@ -102,7 +103,7 @@ func TestCreateUserWithEmailAndEmailCode(t *testing.T) {
 
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
 
-	app, store, _, passwordProcessor := mocks.InitMockApp(ctrl)
+	app, store, _, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	passwordProcessor.
 		EXPECT().
@@ -136,7 +137,7 @@ func TestCreateUserWithEmailAndEmailCodeAfterIncorrectEmailConfirmationCodeRecei
 
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
 
-	app, store, _, passwordProcessor := mocks.InitMockApp(ctrl)
+	app, store, _, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	passwordProcessor.
 		EXPECT().
@@ -170,7 +171,7 @@ func TestSuccessfulCreateUserWithEmail(t *testing.T) {
 
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
 
-	app, store, esb, passwordProcessor := mocks.InitMockApp(ctrl)
+	app, store, esb, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	userID := uuid.NewV4()
 
@@ -233,7 +234,7 @@ func TestGetUsersV1QueryForAdminUser(t *testing.T) {
 		Id:    functools.StringsSliceToUUIDSlice(requestedIdentifiers),
 	}, GetUsersV1Query(map[string][]string{
 		"id": requestedIdentifiers,
-	}, &models.AccessTokenPayload{
+	}, &backends.BasicAuthenticationBackendUser{
 		IsAdmin: true,
 		UserID:  adminUserID,
 	}))
@@ -250,7 +251,7 @@ func TestGetUsersV1QueryForRegularUser(t *testing.T) {
 		Id:    []uuid.UUID{userID},
 	}, GetUsersV1Query(map[string][]string{
 		"id": requestedIdentifiers,
-	}, &models.AccessTokenPayload{
+	}, &backends.BasicAuthenticationBackendUser{
 		IsAdmin: false,
 		UserID:  userID,
 	}))

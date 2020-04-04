@@ -15,7 +15,7 @@ func TestCreatePhoneConfirmation(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, esb, _ := mocks.InitMockApp(ctrl)
+	_, store, esb, _, _ := mocks.InitMockApp(ctrl)
 	ctx := context.Background()
 
 	store.
@@ -50,7 +50,7 @@ func TestCreatePhoneConfirmationWithIncorrectPhone(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, esb, _ := mocks.InitMockApp(ctrl)
+	_, store, esb, _, _ := mocks.InitMockApp(ctrl)
 	ctx := context.Background()
 	phone := "qwerty"
 	status, confirmation := CreatePhoneConfirmation(store, esb, ctx, phone, "RU")

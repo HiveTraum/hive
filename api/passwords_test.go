@@ -27,11 +27,11 @@ func TestCreatePasswordWithoutUserV1(t *testing.T) {
 	})
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, _, loginController := mocks.InitMockApp(ctrl)
+	app, store, _, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
 
-	loginController.
+	passwordProcessor.
 		EXPECT().
 		EncodePassword(gomock.Any(), "hello").
 		Return("olleh")
@@ -55,7 +55,7 @@ func TestCreatePasswordWithUserV1(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, esb, passwordProcessor := mocks.InitMockApp(ctrl)
+	app, store, esb, _, passwordProcessor := mocks.InitMockApp(ctrl)
 	ctx := context.Background()
 
 	userID := uuid.NewV4()
@@ -98,7 +98,7 @@ func TestCreatePasswordWithTooLongValueV1(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, esb, passwordProcessor := mocks.InitMockApp(ctrl)
+	app, store, esb, _, passwordProcessor := mocks.InitMockApp(ctrl)
 	ctx := context.Background()
 
 	userID := uuid.NewV4()

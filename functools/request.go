@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
 )
 
 type Request struct {
@@ -106,18 +105,6 @@ func GetPagination(values url.Values) *models.PaginationRequest {
 	}
 }
 
-func (request *Request) GetAccessToken() string {
-	authHeader := request.Header.Get("Authorization")
-
-	if authHeader == "" {
-		return ""
-	}
-
-	parts := strings.Split(authHeader, " ")
-
-	if len(parts) < 2 {
-		return ""
-	}
-
-	return parts[1]
+func (request *Request) GetAuthorizationHeader() string {
+	return request.Header.Get("Authorization")
 }

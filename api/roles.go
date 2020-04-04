@@ -46,7 +46,7 @@ func getRoleV1(r *functools.Request, app *app.App, id uuid.UUID) (int, proto.Mes
 func getRolesV1(r *functools.Request, app *app.App) (int, *inout.ListRoleResponseV1) {
 
 	query := GetRolesV1Query(r)
-	roles := app.Store.GetRoles(r.Context(), query)
+	roles, pagination := app.Store.GetRoles(r.Context(), query)
 	rolesData := make([]*inout.Role, len(roles))
 
 	for i, role := range roles {
@@ -57,7 +57,11 @@ func getRolesV1(r *functools.Request, app *app.App) (int, *inout.ListRoleRespons
 		}
 	}
 
-	return http.StatusOK, &inout.ListRoleResponseV1{Data: rolesData}
+	return http.StatusOK, &inout.ListRoleResponseV1{Data: rolesData, Pagination: &inout.Pagination{
+		HasPrevious: pagination.HasPrevious,
+		HasNext:     pagination.HasNext,
+		Count:       pagination.Count,
+	}}
 }
 
 func createRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
@@ -72,7 +76,7 @@ func createRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 
 	ctx := r.Context()
 
-	status, payload := app.GetLoginController().Login(ctx, r.GetAccessToken())
+	status, payload := app.GetLoginController().Login(ctx, r.GetAuthorizationHeader())
 	if status != enums.Ok || payload == nil {
 		return http.StatusUnauthorized, &inout.CreateRoleResponseV1{
 			Data: &inout.CreateRoleResponseV1_Error{
@@ -82,7 +86,7 @@ func createRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 				}}}
 	}
 
-	if payload.IsAdmin == false {
+	if payload.GetIsAdmin() == false {
 		return http.StatusForbidden, &inout.CreateRoleResponseV1{
 			Data: &inout.CreateRoleResponseV1_Error{
 				Error: &inout.Error{

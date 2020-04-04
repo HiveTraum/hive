@@ -36,7 +36,7 @@ func createSessionV1(r *functools.Request, app infrastructure.AppInterface) (int
 		}
 	}
 
-	status, session := controllers.CreateSession(app.GetStore(), app.GetLoginController(), r.Context(), body)
+	status, session := controllers.CreateSession(app.GetStore(), app.GetLoginController(), app.GetPasswordProcessor(), r.Context(), body)
 
 	switch status {
 	case enums.Ok:

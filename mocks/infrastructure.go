@@ -427,11 +427,12 @@ func (mr *MockStoreInterfaceMockRecorder) GetRole(context, id interface{}) *gomo
 }
 
 // GetRoles mocks base method
-func (m *MockStoreInterface) GetRoles(context context.Context, query repositories.GetRolesQuery) []*models.Role {
+func (m *MockStoreInterface) GetRoles(context context.Context, query repositories.GetRolesQuery) ([]*models.Role, *models.PaginationResponse) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRoles", context, query)
 	ret0, _ := ret[0].([]*models.Role)
-	return ret0
+	ret1, _ := ret[1].(*models.PaginationResponse)
+	return ret0, ret1
 }
 
 // GetRoles indicates an expected call of GetRoles
@@ -726,6 +727,109 @@ func (mr *MockESBDispatcherInterfaceMockRecorder) Send(event interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockESBDispatcherInterface)(nil).Send), event)
 }
 
+// MockAuthenticationBackendUser is a mock of AuthenticationBackendUser interface
+type MockAuthenticationBackendUser struct {
+	ctrl     *gomock.Controller
+	recorder *MockAuthenticationBackendUserMockRecorder
+}
+
+// MockAuthenticationBackendUserMockRecorder is the mock recorder for MockAuthenticationBackendUser
+type MockAuthenticationBackendUserMockRecorder struct {
+	mock *MockAuthenticationBackendUser
+}
+
+// NewMockAuthenticationBackendUser creates a new mock instance
+func NewMockAuthenticationBackendUser(ctrl *gomock.Controller) *MockAuthenticationBackendUser {
+	mock := &MockAuthenticationBackendUser{ctrl: ctrl}
+	mock.recorder = &MockAuthenticationBackendUserMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockAuthenticationBackendUser) EXPECT() *MockAuthenticationBackendUserMockRecorder {
+	return m.recorder
+}
+
+// GetIsAdmin mocks base method
+func (m *MockAuthenticationBackendUser) GetIsAdmin() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetIsAdmin")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// GetIsAdmin indicates an expected call of GetIsAdmin
+func (mr *MockAuthenticationBackendUserMockRecorder) GetIsAdmin() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIsAdmin", reflect.TypeOf((*MockAuthenticationBackendUser)(nil).GetIsAdmin))
+}
+
+// GetRoles mocks base method
+func (m *MockAuthenticationBackendUser) GetRoles() []string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRoles")
+	ret0, _ := ret[0].([]string)
+	return ret0
+}
+
+// GetRoles indicates an expected call of GetRoles
+func (mr *MockAuthenticationBackendUserMockRecorder) GetRoles() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoles", reflect.TypeOf((*MockAuthenticationBackendUser)(nil).GetRoles))
+}
+
+// GetUserID mocks base method
+func (m *MockAuthenticationBackendUser) GetUserID() go_uuid.UUID {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserID")
+	ret0, _ := ret[0].(go_uuid.UUID)
+	return ret0
+}
+
+// GetUserID indicates an expected call of GetUserID
+func (mr *MockAuthenticationBackendUserMockRecorder) GetUserID() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserID", reflect.TypeOf((*MockAuthenticationBackendUser)(nil).GetUserID))
+}
+
+// MockAuthenticationBackend is a mock of AuthenticationBackend interface
+type MockAuthenticationBackend struct {
+	ctrl     *gomock.Controller
+	recorder *MockAuthenticationBackendMockRecorder
+}
+
+// MockAuthenticationBackendMockRecorder is the mock recorder for MockAuthenticationBackend
+type MockAuthenticationBackendMockRecorder struct {
+	mock *MockAuthenticationBackend
+}
+
+// NewMockAuthenticationBackend creates a new mock instance
+func NewMockAuthenticationBackend(ctrl *gomock.Controller) *MockAuthenticationBackend {
+	mock := &MockAuthenticationBackend{ctrl: ctrl}
+	mock.recorder = &MockAuthenticationBackendMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockAuthenticationBackend) EXPECT() *MockAuthenticationBackendMockRecorder {
+	return m.recorder
+}
+
+// GetUser mocks base method
+func (m *MockAuthenticationBackend) GetUser(ctx context.Context, token string) (int, infrastructure.AuthenticationBackendUser) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUser", ctx, token)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(infrastructure.AuthenticationBackendUser)
+	return ret0, ret1
+}
+
+// GetUser indicates an expected call of GetUser
+func (mr *MockAuthenticationBackendMockRecorder) GetUser(ctx, token interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockAuthenticationBackend)(nil).GetUser), ctx, token)
+}
+
 // MockLoginControllerInterface is a mock of LoginControllerInterface interface
 type MockLoginControllerInterface struct {
 	ctrl     *gomock.Controller
@@ -750,66 +854,45 @@ func (m *MockLoginControllerInterface) EXPECT() *MockLoginControllerInterfaceMoc
 }
 
 // Login mocks base method
-func (m *MockLoginControllerInterface) Login(ctx context.Context, accessToken string) (int, *models.AccessTokenPayload) {
+func (m *MockLoginControllerInterface) Login(ctx context.Context, authorizationHeader string) (int, infrastructure.AuthenticationBackendUser) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Login", ctx, accessToken)
+	ret := m.ctrl.Call(m, "Login", ctx, authorizationHeader)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(*models.AccessTokenPayload)
+	ret1, _ := ret[1].(infrastructure.AuthenticationBackendUser)
 	return ret0, ret1
 }
 
 // Login indicates an expected call of Login
-func (mr *MockLoginControllerInterfaceMockRecorder) Login(ctx, accessToken interface{}) *gomock.Call {
+func (mr *MockLoginControllerInterfaceMockRecorder) Login(ctx, authorizationHeader interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*MockLoginControllerInterface)(nil).Login), ctx, accessToken)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*MockLoginControllerInterface)(nil).Login), ctx, authorizationHeader)
 }
 
-// DecodeAccessToken mocks base method
-func (m *MockLoginControllerInterface) DecodeAccessToken(ctx context.Context, token string, secret go_uuid.UUID) (int, *models.AccessTokenPayload) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DecodeAccessToken", ctx, token, secret)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(*models.AccessTokenPayload)
-	return ret0, ret1
+// MockPasswordProcessorInterface is a mock of PasswordProcessorInterface interface
+type MockPasswordProcessorInterface struct {
+	ctrl     *gomock.Controller
+	recorder *MockPasswordProcessorInterfaceMockRecorder
 }
 
-// DecodeAccessToken indicates an expected call of DecodeAccessToken
-func (mr *MockLoginControllerInterfaceMockRecorder) DecodeAccessToken(ctx, token, secret interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecodeAccessToken", reflect.TypeOf((*MockLoginControllerInterface)(nil).DecodeAccessToken), ctx, token, secret)
+// MockPasswordProcessorInterfaceMockRecorder is the mock recorder for MockPasswordProcessorInterface
+type MockPasswordProcessorInterfaceMockRecorder struct {
+	mock *MockPasswordProcessorInterface
 }
 
-// DecodeAccessTokenWithoutValidation mocks base method
-func (m *MockLoginControllerInterface) DecodeAccessTokenWithoutValidation(ctx context.Context, tokenValue string) (int, *models.AccessTokenPayload) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DecodeAccessTokenWithoutValidation", ctx, tokenValue)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(*models.AccessTokenPayload)
-	return ret0, ret1
+// NewMockPasswordProcessorInterface creates a new mock instance
+func NewMockPasswordProcessorInterface(ctrl *gomock.Controller) *MockPasswordProcessorInterface {
+	mock := &MockPasswordProcessorInterface{ctrl: ctrl}
+	mock.recorder = &MockPasswordProcessorInterfaceMockRecorder{mock}
+	return mock
 }
 
-// DecodeAccessTokenWithoutValidation indicates an expected call of DecodeAccessTokenWithoutValidation
-func (mr *MockLoginControllerInterfaceMockRecorder) DecodeAccessTokenWithoutValidation(ctx, tokenValue interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecodeAccessTokenWithoutValidation", reflect.TypeOf((*MockLoginControllerInterface)(nil).DecodeAccessTokenWithoutValidation), ctx, tokenValue)
-}
-
-// EncodeAccessToken mocks base method
-func (m *MockLoginControllerInterface) EncodeAccessToken(ctx context.Context, userID go_uuid.UUID, roles []string, secret *models.Secret, expire time.Time) string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EncodeAccessToken", ctx, userID, roles, secret, expire)
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// EncodeAccessToken indicates an expected call of EncodeAccessToken
-func (mr *MockLoginControllerInterfaceMockRecorder) EncodeAccessToken(ctx, userID, roles, secret, expire interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncodeAccessToken", reflect.TypeOf((*MockLoginControllerInterface)(nil).EncodeAccessToken), ctx, userID, roles, secret, expire)
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockPasswordProcessorInterface) EXPECT() *MockPasswordProcessorInterfaceMockRecorder {
+	return m.recorder
 }
 
 // EncodePassword mocks base method
-func (m *MockLoginControllerInterface) EncodePassword(arg0 context.Context, arg1 string) string {
+func (m *MockPasswordProcessorInterface) EncodePassword(arg0 context.Context, arg1 string) string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EncodePassword", arg0, arg1)
 	ret0, _ := ret[0].(string)
@@ -817,13 +900,13 @@ func (m *MockLoginControllerInterface) EncodePassword(arg0 context.Context, arg1
 }
 
 // EncodePassword indicates an expected call of EncodePassword
-func (mr *MockLoginControllerInterfaceMockRecorder) EncodePassword(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockPasswordProcessorInterfaceMockRecorder) EncodePassword(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncodePassword", reflect.TypeOf((*MockLoginControllerInterface)(nil).EncodePassword), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncodePassword", reflect.TypeOf((*MockPasswordProcessorInterface)(nil).EncodePassword), arg0, arg1)
 }
 
 // VerifyPassword mocks base method
-func (m *MockLoginControllerInterface) VerifyPassword(ctx context.Context, password, encodedPassword string) bool {
+func (m *MockPasswordProcessorInterface) VerifyPassword(ctx context.Context, password, encodedPassword string) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "VerifyPassword", ctx, password, encodedPassword)
 	ret0, _ := ret[0].(bool)
@@ -831,9 +914,9 @@ func (m *MockLoginControllerInterface) VerifyPassword(ctx context.Context, passw
 }
 
 // VerifyPassword indicates an expected call of VerifyPassword
-func (mr *MockLoginControllerInterfaceMockRecorder) VerifyPassword(ctx, password, encodedPassword interface{}) *gomock.Call {
+func (mr *MockPasswordProcessorInterfaceMockRecorder) VerifyPassword(ctx, password, encodedPassword interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyPassword", reflect.TypeOf((*MockLoginControllerInterface)(nil).VerifyPassword), ctx, password, encodedPassword)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyPassword", reflect.TypeOf((*MockPasswordProcessorInterface)(nil).VerifyPassword), ctx, password, encodedPassword)
 }
 
 // MockAppInterface is a mock of AppInterface interface
@@ -899,4 +982,18 @@ func (m *MockAppInterface) GetLoginController() infrastructure.LoginControllerIn
 func (mr *MockAppInterfaceMockRecorder) GetLoginController() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLoginController", reflect.TypeOf((*MockAppInterface)(nil).GetLoginController))
+}
+
+// GetPasswordProcessor mocks base method
+func (m *MockAppInterface) GetPasswordProcessor() infrastructure.PasswordProcessorInterface {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPasswordProcessor")
+	ret0, _ := ret[0].(infrastructure.PasswordProcessorInterface)
+	return ret0
+}
+
+// GetPasswordProcessor indicates an expected call of GetPasswordProcessor
+func (mr *MockAppInterfaceMockRecorder) GetPasswordProcessor() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPasswordProcessor", reflect.TypeOf((*MockAppInterface)(nil).GetPasswordProcessor))
 }

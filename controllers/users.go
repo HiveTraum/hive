@@ -13,7 +13,7 @@ import (
 func CreateUser(
 	store infrastructure.StoreInterface,
 	esb infrastructure.ESBInterface,
-	passwordProcessor infrastructure.LoginControllerInterface,
+	passwordProcessor infrastructure.PasswordProcessorInterface,
 	ctx context.Context,
 	body *inout.CreateUserRequestV1) (int, *models.User) {
 

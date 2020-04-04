@@ -1,17 +1,24 @@
 package app
 
 import (
+	"auth/backends"
 	"auth/config"
 	"auth/controllers"
 	"auth/infrastructure"
+	"auth/processors"
 	"auth/stores"
 	"github.com/opentracing/opentracing-go"
 )
 
 type App struct {
-	Store           infrastructure.StoreInterface
-	ESB             infrastructure.ESBInterface
-	LoginController infrastructure.LoginControllerInterface
+	Store             infrastructure.StoreInterface
+	ESB               infrastructure.ESBInterface
+	LoginController   infrastructure.LoginControllerInterface
+	PasswordProcessor infrastructure.PasswordProcessorInterface
+}
+
+func (app *App) GetPasswordProcessor() infrastructure.PasswordProcessorInterface {
+	return app.PasswordProcessor
 }
 
 func (app *App) GetStore() infrastructure.StoreInterface {
@@ -32,9 +39,14 @@ func InitApp(tracer opentracing.Tracer) *App {
 	redis := config.InitRedis()
 	inMemoryCache := config.InitInMemoryCache()
 	store := &stores.DatabaseStore{Db: pool, Cache: redis, InMemoryCache: inMemoryCache}
-	loginController := &controllers.LoginController{Store: store}
+	authBackends := map[string]infrastructure.AuthenticationBackend{
+		"Bearer": backends.JWTAuthenticationBackend{Store: store},
+		"Basic":  backends.BasicAuthenticationBackend{Store: store},
+	}
+	loginController := &controllers.LoginController{Backends: authBackends}
+	passwordProcessor := &processors.PasswordProcessor{}
 	esb := InitESB(store)
 	InitialAdminRole(store)
 	InitialAdmin(store)
-	return &App{ESB: esb, Store: store, LoginController: loginController}
+	return &App{ESB: esb, Store: store, LoginController: loginController, PasswordProcessor: passwordProcessor}
 }

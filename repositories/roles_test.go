@@ -17,8 +17,8 @@ func TestCreateRole(t *testing.T) {
 	status, role := CreateRole(pool, ctx, "admin")
 	require.Equal(t, enums.Ok, status)
 	require.NotNil(t, role)
-	roles := GetRoles(pool, ctx, GetRolesQuery{
-		Pagination: &models.PaginationRequest{Limit: 10,},
+	roles, _ := GetRoles(pool, ctx, GetRolesQuery{
+		Pagination:  &models.PaginationRequest{Limit: 10},
 		Identifiers: nil,
 	})
 	require.Len(t, roles, 1)
@@ -32,8 +32,8 @@ func TestCreateRoleThatAlreadyExist(t *testing.T) {
 	status, role := CreateRole(pool, ctx, "admin")
 	require.Equal(t, enums.RoleAlreadyExist, status)
 	require.Nil(t, role)
-	roles := GetRoles(pool, ctx, GetRolesQuery{
-		Pagination: &models.PaginationRequest{Limit: 10,},
+	roles, _ := GetRoles(pool, ctx, GetRolesQuery{
+		Pagination:  &models.PaginationRequest{Limit: 10},
 		Identifiers: nil,
 	})
 	require.Len(t, roles, 1)
@@ -43,8 +43,8 @@ func TestGetRolesWithEmptyTable(t *testing.T) {
 	pool := config.InitPool(nil)
 	ctx := context.Background()
 	PurgeRoles(pool, ctx)
-	roles := GetRoles(pool, ctx, GetRolesQuery{
-		Pagination: &models.PaginationRequest{Limit: 10,},
+	roles, _ := GetRoles(pool, ctx, GetRolesQuery{
+		Pagination:  &models.PaginationRequest{Limit: 10},
 		Identifiers: nil,
 	})
 	require.Len(t, roles, 0)
