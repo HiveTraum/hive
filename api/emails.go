@@ -13,7 +13,7 @@ import (
 	"net/http"
 )
 
-func createEmailV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
+func createEmailV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.CreateEmailResponseV1) {
 	body := inout.CreateEmailResponseV1_Request{}
 	err := r.ParseBody(&body)
 
@@ -58,7 +58,7 @@ func createEmailV1(r *functools.Request, app infrastructure.AppInterface) (int, 
 					Email: []string{"Некорректный email"},
 				}}}
 	default:
-		return unhandledStatus(r, status)
+		return unhandledStatus(r, status), nil
 	}
 }
 
@@ -68,7 +68,7 @@ func EmailsAPIV1(app *app.App) middlewares.ResponseControllerHandler {
 	}
 }
 
-func createEmailConfirmationV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
+func createEmailConfirmationV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.CreateEmailConfirmationResponseV1) {
 
 	body := inout.CreateEmailConfirmationResponseV1_Request{}
 
@@ -95,7 +95,7 @@ func createEmailConfirmationV1(r *functools.Request, app infrastructure.AppInter
 				ValidationError: &inout.CreateEmailConfirmationResponseV1_ValidationError{
 					Email: []string{"Некорректный email"}}}}
 	default:
-		return unhandledStatus(r, status)
+		return unhandledStatus(r, status), nil
 	}
 }
 
