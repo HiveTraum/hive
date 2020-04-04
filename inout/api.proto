@@ -48,6 +48,12 @@ message Email {
     string email = 4;
 }
 
+message EmailConfirmation {
+    int64 created = 1;
+    int64 expire = 2;
+    string email = 3;
+}
+
 // Roles API
 
 message GetRoleResponseV1 {
@@ -132,18 +138,19 @@ message CreateEmailResponseV1 {
 
 // Emails Confirmation API
 
-message CreateEmailConfirmationRequestV1 {
-    string email = 1;
-}
-
-message CreateEmailConfirmationBadRequestV1 {
-    repeated string email = 1;
-}
-
 message CreateEmailConfirmationResponseV1 {
-    int64 created = 1;
-    int64 expire = 2;
-    string email = 3;
+    message Request {
+        string email = 1;
+    }
+
+    message ValidationError {
+        repeated string email = 1;
+    }
+
+    oneof data {
+        EmailConfirmation ok = 1;
+        ValidationError validationError = 2;
+    }
 }
 
 // Phones API

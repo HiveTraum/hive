@@ -70,7 +70,7 @@ func EmailsAPIV1(app *app.App) middlewares.ResponseControllerHandler {
 
 func createEmailConfirmationV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
 
-	body := inout.CreateEmailConfirmationRequestV1{}
+	body := inout.CreateEmailConfirmationResponseV1_Request{}
 
 	err := r.ParseBody(&body)
 
@@ -83,14 +83,17 @@ func createEmailConfirmationV1(r *functools.Request, app infrastructure.AppInter
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.CreateEmailConfirmationResponseV1{
-			Created: emailConfirmation.Created,
-			Expire:  emailConfirmation.Expire,
-			Email:   emailConfirmation.Email,
-		}
+			Data: &inout.CreateEmailConfirmationResponseV1_Ok{
+				Ok: &inout.EmailConfirmation{
+					Created: emailConfirmation.Created,
+					Expire:  emailConfirmation.Expire,
+					Email:   emailConfirmation.Email,
+				}}}
 	case enums.IncorrectPhone:
-		return http.StatusBadRequest, &inout.CreateEmailConfirmationBadRequestV1{
-			Email: []string{"Некорректный email"},
-		}
+		return http.StatusBadRequest, &inout.CreateEmailConfirmationResponseV1{
+			Data: &inout.CreateEmailConfirmationResponseV1_ValidationError_{
+				ValidationError: &inout.CreateEmailConfirmationResponseV1_ValidationError{
+					Email: []string{"Некорректный email"}}}}
 	default:
 		return unhandledStatus(r, status)
 	}
