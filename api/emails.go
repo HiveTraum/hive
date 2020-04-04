@@ -14,7 +14,7 @@ import (
 )
 
 func createEmailV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
-	body := inout.CreateEmailRequestV1{}
+	body := inout.CreateEmailResponseV1_Request{}
 	err := r.ParseBody(&body)
 
 	if err != nil {
@@ -26,27 +26,37 @@ func createEmailV1(r *functools.Request, app infrastructure.AppInterface) (int, 
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.CreateEmailResponseV1{
-			Id:      email.Id.Bytes(),
-			Created: email.Created,
-			UserID:  email.UserId.Bytes(),
-			Email:   email.Value,
-		}
+			Data: &inout.CreateEmailResponseV1_Ok{
+				Ok: &inout.Email{
+					Id:      email.Id.Bytes(),
+					Created: email.Created,
+					UserID:  email.UserId.Bytes(),
+					Email:   email.Value,
+				}}}
 	case enums.IncorrectEmailCode:
-		return http.StatusBadRequest, &inout.CreateEmailBadRequestV1{
-			Code: []string{"Неверный код"},
-		}
+		return http.StatusBadRequest, &inout.CreateEmailResponseV1{
+			Data: &inout.CreateEmailResponseV1_ValidationError_{
+				ValidationError: &inout.CreateEmailResponseV1_ValidationError{
+					Code: []string{"Неверный код"},
+				}}}
 	case enums.EmailNotFound:
-		return http.StatusBadRequest, &inout.CreateEmailBadRequestV1{
-			Email: []string{"Не удалось найти код для данного email."},
-		}
+		return http.StatusBadRequest, &inout.CreateEmailResponseV1{
+			Data: &inout.CreateEmailResponseV1_ValidationError_{
+				ValidationError: &inout.CreateEmailResponseV1_ValidationError{
+					Email: []string{"Не удалось найти код для данного email."},
+				}}}
 	case enums.UserNotFound:
-		return http.StatusBadRequest, &inout.CreateEmailBadRequestV1{
-			UserId: []string{"Такого пользователя не существует"},
-		}
+		return http.StatusBadRequest, &inout.CreateEmailResponseV1{
+			Data: &inout.CreateEmailResponseV1_ValidationError_{
+				ValidationError: &inout.CreateEmailResponseV1_ValidationError{
+					UserId: []string{"Такого пользователя не существует"},
+				}}}
 	case enums.IncorrectEmail:
-		return http.StatusBadRequest, &inout.CreateEmailBadRequestV1{
-			Email: []string{"Некорректный email"},
-		}
+		return http.StatusBadRequest, &inout.CreateEmailResponseV1{
+			Data: &inout.CreateEmailResponseV1_ValidationError_{
+				ValidationError: &inout.CreateEmailResponseV1_ValidationError{
+					Email: []string{"Некорректный email"},
+				}}}
 	default:
 		return unhandledStatus(r, status)
 	}

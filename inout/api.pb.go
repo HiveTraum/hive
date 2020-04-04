@@ -38,7 +38,7 @@ func (x Error_ErrorType) String() string {
 	return proto.EnumName(Error_ErrorType_name, int32(x))
 }
 func (Error_ErrorType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{1, 0}
+	return fileDescriptor_api_e983af09c7641dd8, []int{1, 0}
 }
 
 type Pagination struct {
@@ -54,7 +54,7 @@ func (m *Pagination) Reset()         { *m = Pagination{} }
 func (m *Pagination) String() string { return proto.CompactTextString(m) }
 func (*Pagination) ProtoMessage()    {}
 func (*Pagination) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{0}
+	return fileDescriptor_api_e983af09c7641dd8, []int{0}
 }
 func (m *Pagination) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Pagination.Unmarshal(m, b)
@@ -107,7 +107,7 @@ func (m *Error) Reset()         { *m = Error{} }
 func (m *Error) String() string { return proto.CompactTextString(m) }
 func (*Error) ProtoMessage()    {}
 func (*Error) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{1}
+	return fileDescriptor_api_e983af09c7641dd8, []int{1}
 }
 func (m *Error) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Error.Unmarshal(m, b)
@@ -154,7 +154,7 @@ func (m *Role) Reset()         { *m = Role{} }
 func (m *Role) String() string { return proto.CompactTextString(m) }
 func (*Role) ProtoMessage()    {}
 func (*Role) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{2}
+	return fileDescriptor_api_e983af09c7641dd8, []int{2}
 }
 func (m *Role) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Role.Unmarshal(m, b)
@@ -209,7 +209,7 @@ func (m *UserRole) Reset()         { *m = UserRole{} }
 func (m *UserRole) String() string { return proto.CompactTextString(m) }
 func (*UserRole) ProtoMessage()    {}
 func (*UserRole) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{3}
+	return fileDescriptor_api_e983af09c7641dd8, []int{3}
 }
 func (m *UserRole) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UserRole.Unmarshal(m, b)
@@ -271,7 +271,7 @@ func (m *Session) Reset()         { *m = Session{} }
 func (m *Session) String() string { return proto.CompactTextString(m) }
 func (*Session) ProtoMessage()    {}
 func (*Session) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{4}
+	return fileDescriptor_api_e983af09c7641dd8, []int{4}
 }
 func (m *Session) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Session.Unmarshal(m, b)
@@ -319,6 +319,68 @@ func (m *Session) GetExpired() int64 {
 	return 0
 }
 
+type Email struct {
+	Id                   []byte   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Created              int64    `protobuf:"varint,2,opt,name=created,proto3" json:"created,omitempty"`
+	UserID               []byte   `protobuf:"bytes,3,opt,name=userID,proto3" json:"userID,omitempty"`
+	Email                string   `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Email) Reset()         { *m = Email{} }
+func (m *Email) String() string { return proto.CompactTextString(m) }
+func (*Email) ProtoMessage()    {}
+func (*Email) Descriptor() ([]byte, []int) {
+	return fileDescriptor_api_e983af09c7641dd8, []int{5}
+}
+func (m *Email) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Email.Unmarshal(m, b)
+}
+func (m *Email) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Email.Marshal(b, m, deterministic)
+}
+func (dst *Email) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Email.Merge(dst, src)
+}
+func (m *Email) XXX_Size() int {
+	return xxx_messageInfo_Email.Size(m)
+}
+func (m *Email) XXX_DiscardUnknown() {
+	xxx_messageInfo_Email.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Email proto.InternalMessageInfo
+
+func (m *Email) GetId() []byte {
+	if m != nil {
+		return m.Id
+	}
+	return nil
+}
+
+func (m *Email) GetCreated() int64 {
+	if m != nil {
+		return m.Created
+	}
+	return 0
+}
+
+func (m *Email) GetUserID() []byte {
+	if m != nil {
+		return m.UserID
+	}
+	return nil
+}
+
+func (m *Email) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
 type GetRoleResponseV1 struct {
 	Data                 *Role    `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -330,7 +392,7 @@ func (m *GetRoleResponseV1) Reset()         { *m = GetRoleResponseV1{} }
 func (m *GetRoleResponseV1) String() string { return proto.CompactTextString(m) }
 func (*GetRoleResponseV1) ProtoMessage()    {}
 func (*GetRoleResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{5}
+	return fileDescriptor_api_e983af09c7641dd8, []int{6}
 }
 func (m *GetRoleResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetRoleResponseV1.Unmarshal(m, b)
@@ -372,7 +434,7 @@ func (m *CreateRoleResponseV1) Reset()         { *m = CreateRoleResponseV1{} }
 func (m *CreateRoleResponseV1) String() string { return proto.CompactTextString(m) }
 func (*CreateRoleResponseV1) ProtoMessage()    {}
 func (*CreateRoleResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{6}
+	return fileDescriptor_api_e983af09c7641dd8, []int{7}
 }
 func (m *CreateRoleResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateRoleResponseV1.Unmarshal(m, b)
@@ -546,7 +608,7 @@ func (m *CreateRoleResponseV1_Request) Reset()         { *m = CreateRoleResponse
 func (m *CreateRoleResponseV1_Request) String() string { return proto.CompactTextString(m) }
 func (*CreateRoleResponseV1_Request) ProtoMessage()    {}
 func (*CreateRoleResponseV1_Request) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{6, 0}
+	return fileDescriptor_api_e983af09c7641dd8, []int{7, 0}
 }
 func (m *CreateRoleResponseV1_Request) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateRoleResponseV1_Request.Unmarshal(m, b)
@@ -584,7 +646,7 @@ func (m *CreateRoleResponseV1_ValidationError) Reset()         { *m = CreateRole
 func (m *CreateRoleResponseV1_ValidationError) String() string { return proto.CompactTextString(m) }
 func (*CreateRoleResponseV1_ValidationError) ProtoMessage()    {}
 func (*CreateRoleResponseV1_ValidationError) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{6, 1}
+	return fileDescriptor_api_e983af09c7641dd8, []int{7, 1}
 }
 func (m *CreateRoleResponseV1_ValidationError) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateRoleResponseV1_ValidationError.Unmarshal(m, b)
@@ -623,7 +685,7 @@ func (m *ListRoleResponseV1) Reset()         { *m = ListRoleResponseV1{} }
 func (m *ListRoleResponseV1) String() string { return proto.CompactTextString(m) }
 func (*ListRoleResponseV1) ProtoMessage()    {}
 func (*ListRoleResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{7}
+	return fileDescriptor_api_e983af09c7641dd8, []int{8}
 }
 func (m *ListRoleResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRoleResponseV1.Unmarshal(m, b)
@@ -672,7 +734,7 @@ func (m *CreateUserRoleResponseV1) Reset()         { *m = CreateUserRoleResponse
 func (m *CreateUserRoleResponseV1) String() string { return proto.CompactTextString(m) }
 func (*CreateUserRoleResponseV1) ProtoMessage()    {}
 func (*CreateUserRoleResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{8}
+	return fileDescriptor_api_e983af09c7641dd8, []int{9}
 }
 func (m *CreateUserRoleResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateUserRoleResponseV1.Unmarshal(m, b)
@@ -847,7 +909,7 @@ func (m *CreateUserRoleResponseV1_Request) Reset()         { *m = CreateUserRole
 func (m *CreateUserRoleResponseV1_Request) String() string { return proto.CompactTextString(m) }
 func (*CreateUserRoleResponseV1_Request) ProtoMessage()    {}
 func (*CreateUserRoleResponseV1_Request) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{8, 0}
+	return fileDescriptor_api_e983af09c7641dd8, []int{9, 0}
 }
 func (m *CreateUserRoleResponseV1_Request) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateUserRoleResponseV1_Request.Unmarshal(m, b)
@@ -896,7 +958,7 @@ func (m *CreateUserRoleResponseV1_ValidationError) Reset() {
 func (m *CreateUserRoleResponseV1_ValidationError) String() string { return proto.CompactTextString(m) }
 func (*CreateUserRoleResponseV1_ValidationError) ProtoMessage()    {}
 func (*CreateUserRoleResponseV1_ValidationError) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{8, 1}
+	return fileDescriptor_api_e983af09c7641dd8, []int{9, 1}
 }
 func (m *CreateUserRoleResponseV1_ValidationError) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateUserRoleResponseV1_ValidationError.Unmarshal(m, b)
@@ -948,7 +1010,7 @@ func (m *GetUserRoleResponseV1) Reset()         { *m = GetUserRoleResponseV1{} }
 func (m *GetUserRoleResponseV1) String() string { return proto.CompactTextString(m) }
 func (*GetUserRoleResponseV1) ProtoMessage()    {}
 func (*GetUserRoleResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{9}
+	return fileDescriptor_api_e983af09c7641dd8, []int{10}
 }
 func (m *GetUserRoleResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetUserRoleResponseV1.Unmarshal(m, b)
@@ -987,7 +1049,7 @@ func (m *ListUserRolesResponseV1) Reset()         { *m = ListUserRolesResponseV1
 func (m *ListUserRolesResponseV1) String() string { return proto.CompactTextString(m) }
 func (*ListUserRolesResponseV1) ProtoMessage()    {}
 func (*ListUserRolesResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{10}
+	return fileDescriptor_api_e983af09c7641dd8, []int{11}
 }
 func (m *ListUserRolesResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListUserRolesResponseV1.Unmarshal(m, b)
@@ -1021,129 +1083,22 @@ func (m *ListUserRolesResponseV1) GetData() []*UserRole {
 	return nil
 }
 
-type CreateEmailRequestV1 struct {
-	Email                string   `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	Code                 string   `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
-	UserID               []byte   `protobuf:"bytes,3,opt,name=userID,proto3" json:"userID,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *CreateEmailRequestV1) Reset()         { *m = CreateEmailRequestV1{} }
-func (m *CreateEmailRequestV1) String() string { return proto.CompactTextString(m) }
-func (*CreateEmailRequestV1) ProtoMessage()    {}
-func (*CreateEmailRequestV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{11}
-}
-func (m *CreateEmailRequestV1) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_CreateEmailRequestV1.Unmarshal(m, b)
-}
-func (m *CreateEmailRequestV1) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_CreateEmailRequestV1.Marshal(b, m, deterministic)
-}
-func (dst *CreateEmailRequestV1) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CreateEmailRequestV1.Merge(dst, src)
-}
-func (m *CreateEmailRequestV1) XXX_Size() int {
-	return xxx_messageInfo_CreateEmailRequestV1.Size(m)
-}
-func (m *CreateEmailRequestV1) XXX_DiscardUnknown() {
-	xxx_messageInfo_CreateEmailRequestV1.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_CreateEmailRequestV1 proto.InternalMessageInfo
-
-func (m *CreateEmailRequestV1) GetEmail() string {
-	if m != nil {
-		return m.Email
-	}
-	return ""
-}
-
-func (m *CreateEmailRequestV1) GetCode() string {
-	if m != nil {
-		return m.Code
-	}
-	return ""
-}
-
-func (m *CreateEmailRequestV1) GetUserID() []byte {
-	if m != nil {
-		return m.UserID
-	}
-	return nil
-}
-
-type CreateEmailBadRequestV1 struct {
-	Email                []string `protobuf:"bytes,1,rep,name=email,proto3" json:"email,omitempty"`
-	Code                 []string `protobuf:"bytes,2,rep,name=code,proto3" json:"code,omitempty"`
-	UserId               []string `protobuf:"bytes,3,rep,name=userId,proto3" json:"userId,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *CreateEmailBadRequestV1) Reset()         { *m = CreateEmailBadRequestV1{} }
-func (m *CreateEmailBadRequestV1) String() string { return proto.CompactTextString(m) }
-func (*CreateEmailBadRequestV1) ProtoMessage()    {}
-func (*CreateEmailBadRequestV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{12}
-}
-func (m *CreateEmailBadRequestV1) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_CreateEmailBadRequestV1.Unmarshal(m, b)
-}
-func (m *CreateEmailBadRequestV1) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_CreateEmailBadRequestV1.Marshal(b, m, deterministic)
-}
-func (dst *CreateEmailBadRequestV1) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CreateEmailBadRequestV1.Merge(dst, src)
-}
-func (m *CreateEmailBadRequestV1) XXX_Size() int {
-	return xxx_messageInfo_CreateEmailBadRequestV1.Size(m)
-}
-func (m *CreateEmailBadRequestV1) XXX_DiscardUnknown() {
-	xxx_messageInfo_CreateEmailBadRequestV1.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_CreateEmailBadRequestV1 proto.InternalMessageInfo
-
-func (m *CreateEmailBadRequestV1) GetEmail() []string {
-	if m != nil {
-		return m.Email
-	}
-	return nil
-}
-
-func (m *CreateEmailBadRequestV1) GetCode() []string {
-	if m != nil {
-		return m.Code
-	}
-	return nil
-}
-
-func (m *CreateEmailBadRequestV1) GetUserId() []string {
-	if m != nil {
-		return m.UserId
-	}
-	return nil
-}
-
 type CreateEmailResponseV1 struct {
-	Id                   []byte   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Created              int64    `protobuf:"varint,2,opt,name=created,proto3" json:"created,omitempty"`
-	UserID               []byte   `protobuf:"bytes,3,opt,name=userID,proto3" json:"userID,omitempty"`
-	Email                string   `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	// Types that are valid to be assigned to Data:
+	//	*CreateEmailResponseV1_Ok
+	//	*CreateEmailResponseV1_ValidationError_
+	//	*CreateEmailResponseV1_Error
+	Data                 isCreateEmailResponseV1_Data `protobuf_oneof:"data"`
+	XXX_NoUnkeyedLiteral struct{}                     `json:"-"`
+	XXX_unrecognized     []byte                       `json:"-"`
+	XXX_sizecache        int32                        `json:"-"`
 }
 
 func (m *CreateEmailResponseV1) Reset()         { *m = CreateEmailResponseV1{} }
 func (m *CreateEmailResponseV1) String() string { return proto.CompactTextString(m) }
 func (*CreateEmailResponseV1) ProtoMessage()    {}
 func (*CreateEmailResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{13}
+	return fileDescriptor_api_e983af09c7641dd8, []int{12}
 }
 func (m *CreateEmailResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateEmailResponseV1.Unmarshal(m, b)
@@ -1163,32 +1118,255 @@ func (m *CreateEmailResponseV1) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CreateEmailResponseV1 proto.InternalMessageInfo
 
-func (m *CreateEmailResponseV1) GetId() []byte {
+type isCreateEmailResponseV1_Data interface {
+	isCreateEmailResponseV1_Data()
+}
+
+type CreateEmailResponseV1_Ok struct {
+	Ok *Email `protobuf:"bytes,1,opt,name=ok,proto3,oneof"`
+}
+
+type CreateEmailResponseV1_ValidationError_ struct {
+	ValidationError *CreateEmailResponseV1_ValidationError `protobuf:"bytes,2,opt,name=validationError,proto3,oneof"`
+}
+
+type CreateEmailResponseV1_Error struct {
+	Error *Error `protobuf:"bytes,3,opt,name=error,proto3,oneof"`
+}
+
+func (*CreateEmailResponseV1_Ok) isCreateEmailResponseV1_Data() {}
+
+func (*CreateEmailResponseV1_ValidationError_) isCreateEmailResponseV1_Data() {}
+
+func (*CreateEmailResponseV1_Error) isCreateEmailResponseV1_Data() {}
+
+func (m *CreateEmailResponseV1) GetData() isCreateEmailResponseV1_Data {
 	if m != nil {
-		return m.Id
+		return m.Data
 	}
 	return nil
 }
 
-func (m *CreateEmailResponseV1) GetCreated() int64 {
-	if m != nil {
-		return m.Created
+func (m *CreateEmailResponseV1) GetOk() *Email {
+	if x, ok := m.GetData().(*CreateEmailResponseV1_Ok); ok {
+		return x.Ok
 	}
-	return 0
+	return nil
 }
 
-func (m *CreateEmailResponseV1) GetUserID() []byte {
+func (m *CreateEmailResponseV1) GetValidationError() *CreateEmailResponseV1_ValidationError {
+	if x, ok := m.GetData().(*CreateEmailResponseV1_ValidationError_); ok {
+		return x.ValidationError
+	}
+	return nil
+}
+
+func (m *CreateEmailResponseV1) GetError() *Error {
+	if x, ok := m.GetData().(*CreateEmailResponseV1_Error); ok {
+		return x.Error
+	}
+	return nil
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*CreateEmailResponseV1) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _CreateEmailResponseV1_OneofMarshaler, _CreateEmailResponseV1_OneofUnmarshaler, _CreateEmailResponseV1_OneofSizer, []interface{}{
+		(*CreateEmailResponseV1_Ok)(nil),
+		(*CreateEmailResponseV1_ValidationError_)(nil),
+		(*CreateEmailResponseV1_Error)(nil),
+	}
+}
+
+func _CreateEmailResponseV1_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*CreateEmailResponseV1)
+	// data
+	switch x := m.Data.(type) {
+	case *CreateEmailResponseV1_Ok:
+		b.EncodeVarint(1<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Ok); err != nil {
+			return err
+		}
+	case *CreateEmailResponseV1_ValidationError_:
+		b.EncodeVarint(2<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.ValidationError); err != nil {
+			return err
+		}
+	case *CreateEmailResponseV1_Error:
+		b.EncodeVarint(3<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Error); err != nil {
+			return err
+		}
+	case nil:
+	default:
+		return fmt.Errorf("CreateEmailResponseV1.Data has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _CreateEmailResponseV1_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*CreateEmailResponseV1)
+	switch tag {
+	case 1: // data.ok
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(Email)
+		err := b.DecodeMessage(msg)
+		m.Data = &CreateEmailResponseV1_Ok{msg}
+		return true, err
+	case 2: // data.validationError
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(CreateEmailResponseV1_ValidationError)
+		err := b.DecodeMessage(msg)
+		m.Data = &CreateEmailResponseV1_ValidationError_{msg}
+		return true, err
+	case 3: // data.error
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(Error)
+		err := b.DecodeMessage(msg)
+		m.Data = &CreateEmailResponseV1_Error{msg}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _CreateEmailResponseV1_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*CreateEmailResponseV1)
+	// data
+	switch x := m.Data.(type) {
+	case *CreateEmailResponseV1_Ok:
+		s := proto.Size(x.Ok)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *CreateEmailResponseV1_ValidationError_:
+		s := proto.Size(x.ValidationError)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *CreateEmailResponseV1_Error:
+		s := proto.Size(x.Error)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
+}
+
+type CreateEmailResponseV1_Request struct {
+	Email                string   `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	Code                 string   `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	UserID               []byte   `protobuf:"bytes,3,opt,name=userID,proto3" json:"userID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CreateEmailResponseV1_Request) Reset()         { *m = CreateEmailResponseV1_Request{} }
+func (m *CreateEmailResponseV1_Request) String() string { return proto.CompactTextString(m) }
+func (*CreateEmailResponseV1_Request) ProtoMessage()    {}
+func (*CreateEmailResponseV1_Request) Descriptor() ([]byte, []int) {
+	return fileDescriptor_api_e983af09c7641dd8, []int{12, 0}
+}
+func (m *CreateEmailResponseV1_Request) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateEmailResponseV1_Request.Unmarshal(m, b)
+}
+func (m *CreateEmailResponseV1_Request) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateEmailResponseV1_Request.Marshal(b, m, deterministic)
+}
+func (dst *CreateEmailResponseV1_Request) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateEmailResponseV1_Request.Merge(dst, src)
+}
+func (m *CreateEmailResponseV1_Request) XXX_Size() int {
+	return xxx_messageInfo_CreateEmailResponseV1_Request.Size(m)
+}
+func (m *CreateEmailResponseV1_Request) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateEmailResponseV1_Request.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateEmailResponseV1_Request proto.InternalMessageInfo
+
+func (m *CreateEmailResponseV1_Request) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *CreateEmailResponseV1_Request) GetCode() string {
+	if m != nil {
+		return m.Code
+	}
+	return ""
+}
+
+func (m *CreateEmailResponseV1_Request) GetUserID() []byte {
 	if m != nil {
 		return m.UserID
 	}
 	return nil
 }
 
-func (m *CreateEmailResponseV1) GetEmail() string {
+type CreateEmailResponseV1_ValidationError struct {
+	Email                []string `protobuf:"bytes,1,rep,name=email,proto3" json:"email,omitempty"`
+	Code                 []string `protobuf:"bytes,2,rep,name=code,proto3" json:"code,omitempty"`
+	UserId               []string `protobuf:"bytes,3,rep,name=userId,proto3" json:"userId,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CreateEmailResponseV1_ValidationError) Reset()         { *m = CreateEmailResponseV1_ValidationError{} }
+func (m *CreateEmailResponseV1_ValidationError) String() string { return proto.CompactTextString(m) }
+func (*CreateEmailResponseV1_ValidationError) ProtoMessage()    {}
+func (*CreateEmailResponseV1_ValidationError) Descriptor() ([]byte, []int) {
+	return fileDescriptor_api_e983af09c7641dd8, []int{12, 1}
+}
+func (m *CreateEmailResponseV1_ValidationError) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateEmailResponseV1_ValidationError.Unmarshal(m, b)
+}
+func (m *CreateEmailResponseV1_ValidationError) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateEmailResponseV1_ValidationError.Marshal(b, m, deterministic)
+}
+func (dst *CreateEmailResponseV1_ValidationError) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateEmailResponseV1_ValidationError.Merge(dst, src)
+}
+func (m *CreateEmailResponseV1_ValidationError) XXX_Size() int {
+	return xxx_messageInfo_CreateEmailResponseV1_ValidationError.Size(m)
+}
+func (m *CreateEmailResponseV1_ValidationError) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateEmailResponseV1_ValidationError.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateEmailResponseV1_ValidationError proto.InternalMessageInfo
+
+func (m *CreateEmailResponseV1_ValidationError) GetEmail() []string {
 	if m != nil {
 		return m.Email
 	}
-	return ""
+	return nil
+}
+
+func (m *CreateEmailResponseV1_ValidationError) GetCode() []string {
+	if m != nil {
+		return m.Code
+	}
+	return nil
+}
+
+func (m *CreateEmailResponseV1_ValidationError) GetUserId() []string {
+	if m != nil {
+		return m.UserId
+	}
+	return nil
 }
 
 type CreateEmailConfirmationRequestV1 struct {
@@ -1202,7 +1380,7 @@ func (m *CreateEmailConfirmationRequestV1) Reset()         { *m = CreateEmailCon
 func (m *CreateEmailConfirmationRequestV1) String() string { return proto.CompactTextString(m) }
 func (*CreateEmailConfirmationRequestV1) ProtoMessage()    {}
 func (*CreateEmailConfirmationRequestV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{14}
+	return fileDescriptor_api_e983af09c7641dd8, []int{13}
 }
 func (m *CreateEmailConfirmationRequestV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateEmailConfirmationRequestV1.Unmarshal(m, b)
@@ -1240,7 +1418,7 @@ func (m *CreateEmailConfirmationBadRequestV1) Reset()         { *m = CreateEmail
 func (m *CreateEmailConfirmationBadRequestV1) String() string { return proto.CompactTextString(m) }
 func (*CreateEmailConfirmationBadRequestV1) ProtoMessage()    {}
 func (*CreateEmailConfirmationBadRequestV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{15}
+	return fileDescriptor_api_e983af09c7641dd8, []int{14}
 }
 func (m *CreateEmailConfirmationBadRequestV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateEmailConfirmationBadRequestV1.Unmarshal(m, b)
@@ -1280,7 +1458,7 @@ func (m *CreateEmailConfirmationResponseV1) Reset()         { *m = CreateEmailCo
 func (m *CreateEmailConfirmationResponseV1) String() string { return proto.CompactTextString(m) }
 func (*CreateEmailConfirmationResponseV1) ProtoMessage()    {}
 func (*CreateEmailConfirmationResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{16}
+	return fileDescriptor_api_e983af09c7641dd8, []int{15}
 }
 func (m *CreateEmailConfirmationResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateEmailConfirmationResponseV1.Unmarshal(m, b)
@@ -1335,7 +1513,7 @@ func (m *CreatePhoneRequestV1) Reset()         { *m = CreatePhoneRequestV1{} }
 func (m *CreatePhoneRequestV1) String() string { return proto.CompactTextString(m) }
 func (*CreatePhoneRequestV1) ProtoMessage()    {}
 func (*CreatePhoneRequestV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{17}
+	return fileDescriptor_api_e983af09c7641dd8, []int{16}
 }
 func (m *CreatePhoneRequestV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreatePhoneRequestV1.Unmarshal(m, b)
@@ -1397,7 +1575,7 @@ func (m *CreatePhoneBadRequestV1) Reset()         { *m = CreatePhoneBadRequestV1
 func (m *CreatePhoneBadRequestV1) String() string { return proto.CompactTextString(m) }
 func (*CreatePhoneBadRequestV1) ProtoMessage()    {}
 func (*CreatePhoneBadRequestV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{18}
+	return fileDescriptor_api_e983af09c7641dd8, []int{17}
 }
 func (m *CreatePhoneBadRequestV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreatePhoneBadRequestV1.Unmarshal(m, b)
@@ -1460,7 +1638,7 @@ func (m *CreatePhoneResponseV1) Reset()         { *m = CreatePhoneResponseV1{} }
 func (m *CreatePhoneResponseV1) String() string { return proto.CompactTextString(m) }
 func (*CreatePhoneResponseV1) ProtoMessage()    {}
 func (*CreatePhoneResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{19}
+	return fileDescriptor_api_e983af09c7641dd8, []int{18}
 }
 func (m *CreatePhoneResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreatePhoneResponseV1.Unmarshal(m, b)
@@ -1527,7 +1705,7 @@ func (m *CreatePhoneConfirmationRequestV1) Reset()         { *m = CreatePhoneCon
 func (m *CreatePhoneConfirmationRequestV1) String() string { return proto.CompactTextString(m) }
 func (*CreatePhoneConfirmationRequestV1) ProtoMessage()    {}
 func (*CreatePhoneConfirmationRequestV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{20}
+	return fileDescriptor_api_e983af09c7641dd8, []int{19}
 }
 func (m *CreatePhoneConfirmationRequestV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreatePhoneConfirmationRequestV1.Unmarshal(m, b)
@@ -1573,7 +1751,7 @@ func (m *CreatePhoneConfirmationBadRequestV1) Reset()         { *m = CreatePhone
 func (m *CreatePhoneConfirmationBadRequestV1) String() string { return proto.CompactTextString(m) }
 func (*CreatePhoneConfirmationBadRequestV1) ProtoMessage()    {}
 func (*CreatePhoneConfirmationBadRequestV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{21}
+	return fileDescriptor_api_e983af09c7641dd8, []int{20}
 }
 func (m *CreatePhoneConfirmationBadRequestV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreatePhoneConfirmationBadRequestV1.Unmarshal(m, b)
@@ -1621,7 +1799,7 @@ func (m *CreatePhoneConfirmationResponseV1) Reset()         { *m = CreatePhoneCo
 func (m *CreatePhoneConfirmationResponseV1) String() string { return proto.CompactTextString(m) }
 func (*CreatePhoneConfirmationResponseV1) ProtoMessage()    {}
 func (*CreatePhoneConfirmationResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{22}
+	return fileDescriptor_api_e983af09c7641dd8, []int{21}
 }
 func (m *CreatePhoneConfirmationResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreatePhoneConfirmationResponseV1.Unmarshal(m, b)
@@ -1681,7 +1859,7 @@ func (m *CreatePasswordRequestV1) Reset()         { *m = CreatePasswordRequestV1
 func (m *CreatePasswordRequestV1) String() string { return proto.CompactTextString(m) }
 func (*CreatePasswordRequestV1) ProtoMessage()    {}
 func (*CreatePasswordRequestV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{23}
+	return fileDescriptor_api_e983af09c7641dd8, []int{22}
 }
 func (m *CreatePasswordRequestV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreatePasswordRequestV1.Unmarshal(m, b)
@@ -1727,7 +1905,7 @@ func (m *CreatePasswordBadRequestResponseV1) Reset()         { *m = CreatePasswo
 func (m *CreatePasswordBadRequestResponseV1) String() string { return proto.CompactTextString(m) }
 func (*CreatePasswordBadRequestResponseV1) ProtoMessage()    {}
 func (*CreatePasswordBadRequestResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{24}
+	return fileDescriptor_api_e983af09c7641dd8, []int{23}
 }
 func (m *CreatePasswordBadRequestResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreatePasswordBadRequestResponseV1.Unmarshal(m, b)
@@ -1774,7 +1952,7 @@ func (m *CreatePasswordResponseV1) Reset()         { *m = CreatePasswordResponse
 func (m *CreatePasswordResponseV1) String() string { return proto.CompactTextString(m) }
 func (*CreatePasswordResponseV1) ProtoMessage()    {}
 func (*CreatePasswordResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{25}
+	return fileDescriptor_api_e983af09c7641dd8, []int{24}
 }
 func (m *CreatePasswordResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreatePasswordResponseV1.Unmarshal(m, b)
@@ -1831,7 +2009,7 @@ func (m *CreateUserRequestV1) Reset()         { *m = CreateUserRequestV1{} }
 func (m *CreateUserRequestV1) String() string { return proto.CompactTextString(m) }
 func (*CreateUserRequestV1) ProtoMessage()    {}
 func (*CreateUserRequestV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{26}
+	return fileDescriptor_api_e983af09c7641dd8, []int{25}
 }
 func (m *CreateUserRequestV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateUserRequestV1.Unmarshal(m, b)
@@ -1910,7 +2088,7 @@ func (m *CreateUserBadRequestV1) Reset()         { *m = CreateUserBadRequestV1{}
 func (m *CreateUserBadRequestV1) String() string { return proto.CompactTextString(m) }
 func (*CreateUserBadRequestV1) ProtoMessage()    {}
 func (*CreateUserBadRequestV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{27}
+	return fileDescriptor_api_e983af09c7641dd8, []int{26}
 }
 func (m *CreateUserBadRequestV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateUserBadRequestV1.Unmarshal(m, b)
@@ -1991,7 +2169,7 @@ func (m *GetUserResponseV1) Reset()         { *m = GetUserResponseV1{} }
 func (m *GetUserResponseV1) String() string { return proto.CompactTextString(m) }
 func (*GetUserResponseV1) ProtoMessage()    {}
 func (*GetUserResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{28}
+	return fileDescriptor_api_e983af09c7641dd8, []int{27}
 }
 func (m *GetUserResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetUserResponseV1.Unmarshal(m, b)
@@ -2036,7 +2214,7 @@ func (m *ListUserResponseV1) Reset()         { *m = ListUserResponseV1{} }
 func (m *ListUserResponseV1) String() string { return proto.CompactTextString(m) }
 func (*ListUserResponseV1) ProtoMessage()    {}
 func (*ListUserResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{29}
+	return fileDescriptor_api_e983af09c7641dd8, []int{28}
 }
 func (m *ListUserResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListUserResponseV1.Unmarshal(m, b)
@@ -2077,7 +2255,7 @@ func (m *CreateSessionResponseV1) Reset()         { *m = CreateSessionResponseV1
 func (m *CreateSessionResponseV1) String() string { return proto.CompactTextString(m) }
 func (*CreateSessionResponseV1) ProtoMessage()    {}
 func (*CreateSessionResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{30}
+	return fileDescriptor_api_e983af09c7641dd8, []int{29}
 }
 func (m *CreateSessionResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateSessionResponseV1.Unmarshal(m, b)
@@ -2227,7 +2405,7 @@ func (m *CreateSessionResponseV1_Request) Reset()         { *m = CreateSessionRe
 func (m *CreateSessionResponseV1_Request) String() string { return proto.CompactTextString(m) }
 func (*CreateSessionResponseV1_Request) ProtoMessage()    {}
 func (*CreateSessionResponseV1_Request) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{30, 0}
+	return fileDescriptor_api_e983af09c7641dd8, []int{29, 0}
 }
 func (m *CreateSessionResponseV1_Request) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateSessionResponseV1_Request.Unmarshal(m, b)
@@ -2485,7 +2663,7 @@ func (m *CreateSessionResponseV1_Request_PhoneAndPassword) String() string {
 }
 func (*CreateSessionResponseV1_Request_PhoneAndPassword) ProtoMessage() {}
 func (*CreateSessionResponseV1_Request_PhoneAndPassword) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{30, 0, 0}
+	return fileDescriptor_api_e983af09c7641dd8, []int{29, 0, 0}
 }
 func (m *CreateSessionResponseV1_Request_PhoneAndPassword) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateSessionResponseV1_Request_PhoneAndPassword.Unmarshal(m, b)
@@ -2543,7 +2721,7 @@ func (m *CreateSessionResponseV1_Request_PhoneAndCode) String() string {
 }
 func (*CreateSessionResponseV1_Request_PhoneAndCode) ProtoMessage() {}
 func (*CreateSessionResponseV1_Request_PhoneAndCode) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{30, 0, 1}
+	return fileDescriptor_api_e983af09c7641dd8, []int{29, 0, 1}
 }
 func (m *CreateSessionResponseV1_Request_PhoneAndCode) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateSessionResponseV1_Request_PhoneAndCode.Unmarshal(m, b)
@@ -2600,7 +2778,7 @@ func (m *CreateSessionResponseV1_Request_EmailAndPassword) String() string {
 }
 func (*CreateSessionResponseV1_Request_EmailAndPassword) ProtoMessage() {}
 func (*CreateSessionResponseV1_Request_EmailAndPassword) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{30, 0, 2}
+	return fileDescriptor_api_e983af09c7641dd8, []int{29, 0, 2}
 }
 func (m *CreateSessionResponseV1_Request_EmailAndPassword) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateSessionResponseV1_Request_EmailAndPassword.Unmarshal(m, b)
@@ -2650,7 +2828,7 @@ func (m *CreateSessionResponseV1_Request_EmailAndCode) String() string {
 }
 func (*CreateSessionResponseV1_Request_EmailAndCode) ProtoMessage() {}
 func (*CreateSessionResponseV1_Request_EmailAndCode) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{30, 0, 3}
+	return fileDescriptor_api_e983af09c7641dd8, []int{29, 0, 3}
 }
 func (m *CreateSessionResponseV1_Request_EmailAndCode) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateSessionResponseV1_Request_EmailAndCode.Unmarshal(m, b)
@@ -2698,7 +2876,7 @@ func (m *CreateSessionResponseV1_Request_Tokens) Reset() {
 func (m *CreateSessionResponseV1_Request_Tokens) String() string { return proto.CompactTextString(m) }
 func (*CreateSessionResponseV1_Request_Tokens) ProtoMessage()    {}
 func (*CreateSessionResponseV1_Request_Tokens) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{30, 0, 4}
+	return fileDescriptor_api_e983af09c7641dd8, []int{29, 0, 4}
 }
 func (m *CreateSessionResponseV1_Request_Tokens) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateSessionResponseV1_Request_Tokens.Unmarshal(m, b)
@@ -2752,7 +2930,7 @@ func (m *CreateSessionResponseV1_ValidationError) Reset() {
 func (m *CreateSessionResponseV1_ValidationError) String() string { return proto.CompactTextString(m) }
 func (*CreateSessionResponseV1_ValidationError) ProtoMessage()    {}
 func (*CreateSessionResponseV1_ValidationError) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{30, 1}
+	return fileDescriptor_api_e983af09c7641dd8, []int{29, 1}
 }
 func (m *CreateSessionResponseV1_ValidationError) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateSessionResponseV1_ValidationError.Unmarshal(m, b)
@@ -2841,7 +3019,7 @@ func (m *GetSecretResponseV1) Reset()         { *m = GetSecretResponseV1{} }
 func (m *GetSecretResponseV1) String() string { return proto.CompactTextString(m) }
 func (*GetSecretResponseV1) ProtoMessage()    {}
 func (*GetSecretResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{31}
+	return fileDescriptor_api_e983af09c7641dd8, []int{30}
 }
 func (m *GetSecretResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetSecretResponseV1.Unmarshal(m, b)
@@ -2897,7 +3075,7 @@ func (m *GetUserViewResponseV1) Reset()         { *m = GetUserViewResponseV1{} }
 func (m *GetUserViewResponseV1) String() string { return proto.CompactTextString(m) }
 func (*GetUserViewResponseV1) ProtoMessage()    {}
 func (*GetUserViewResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{32}
+	return fileDescriptor_api_e983af09c7641dd8, []int{31}
 }
 func (m *GetUserViewResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetUserViewResponseV1.Unmarshal(m, b)
@@ -2964,7 +3142,7 @@ func (m *ListUserViewResponseV1) Reset()         { *m = ListUserViewResponseV1{}
 func (m *ListUserViewResponseV1) String() string { return proto.CompactTextString(m) }
 func (*ListUserViewResponseV1) ProtoMessage()    {}
 func (*ListUserViewResponseV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_api_c0fddf39ade83ed8, []int{33}
+	return fileDescriptor_api_e983af09c7641dd8, []int{32}
 }
 func (m *ListUserViewResponseV1) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListUserViewResponseV1.Unmarshal(m, b)
@@ -3004,6 +3182,7 @@ func init() {
 	proto.RegisterType((*Role)(nil), "inout.Role")
 	proto.RegisterType((*UserRole)(nil), "inout.UserRole")
 	proto.RegisterType((*Session)(nil), "inout.Session")
+	proto.RegisterType((*Email)(nil), "inout.Email")
 	proto.RegisterType((*GetRoleResponseV1)(nil), "inout.GetRoleResponseV1")
 	proto.RegisterType((*CreateRoleResponseV1)(nil), "inout.CreateRoleResponseV1")
 	proto.RegisterType((*CreateRoleResponseV1_Request)(nil), "inout.CreateRoleResponseV1.Request")
@@ -3014,9 +3193,9 @@ func init() {
 	proto.RegisterType((*CreateUserRoleResponseV1_ValidationError)(nil), "inout.CreateUserRoleResponseV1.ValidationError")
 	proto.RegisterType((*GetUserRoleResponseV1)(nil), "inout.GetUserRoleResponseV1")
 	proto.RegisterType((*ListUserRolesResponseV1)(nil), "inout.ListUserRolesResponseV1")
-	proto.RegisterType((*CreateEmailRequestV1)(nil), "inout.CreateEmailRequestV1")
-	proto.RegisterType((*CreateEmailBadRequestV1)(nil), "inout.CreateEmailBadRequestV1")
 	proto.RegisterType((*CreateEmailResponseV1)(nil), "inout.CreateEmailResponseV1")
+	proto.RegisterType((*CreateEmailResponseV1_Request)(nil), "inout.CreateEmailResponseV1.Request")
+	proto.RegisterType((*CreateEmailResponseV1_ValidationError)(nil), "inout.CreateEmailResponseV1.ValidationError")
 	proto.RegisterType((*CreateEmailConfirmationRequestV1)(nil), "inout.CreateEmailConfirmationRequestV1")
 	proto.RegisterType((*CreateEmailConfirmationBadRequestV1)(nil), "inout.CreateEmailConfirmationBadRequestV1")
 	proto.RegisterType((*CreateEmailConfirmationResponseV1)(nil), "inout.CreateEmailConfirmationResponseV1")
@@ -3047,94 +3226,96 @@ func init() {
 	proto.RegisterEnum("inout.Error_ErrorType", Error_ErrorType_name, Error_ErrorType_value)
 }
 
-func init() { proto.RegisterFile("api.proto", fileDescriptor_api_c0fddf39ade83ed8) }
+func init() { proto.RegisterFile("api.proto", fileDescriptor_api_e983af09c7641dd8) }
 
-var fileDescriptor_api_c0fddf39ade83ed8 = []byte{
-	// 1372 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x58, 0x6d, 0x6f, 0x1b, 0x45,
-	0x10, 0xf6, 0xdd, 0xfa, 0x25, 0x19, 0x5b, 0x8d, 0x7b, 0x6d, 0x53, 0xcb, 0x2a, 0xaa, 0xbb, 0x41,
-	0xa2, 0x2a, 0x60, 0x48, 0x8a, 0x44, 0x11, 0xf0, 0xa1, 0x79, 0x21, 0xae, 0x84, 0xaa, 0xe8, 0xda,
-	0x04, 0x4a, 0x11, 0xd2, 0xe1, 0xdb, 0xc4, 0xa7, 0x38, 0x77, 0xd7, 0xdb, 0x73, 0xda, 0x20, 0xf1,
-	0xa1, 0x02, 0xd1, 0x9f, 0xc0, 0x07, 0x7e, 0x0f, 0xfc, 0x0c, 0xc4, 0x0f, 0xe0, 0x47, 0xa0, 0x7d,
-	0xbb, 0xdb, 0x7b, 0xab, 0xf3, 0xc6, 0x97, 0x28, 0x33, 0xb7, 0x33, 0x3b, 0xf3, 0xcc, 0xb3, 0xb3,
-	0xb3, 0x86, 0x45, 0x27, 0xf4, 0x86, 0x61, 0x14, 0xc4, 0x81, 0xd5, 0xf0, 0xfc, 0x60, 0x16, 0xe3,
-	0x1f, 0x00, 0x76, 0x9c, 0x03, 0xcf, 0x77, 0x62, 0x2f, 0xf0, 0xad, 0x01, 0xb4, 0x27, 0x0e, 0xdd,
-	0x89, 0xc8, 0xb1, 0x17, 0xcc, 0x68, 0xcf, 0x18, 0x18, 0x77, 0x17, 0x6c, 0x5d, 0x65, 0xf5, 0xa0,
-	0x35, 0x71, 0xe8, 0x63, 0xf2, 0x2a, 0xee, 0x99, 0xfc, 0xab, 0x12, 0xad, 0xeb, 0xd0, 0x18, 0x07,
-	0x33, 0x3f, 0xee, 0xa1, 0x81, 0x71, 0x17, 0xd9, 0x42, 0xc0, 0xaf, 0x0d, 0x68, 0x6c, 0x45, 0x51,
-	0x10, 0x31, 0xcb, 0x23, 0x42, 0xa9, 0x73, 0x40, 0xb8, 0xdf, 0x45, 0x5b, 0x89, 0xd6, 0x3d, 0xa8,
-	0xc7, 0x27, 0x21, 0xe1, 0x0e, 0xaf, 0xac, 0x2d, 0x0f, 0x79, 0x64, 0x43, 0x6e, 0x25, 0xfe, 0x3e,
-	0x3d, 0x09, 0x89, 0xcd, 0xd7, 0xe0, 0x35, 0x58, 0x4c, 0x54, 0xd6, 0x35, 0x58, 0xda, 0xf5, 0x9d,
-	0x59, 0x3c, 0x21, 0x7e, 0xec, 0x8d, 0x9d, 0x98, 0xb8, 0xdd, 0x9a, 0xd5, 0x85, 0x8e, 0x50, 0x06,
-	0x91, 0xf7, 0x13, 0x71, 0xbb, 0x06, 0xfe, 0x0a, 0xea, 0x76, 0x30, 0x25, 0xd6, 0x15, 0x30, 0x3d,
-	0x97, 0x6f, 0xde, 0xb1, 0x4d, 0xcf, 0x65, 0x11, 0x8d, 0x23, 0xc2, 0xcc, 0xf8, 0xd6, 0xc8, 0x56,
-	0x22, 0xcb, 0x25, 0xf6, 0xe2, 0x29, 0xe1, 0xb9, 0x2c, 0xda, 0x42, 0xc0, 0x2e, 0x2c, 0xec, 0x52,
-	0x12, 0x9d, 0xd1, 0xd7, 0x32, 0x34, 0x67, 0x94, 0x44, 0x8f, 0x36, 0xb9, 0xb3, 0x8e, 0x2d, 0x25,
-	0xa6, 0x8f, 0x82, 0x29, 0x79, 0xb4, 0xd9, 0xab, 0x0b, 0xbd, 0x90, 0xf0, 0x2f, 0x06, 0xb4, 0x9e,
-	0x10, 0x4a, 0x59, 0x3d, 0x30, 0x74, 0x22, 0xb2, 0x1f, 0x11, 0x3a, 0x79, 0x1a, 0x1c, 0x12, 0x5f,
-	0x02, 0x97, 0xd1, 0xb1, 0x9a, 0x39, 0xe3, 0x31, 0xa1, 0x54, 0x2c, 0x31, 0xf9, 0x12, 0x5d, 0xa5,
-	0xc7, 0x86, 0xb2, 0xb1, 0xf5, 0xa0, 0x45, 0x5e, 0x85, 0x5e, 0x44, 0x5c, 0x1e, 0x04, 0xb2, 0x95,
-	0x88, 0x3f, 0x81, 0xab, 0xdb, 0x24, 0x66, 0xa9, 0xda, 0x84, 0x86, 0x81, 0x4f, 0xc9, 0xde, 0xaa,
-	0x75, 0x1b, 0xea, 0xae, 0x13, 0x3b, 0x3c, 0x8c, 0xf6, 0x5a, 0x5b, 0x16, 0x8a, 0x2f, 0xe2, 0x1f,
-	0xf0, 0x6f, 0x26, 0x5c, 0xdf, 0xe0, 0xbe, 0x73, 0x96, 0xef, 0x80, 0x19, 0x1c, 0x96, 0xd8, 0x8d,
-	0x6a, 0xb6, 0x19, 0x1c, 0x5a, 0xdf, 0xc0, 0xd2, 0xb1, 0x33, 0xf5, 0x5c, 0xce, 0x42, 0x5e, 0x5f,
-	0x9e, 0x47, 0x7b, 0xed, 0x7d, 0xb9, 0xb6, 0xcc, 0xe9, 0x70, 0x2f, 0x6b, 0x32, 0xaa, 0xd9, 0x79,
-	0x2f, 0xd6, 0xbb, 0xd0, 0x20, 0xdc, 0x1d, 0xe2, 0xee, 0x3a, 0x3a, 0xb7, 0x46, 0x35, 0x5b, 0x7c,
-	0xec, 0xdf, 0x86, 0x96, 0x4d, 0x5e, 0xcc, 0x08, 0x8d, 0xd3, 0xca, 0x1b, 0x5a, 0xe5, 0xfb, 0xef,
-	0xc1, 0x52, 0x6e, 0x33, 0x7d, 0x21, 0x4a, 0x16, 0xae, 0x37, 0x05, 0x42, 0x78, 0x02, 0xd6, 0xd7,
-	0x1e, 0xcd, 0xe3, 0xb7, 0x0a, 0x10, 0x26, 0x87, 0x4d, 0xa2, 0x71, 0x55, 0x86, 0x94, 0x9e, 0x42,
-	0x5b, 0x5b, 0x94, 0x40, 0x6e, 0x0e, 0x50, 0x39, 0xe4, 0x7f, 0x9b, 0xd0, 0x13, 0xe8, 0x28, 0x6e,
-	0x6a, 0x1b, 0xde, 0xd1, 0x60, 0x5f, 0x92, 0xb6, 0x6a, 0x99, 0x84, 0xfe, 0x79, 0x15, 0xf4, 0x1f,
-	0x65, 0xa0, 0x2f, 0x3a, 0xbf, 0x3c, 0xf8, 0x3f, 0x4b, 0xe1, 0x4f, 0x0f, 0x8b, 0x51, 0x71, 0x58,
-	0x4c, 0xfd, 0xb0, 0xf4, 0x9f, 0x15, 0x0b, 0xa3, 0xbb, 0x60, 0x95, 0x29, 0x73, 0xc1, 0xf5, 0x42,
-	0x62, 0x7a, 0x1e, 0x06, 0xed, 0x21, 0xa1, 0x17, 0x52, 0x52, 0xca, 0x2f, 0xe0, 0xc6, 0x36, 0x89,
-	0x4b, 0xc0, 0x5d, 0xc9, 0x9c, 0x86, 0x3c, 0xbc, 0xb2, 0x3c, 0x2f, 0xe0, 0x26, 0x23, 0x82, 0xd2,
-	0xd2, 0x8b, 0xb1, 0x61, 0x25, 0xc3, 0x86, 0x8a, 0x2d, 0xbf, 0x55, 0x67, 0x70, 0xeb, 0xc8, 0xf1,
-	0xa6, 0x12, 0xd9, 0xbd, 0x55, 0xc6, 0x58, 0xc2, 0x34, 0x8a, 0xda, 0x5c, 0xb0, 0x2c, 0xa8, 0x8f,
-	0x03, 0x97, 0xc8, 0xbe, 0xc1, 0xff, 0xaf, 0x6a, 0x59, 0xf8, 0x39, 0xdc, 0xd4, 0x3c, 0xaf, 0x3b,
-	0x6e, 0xa9, 0x73, 0x54, 0xe6, 0x1c, 0x15, 0x9c, 0xbb, 0x0a, 0x6f, 0x21, 0xe1, 0x00, 0x6e, 0x64,
-	0xc2, 0x4e, 0x70, 0xba, 0x78, 0xab, 0x4d, 0x82, 0xab, 0x6b, 0x99, 0xe3, 0x07, 0x30, 0xd0, 0x36,
-	0xdc, 0x08, 0xfc, 0x7d, 0x2f, 0x3a, 0x12, 0x98, 0xbf, 0x1d, 0x33, 0xfc, 0x39, 0xac, 0x54, 0x58,
-	0xce, 0xc7, 0x04, 0x1f, 0xc2, 0x9d, 0xca, 0x6d, 0x93, 0x9c, 0xb5, 0x1c, 0x8d, 0x42, 0x8e, 0xa2,
-	0x47, 0xcb, 0xe4, 0xa5, 0x94, 0x6e, 0x86, 0xf4, 0x48, 0x7f, 0x35, 0x14, 0x19, 0x76, 0x26, 0x81,
-	0x4f, 0x32, 0xb1, 0x85, 0x4c, 0xa3, 0x12, 0xe3, 0x82, 0x75, 0x0f, 0xba, 0xfc, 0x9f, 0x0d, 0x76,
-	0x77, 0x47, 0x27, 0x1b, 0x29, 0x31, 0x0a, 0xfa, 0xa4, 0xb6, 0xa8, 0x94, 0x38, 0xf5, 0x0c, 0x71,
-	0xde, 0x18, 0x8a, 0x39, 0x3c, 0x8c, 0x3c, 0x4a, 0x2a, 0x12, 0x34, 0x2f, 0x12, 0x34, 0x27, 0x12,
-	0x54, 0x1a, 0x89, 0xd6, 0x05, 0xf0, 0x1f, 0x86, 0xa2, 0x99, 0x04, 0xe4, 0x72, 0x69, 0x26, 0x32,
-	0xa9, 0xcf, 0xc3, 0xb4, 0x51, 0x8e, 0x29, 0x76, 0x15, 0x25, 0x77, 0xc4, 0x97, 0x0a, 0x4a, 0x5e,
-	0xac, 0x72, 0xf8, 0x40, 0xd1, 0xb7, 0xb0, 0xcb, 0xe5, 0x16, 0x06, 0xff, 0x6e, 0x28, 0xae, 0x97,
-	0xe4, 0x73, 0x31, 0xae, 0x8b, 0xc8, 0xd0, 0x3c, 0x08, 0xea, 0x15, 0x10, 0x6c, 0x27, 0x7c, 0x74,
-	0x28, 0x7d, 0x19, 0x44, 0x5a, 0xda, 0x55, 0x57, 0xd0, 0x75, 0x68, 0x1c, 0x3b, 0xd3, 0x99, 0x82,
-	0x55, 0x08, 0xd8, 0x06, 0x9c, 0x75, 0x94, 0x42, 0xa8, 0xa5, 0x58, 0x75, 0x27, 0x69, 0x3e, 0x51,
-	0xea, 0xf3, 0x7b, 0x75, 0xa3, 0xa7, 0xc1, 0x5d, 0x1e, 0x4b, 0xf1, 0x9f, 0x06, 0x5c, 0xd3, 0xee,
-	0xf4, 0x24, 0xef, 0x3e, 0x2c, 0x84, 0x72, 0x3f, 0x49, 0xad, 0x44, 0x4e, 0x01, 0x37, 0xe7, 0x01,
-	0x8e, 0x2a, 0xba, 0x45, 0x69, 0x0b, 0xb6, 0x6e, 0xc1, 0xa2, 0x5c, 0x99, 0x1c, 0x8a, 0x54, 0xc1,
-	0xbe, 0x12, 0xd1, 0x23, 0x5d, 0xd2, 0x6b, 0x8a, 0xaf, 0x89, 0x02, 0xff, 0x63, 0xc0, 0x72, 0x9a,
-	0x47, 0x86, 0xb9, 0xd9, 0x54, 0x50, 0x55, 0x2a, 0x68, 0x5e, 0x2a, 0x68, 0x5e, 0x2a, 0xa8, 0x32,
-	0x15, 0xf4, 0xd6, 0x54, 0x50, 0x26, 0x15, 0x6d, 0x04, 0x69, 0xe9, 0x23, 0x08, 0xfe, 0x92, 0x0f,
-	0xe1, 0xa2, 0x4c, 0x67, 0x67, 0x00, 0x5e, 0x17, 0x43, 0x68, 0xce, 0xfe, 0x83, 0x64, 0x6c, 0x61,
-	0x33, 0x44, 0x4f, 0xce, 0x10, 0x85, 0x7d, 0xe4, 0x30, 0xf1, 0x2f, 0xa8, 0x93, 0x22, 0xdf, 0x24,
-	0x9a, 0xa7, 0x81, 0x36, 0x5d, 0x5e, 0x91, 0x7e, 0xe4, 0x2a, 0x39, 0x5c, 0x7e, 0x57, 0x35, 0x5c,
-	0x0e, 0x33, 0xc3, 0x65, 0xc1, 0xf5, 0x29, 0x66, 0xcb, 0xfe, 0x5f, 0xad, 0x74, 0x6c, 0x1c, 0x40,
-	0x7b, 0xdf, 0xf3, 0x0f, 0x48, 0x14, 0x46, 0x9e, 0x1f, 0x4b, 0xfa, 0xea, 0x2a, 0x56, 0x00, 0xc6,
-	0xff, 0x87, 0x07, 0xc4, 0x8f, 0x25, 0x8b, 0x53, 0x85, 0x45, 0x64, 0xf9, 0x1f, 0xfa, 0xae, 0x3a,
-	0x73, 0x72, 0x64, 0xfd, 0x74, 0x4e, 0xa0, 0x32, 0x82, 0xe1, 0x4e, 0xce, 0x7c, 0x54, 0xb3, 0x0b,
-	0x2e, 0xad, 0x67, 0xd0, 0x51, 0xba, 0xa4, 0x3b, 0xb5, 0xd7, 0xee, 0x9f, 0x71, 0x0b, 0x66, 0x3a,
-	0xaa, 0xd9, 0x19, 0x57, 0x2c, 0x03, 0xce, 0x27, 0x3d, 0x83, 0xc6, 0x99, 0x32, 0xd8, 0xca, 0x99,
-	0xb3, 0x0c, 0xf2, 0x2e, 0x59, 0x06, 0x4a, 0x97, 0x9c, 0xca, 0xd3, 0x67, 0xb0, 0xa5, 0x99, 0xb2,
-	0x0c, 0x74, 0x57, 0xd6, 0x36, 0x34, 0x63, 0xf6, 0x5c, 0x65, 0x87, 0x80, 0x39, 0xfd, 0xf0, 0x94,
-	0x4e, 0xf9, 0x1b, 0x97, 0x8e, 0x6a, 0xb6, 0x34, 0xef, 0x87, 0xd0, 0xcd, 0x57, 0xe3, 0x12, 0xc6,
-	0x1d, 0xbd, 0xa7, 0xa0, 0x6c, 0x7b, 0xec, 0xbb, 0xd0, 0xd1, 0x8b, 0xf3, 0xff, 0x0c, 0x57, 0xfd,
-	0x4d, 0xe8, 0xe6, 0x6b, 0x54, 0x31, 0xd3, 0xeb, 0xb1, 0x9a, 0xb9, 0x58, 0x1f, 0x40, 0x47, 0x2f,
-	0xc3, 0xe9, 0x5f, 0x05, 0xfd, 0xc7, 0xd0, 0x14, 0x58, 0xe7, 0x7f, 0x72, 0x30, 0x8a, 0x3f, 0x39,
-	0xe4, 0x7f, 0xb8, 0x30, 0x8b, 0x3f, 0x5c, 0xa8, 0x07, 0x56, 0xff, 0xb5, 0x59, 0xfa, 0xba, 0x2e,
-	0x79, 0x4e, 0x64, 0xba, 0xa8, 0x99, 0xef, 0xa2, 0xda, 0x54, 0xa0, 0x75, 0xf6, 0x4c, 0x5f, 0xae,
-	0xe7, 0xfb, 0x72, 0xf9, 0x70, 0x86, 0xe6, 0x32, 0xa0, 0x99, 0xbb, 0x55, 0x72, 0x0d, 0x48, 0xb4,
-	0xf1, 0xea, 0x06, 0xb4, 0x20, 0xe2, 0x48, 0x14, 0xc9, 0x63, 0x73, 0x17, 0xae, 0x6d, 0x93, 0xf8,
-	0x09, 0x19, 0x47, 0x24, 0x3e, 0xd7, 0xad, 0x9f, 0x4c, 0x14, 0xe2, 0xd2, 0x97, 0x13, 0xc5, 0x1b,
-	0x23, 0x79, 0xc4, 0xee, 0x79, 0xe4, 0xe5, 0x79, 0x3d, 0xb3, 0x17, 0xb3, 0x7a, 0x26, 0x0b, 0x81,
-	0x5d, 0x5d, 0x1c, 0x28, 0xaa, 0xe6, 0x6c, 0x21, 0xf1, 0x2b, 0x8d, 0x55, 0x86, 0x4a, 0x38, 0xa5,
-	0x84, 0x7f, 0x86, 0x65, 0x75, 0x27, 0xe5, 0x22, 0x39, 0xc7, 0x73, 0xf8, 0xe3, 0xcc, 0x73, 0xf8,
-	0x56, 0xf6, 0x2a, 0xcb, 0xba, 0x17, 0xd7, 0xd9, 0x8f, 0x4d, 0xfe, 0xe3, 0xe7, 0xfd, 0xff, 0x02,
-	0x00, 0x00, 0xff, 0xff, 0xff, 0xc3, 0x9a, 0x0d, 0x09, 0x15, 0x00, 0x00,
+var fileDescriptor_api_e983af09c7641dd8 = []byte{
+	// 1408 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x58, 0x6d, 0x6f, 0x1b, 0xc5,
+	0x13, 0xf7, 0xdd, 0xfa, 0x21, 0x1e, 0x5b, 0x8d, 0x7b, 0x49, 0x53, 0xcb, 0xea, 0xff, 0x5f, 0x77,
+	0x83, 0x44, 0x55, 0x8a, 0x21, 0x29, 0x12, 0x45, 0xc0, 0x8b, 0xe6, 0x81, 0xb8, 0x02, 0x55, 0xd1,
+	0xa5, 0x09, 0x14, 0x10, 0xe8, 0xf0, 0x6d, 0xe2, 0x53, 0x9c, 0x3b, 0xf7, 0xf6, 0x9c, 0x36, 0x48,
+	0xbc, 0xa8, 0x40, 0xf4, 0x23, 0xf0, 0x82, 0xcf, 0x03, 0x1f, 0x03, 0xc1, 0x7b, 0x3e, 0x04, 0xda,
+	0xa7, 0xbb, 0xbd, 0xf3, 0x1d, 0xce, 0x83, 0x79, 0x13, 0x65, 0xe6, 0x76, 0x67, 0x67, 0x7e, 0xf3,
+	0xdb, 0x99, 0x59, 0x43, 0xdd, 0x19, 0x7b, 0xbd, 0x71, 0x18, 0x44, 0x81, 0x55, 0xf1, 0xfc, 0x60,
+	0x12, 0xe1, 0x6f, 0x00, 0x76, 0x9d, 0x23, 0xcf, 0x77, 0x22, 0x2f, 0xf0, 0xad, 0x2e, 0x34, 0x86,
+	0x0e, 0xdd, 0x0d, 0xc9, 0xa9, 0x17, 0x4c, 0x68, 0xdb, 0xe8, 0x1a, 0x77, 0x17, 0x6c, 0x5d, 0x65,
+	0xb5, 0xa1, 0x36, 0x74, 0xe8, 0x13, 0xf2, 0x32, 0x6a, 0x9b, 0xfc, 0xab, 0x12, 0xad, 0x65, 0xa8,
+	0x0c, 0x82, 0x89, 0x1f, 0xb5, 0x51, 0xd7, 0xb8, 0x8b, 0x6c, 0x21, 0xe0, 0x57, 0x06, 0x54, 0xb6,
+	0xc3, 0x30, 0x08, 0xd9, 0xce, 0x13, 0x42, 0xa9, 0x73, 0x44, 0xb8, 0xdd, 0xba, 0xad, 0x44, 0xeb,
+	0x1e, 0x94, 0xa3, 0xb3, 0x31, 0xe1, 0x06, 0xaf, 0xad, 0xaf, 0xf4, 0xb8, 0x67, 0x3d, 0xbe, 0x4b,
+	0xfc, 0x7d, 0x7a, 0x36, 0x26, 0x36, 0x5f, 0x83, 0xd7, 0xa1, 0x1e, 0xab, 0xac, 0x25, 0x58, 0xdc,
+	0xf7, 0x9d, 0x49, 0x34, 0x24, 0x7e, 0xe4, 0x0d, 0x9c, 0x88, 0xb8, 0xad, 0x92, 0xd5, 0x82, 0xa6,
+	0x50, 0x06, 0xa1, 0xf7, 0x3d, 0x71, 0x5b, 0x06, 0xfe, 0x04, 0xca, 0x76, 0x30, 0x22, 0xd6, 0x35,
+	0x30, 0x3d, 0x97, 0x1f, 0xde, 0xb4, 0x4d, 0xcf, 0x65, 0x1e, 0x0d, 0x42, 0xc2, 0xb6, 0xf1, 0xa3,
+	0x91, 0xad, 0x44, 0x16, 0x4b, 0xe4, 0x45, 0x23, 0xc2, 0x63, 0xa9, 0xdb, 0x42, 0xc0, 0x2e, 0x2c,
+	0xec, 0x53, 0x12, 0x5e, 0xd0, 0xd6, 0x0a, 0x54, 0x27, 0x94, 0x84, 0x8f, 0xb7, 0xb8, 0xb1, 0xa6,
+	0x2d, 0x25, 0xa6, 0x0f, 0x83, 0x11, 0x79, 0xbc, 0xd5, 0x2e, 0x0b, 0xbd, 0x90, 0xf0, 0x8f, 0x06,
+	0xd4, 0xf6, 0x08, 0xa5, 0x2c, 0x1f, 0x18, 0x9a, 0x21, 0x39, 0x0c, 0x09, 0x1d, 0x3e, 0x0d, 0x8e,
+	0x89, 0x2f, 0x81, 0x4b, 0xe9, 0x58, 0xce, 0x9c, 0xc1, 0x80, 0x50, 0x2a, 0x96, 0x98, 0x7c, 0x89,
+	0xae, 0xd2, 0x7d, 0x43, 0x69, 0xdf, 0xda, 0x50, 0x23, 0x2f, 0xc7, 0x5e, 0x48, 0x5c, 0xee, 0x04,
+	0xb2, 0x95, 0x88, 0xbf, 0x85, 0xca, 0xf6, 0x89, 0xe3, 0x8d, 0xe6, 0x10, 0xe8, 0x32, 0x54, 0x08,
+	0x33, 0xc5, 0x8f, 0xa8, 0xdb, 0x42, 0xc0, 0xef, 0xc1, 0xf5, 0x1d, 0x12, 0x31, 0x2c, 0x6d, 0x42,
+	0xc7, 0x81, 0x4f, 0xc9, 0xc1, 0x9a, 0x75, 0x1b, 0xca, 0xae, 0x13, 0x39, 0xfc, 0xb8, 0xc6, 0x7a,
+	0x43, 0x32, 0x81, 0x2f, 0xe2, 0x1f, 0xf0, 0xcf, 0x26, 0x2c, 0x6f, 0xf2, 0xf3, 0x32, 0x3b, 0xff,
+	0x07, 0x66, 0x70, 0x9c, 0xb3, 0xaf, 0x5f, 0xb2, 0xcd, 0xe0, 0xd8, 0xfa, 0x1c, 0x16, 0x4f, 0x9d,
+	0x91, 0xe7, 0x72, 0x9a, 0x73, 0x02, 0x71, 0xef, 0x1b, 0xeb, 0x6f, 0xc9, 0xb5, 0x79, 0x46, 0x7b,
+	0x07, 0xe9, 0x2d, 0xfd, 0x92, 0x9d, 0xb5, 0x62, 0xbd, 0x01, 0x15, 0xc2, 0xcd, 0x21, 0x6e, 0xae,
+	0xa9, 0x93, 0xb7, 0x5f, 0xb2, 0xc5, 0xc7, 0xce, 0x6d, 0xa8, 0xd9, 0xe4, 0xf9, 0x84, 0xd0, 0x28,
+	0xa1, 0x96, 0xa1, 0x51, 0xab, 0xf3, 0x26, 0x2c, 0x66, 0x0e, 0xd3, 0x17, 0xa2, 0x78, 0xe1, 0x46,
+	0x55, 0x20, 0x84, 0x87, 0x60, 0x7d, 0xe6, 0xd1, 0x2c, 0x7e, 0x6b, 0x00, 0xe3, 0xf8, 0x36, 0x4b,
+	0x34, 0xae, 0x4b, 0x97, 0x92, 0x6b, 0x6e, 0x6b, 0x8b, 0x62, 0xc8, 0xcd, 0x2e, 0xca, 0x87, 0xfc,
+	0x0f, 0x13, 0xda, 0x02, 0x1d, 0x45, 0x7e, 0xed, 0xc0, 0x3b, 0x1a, 0xec, 0x8b, 0x72, 0xaf, 0x5a,
+	0x26, 0xa1, 0xff, 0xaa, 0x08, 0xfa, 0x77, 0x52, 0xd0, 0x4f, 0x1b, 0x9f, 0x1f, 0xfc, 0x1f, 0x24,
+	0xf0, 0x27, 0x24, 0x35, 0x0a, 0x6e, 0xa3, 0xa9, 0xdf, 0xc6, 0xce, 0xb3, 0xe9, 0xc4, 0xe8, 0x26,
+	0x58, 0x66, 0xf2, 0x4c, 0x70, 0xbd, 0x90, 0x98, 0x9e, 0xbb, 0x41, 0xdb, 0x48, 0xe8, 0x85, 0x14,
+	0xa7, 0xf2, 0x23, 0xb8, 0xb1, 0x43, 0xa2, 0x1c, 0x70, 0x57, 0x53, 0xb7, 0x21, 0x0b, 0xaf, 0x4c,
+	0xcf, 0x73, 0xb8, 0xc9, 0x88, 0xa0, 0xb4, 0xf4, 0x6a, 0x6c, 0x58, 0x4d, 0xb1, 0xa1, 0xe0, 0xc8,
+	0xbf, 0x4c, 0xb8, 0x21, 0x92, 0xc6, 0x4b, 0x84, 0x76, 0xe2, 0xff, 0x35, 0x3a, 0xc4, 0xb9, 0x60,
+	0x6b, 0x24, 0x17, 0xbe, 0x28, 0xe2, 0xc2, 0xfd, 0x14, 0x17, 0x32, 0x66, 0xe7, 0x47, 0x84, 0x4f,
+	0x53, 0xf7, 0x50, 0x54, 0x25, 0x43, 0xab, 0x4a, 0x96, 0x05, 0xe5, 0x41, 0xe0, 0x12, 0x59, 0x45,
+	0xf9, 0xff, 0x45, 0x75, 0xad, 0xb3, 0x97, 0x7b, 0x67, 0x95, 0x51, 0x94, 0x67, 0x14, 0x4d, 0x19,
+	0x75, 0x15, 0x29, 0x84, 0x14, 0x93, 0xe2, 0x21, 0x74, 0x35, 0x2c, 0x36, 0x03, 0xff, 0xd0, 0x0b,
+	0x4f, 0x44, 0xbe, 0x44, 0x00, 0x07, 0x6b, 0xf9, 0x21, 0xe0, 0x0f, 0x61, 0xb5, 0x60, 0xe7, 0x86,
+	0xe3, 0xe6, 0x6e, 0x4e, 0x5c, 0xc5, 0xc7, 0x70, 0xa7, 0xf0, 0xd8, 0x38, 0xcb, 0x5a, 0x0b, 0x30,
+	0xa6, 0x5a, 0x80, 0x68, 0x20, 0xb2, 0x37, 0x48, 0x29, 0x39, 0x0c, 0xe9, 0x9e, 0xfe, 0x64, 0xa8,
+	0x62, 0xbe, 0x3b, 0x0c, 0x7c, 0x92, 0xf2, 0x6d, 0xcc, 0x34, 0x2a, 0x30, 0x2e, 0x58, 0xf7, 0xa0,
+	0xc5, 0xff, 0xd9, 0x64, 0x83, 0x45, 0x78, 0xb6, 0x99, 0xe4, 0x69, 0x4a, 0x1f, 0x43, 0x8e, 0x72,
+	0xf3, 0x58, 0xd6, 0xf3, 0x88, 0x5f, 0x1b, 0x70, 0x53, 0x73, 0x23, 0x8b, 0x92, 0xf2, 0x04, 0xcd,
+	0xf2, 0x04, 0xcd, 0xf0, 0x04, 0xe5, 0x7a, 0xa2, 0x55, 0x10, 0xfc, 0xab, 0xa1, 0x2e, 0x96, 0x04,
+	0x24, 0x86, 0x7c, 0x2e, 0x5d, 0x58, 0x44, 0x52, 0x9e, 0x85, 0x69, 0x25, 0x1f, 0x53, 0xec, 0x2a,
+	0x4a, 0xee, 0x8a, 0x2f, 0x05, 0x94, 0xbc, 0x5a, 0xe6, 0xf0, 0x91, 0xa2, 0xef, 0xd4, 0x29, 0xf3,
+	0x4d, 0x0c, 0xfe, 0xc5, 0x50, 0x5c, 0xcf, 0x89, 0xe7, 0x6a, 0x5c, 0x17, 0x9e, 0xa1, 0x59, 0x10,
+	0x94, 0x0b, 0x20, 0xd8, 0x89, 0xf9, 0xe8, 0x50, 0xfa, 0x22, 0x08, 0xb5, 0xb0, 0x8b, 0xda, 0xd7,
+	0x32, 0x54, 0x4e, 0x9d, 0xd1, 0x44, 0xc1, 0x2a, 0x04, 0x6c, 0x03, 0x4e, 0x1b, 0x4a, 0x20, 0xd4,
+	0x42, 0x2c, 0xea, 0x67, 0x9a, 0x4d, 0x94, 0xd8, 0xfc, 0x5a, 0x4d, 0x03, 0x89, 0x73, 0xf3, 0x63,
+	0x29, 0xfe, 0xcd, 0x80, 0x25, 0x6d, 0x1e, 0x88, 0xe3, 0xee, 0xc0, 0xc2, 0x58, 0x9e, 0x27, 0xa9,
+	0x15, 0xcb, 0x09, 0xe0, 0xe6, 0x2c, 0xc0, 0x51, 0x41, 0xb5, 0xc8, 0x9d, 0x50, 0xad, 0x5b, 0x50,
+	0x97, 0x2b, 0xe3, 0x4b, 0x91, 0x28, 0xd8, 0x57, 0x22, 0x6a, 0xa4, 0x4b, 0xda, 0x55, 0xf1, 0x35,
+	0x56, 0xe0, 0x3f, 0x0d, 0x58, 0x49, 0xe2, 0x48, 0x31, 0x37, 0x1d, 0x0a, 0x2a, 0x0a, 0x05, 0xcd,
+	0x0a, 0x05, 0xcd, 0x0a, 0x05, 0x15, 0x86, 0x82, 0xfe, 0x35, 0x14, 0x94, 0x0a, 0x45, 0x1b, 0x5f,
+	0x6a, 0xfa, 0xf8, 0x82, 0x3f, 0xe6, 0x03, 0xbc, 0x48, 0xd3, 0xc5, 0x19, 0x80, 0x37, 0xc4, 0x00,
+	0x9b, 0xd9, 0x7f, 0x3f, 0x1e, 0x79, 0xd8, 0xfc, 0xd1, 0x96, 0x5d, 0x7c, 0xea, 0x1c, 0x39, 0x88,
+	0xfc, 0x0d, 0xea, 0xa6, 0xc8, 0x07, 0x93, 0x66, 0xa9, 0xab, 0x8d, 0x22, 0xd7, 0xa4, 0x1d, 0xb9,
+	0x4a, 0x0e, 0x23, 0x5f, 0x16, 0x0d, 0x23, 0xbd, 0xd4, 0x30, 0x32, 0x65, 0xfa, 0x1c, 0xe3, 0x48,
+	0xe7, 0xf7, 0x5a, 0x32, 0x69, 0x74, 0xa1, 0x71, 0xe8, 0xf9, 0x47, 0x24, 0x1c, 0x87, 0x9e, 0x1f,
+	0x49, 0xfa, 0xea, 0x2a, 0x96, 0x00, 0xc6, 0xff, 0x47, 0x47, 0xc4, 0x8f, 0x24, 0x8b, 0x13, 0x85,
+	0x45, 0x64, 0xfa, 0x1f, 0xf9, 0xae, 0xba, 0x73, 0x72, 0xca, 0x79, 0x7f, 0x86, 0xa3, 0xd2, 0x83,
+	0xde, 0x6e, 0x66, 0x7b, 0xbf, 0x64, 0x4f, 0x99, 0xb4, 0x9e, 0x41, 0x53, 0xe9, 0xe2, 0xea, 0xd4,
+	0x58, 0x7f, 0x70, 0xc1, 0x23, 0xd8, 0xd6, 0x7e, 0xc9, 0x4e, 0x99, 0x62, 0x11, 0x70, 0x3e, 0xe9,
+	0x11, 0x54, 0x2e, 0x14, 0xc1, 0x76, 0x66, 0x3b, 0x8b, 0x20, 0x6b, 0x92, 0x45, 0xa0, 0x74, 0xf1,
+	0xad, 0x3c, 0x7f, 0x04, 0xdb, 0xda, 0x56, 0x16, 0x81, 0x6e, 0xca, 0xda, 0x81, 0x6a, 0xc4, 0xde,
+	0xd2, 0xec, 0x12, 0x30, 0xa3, 0x6f, 0x9f, 0xd3, 0x28, 0x7f, 0x80, 0xd3, 0x7e, 0xc9, 0x96, 0xdb,
+	0x3b, 0x63, 0x68, 0x65, 0xb3, 0x31, 0x87, 0x71, 0x47, 0xaf, 0x29, 0x28, 0x5d, 0x1e, 0x3b, 0x2e,
+	0x34, 0xf5, 0xe4, 0xfc, 0x37, 0xc3, 0x55, 0x67, 0x0b, 0x5a, 0xd9, 0x1c, 0x15, 0x8c, 0xd8, 0xba,
+	0xaf, 0x66, 0xc6, 0xd7, 0x87, 0xd0, 0xd4, 0xd3, 0x70, 0xfe, 0x21, 0xbd, 0xf3, 0x04, 0xaa, 0x02,
+	0xeb, 0xec, 0xef, 0x21, 0xc6, 0xf4, 0xef, 0x21, 0xd9, 0x5f, 0x55, 0xcc, 0xe9, 0x5f, 0x55, 0xd4,
+	0x1c, 0xde, 0x79, 0x65, 0x9e, 0x77, 0xca, 0x4f, 0x55, 0x51, 0x33, 0x5b, 0x45, 0xb5, 0xa9, 0x40,
+	0xab, 0xec, 0xa9, 0xba, 0x5c, 0xce, 0xd6, 0xe5, 0xfc, 0xe1, 0x0c, 0xcd, 0x64, 0x40, 0x35, 0xd3,
+	0x55, 0x32, 0x05, 0x48, 0x94, 0xf1, 0xe2, 0x02, 0xb4, 0x20, 0xfc, 0x88, 0x15, 0xf1, 0x9b, 0x64,
+	0x1f, 0x96, 0x76, 0x48, 0xb4, 0x47, 0x06, 0x21, 0x89, 0x2e, 0xd5, 0xf5, 0xe3, 0x89, 0x42, 0x34,
+	0x7d, 0x39, 0x51, 0xbc, 0x36, 0xe2, 0x07, 0xf0, 0x81, 0x47, 0x5e, 0x5c, 0xd6, 0x32, 0x7b, 0x6d,
+	0xab, 0x27, 0xb6, 0x10, 0x58, 0xeb, 0xe2, 0x40, 0x51, 0x35, 0x67, 0x0b, 0x89, 0xb7, 0x34, 0x96,
+	0x19, 0x2a, 0xe1, 0x94, 0x12, 0xfe, 0x01, 0x56, 0x54, 0x4f, 0xca, 0x78, 0x72, 0x89, 0xa7, 0xf4,
+	0xbb, 0xa9, 0xa7, 0xf4, 0xad, 0x74, 0x2b, 0x4b, 0x9b, 0x17, 0xed, 0xec, 0xbb, 0x2a, 0xff, 0x65,
+	0xf6, 0xc1, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x6c, 0xea, 0xb8, 0xa0, 0xa6, 0x15, 0x00, 0x00,
 }

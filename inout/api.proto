@@ -41,6 +41,13 @@ message Session {
     int64 expired = 4;
 }
 
+message Email {
+    bytes id = 1;
+    int64 created = 2;
+    bytes userID = 3;
+    string email = 4;
+}
+
 // Roles API
 
 message GetRoleResponseV1 {
@@ -101,23 +108,26 @@ message ListUserRolesResponseV1 {
 
 // Emails API
 
-message CreateEmailRequestV1 {
-    string email = 1;
-    string code = 2;
-    bytes userID = 3;
-}
-
-message CreateEmailBadRequestV1 {
-    repeated string email = 1;
-    repeated string code = 2;
-    repeated string userId = 3;
-}
-
 message CreateEmailResponseV1 {
-    bytes id = 1;
-    int64 created = 2;
-    bytes userID = 3;
-    string email = 4;
+
+    message Request {
+        string email = 1;
+        string code = 2;
+        bytes userID = 3;
+    }
+
+    message ValidationError {
+        repeated string email = 1;
+        repeated string code = 2;
+        repeated string userId = 3;
+    }
+
+    oneof data {
+        Email ok = 1;
+        ValidationError validationError = 2;
+        Error error = 3;
+    }
+
 }
 
 // Emails Confirmation API
