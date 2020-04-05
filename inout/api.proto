@@ -86,6 +86,14 @@ message Secret {
     bytes value = 3;
 }
 
+message UserView {
+    bytes id = 1;
+    int64 created = 2;
+    repeated string roles = 3;
+    repeated string phones = 4;
+    repeated string emails = 5;
+}
+
 // Roles API
 
 message GetRoleResponseV1 {
@@ -359,14 +367,10 @@ message GetSecretResponseV1 {
 // User Views API
 
 message GetUserViewResponseV1 {
-    bytes id = 1;
-    int64 created = 2;
-    repeated string roles = 3;
-    repeated string phones = 4;
-    repeated string emails = 5;
+    UserView data = 1;
 }
 
 message ListUserViewResponseV1 {
     Pagination pagination = 1;
-    repeated GetUserViewResponseV1 data = 2;
+    repeated UserView data = 2;
 }
