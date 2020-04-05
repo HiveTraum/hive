@@ -21,10 +21,11 @@ func getSecretV1(r *functools.Request, app infrastructure.AppInterface, id uuid.
 		return http.StatusNotFound, nil
 	} else {
 		return http.StatusOK, &inout.GetSecretResponseV1{
-			Id:      secret.Id.Bytes(),
-			Created: secret.Created,
-			Value:   secret.Value.Bytes(),
-		}
+			Data: &inout.Secret{
+				Id:      secret.Id.Bytes(),
+				Created: secret.Created,
+				Value:   secret.Value.Bytes(),
+			}}
 	}
 }
 

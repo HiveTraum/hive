@@ -28,7 +28,7 @@ func InitialAdmin(store infrastructure.StoreInterface) {
 	}
 
 	store.CreateEmailConfirmationCode(ctx, emailValue, env.TestConfirmationCode, time.Minute)
-	_, user := store.CreateUser(ctx, &inout.CreateUserRequestV1{
+	_, user := store.CreateUser(ctx, &inout.CreateUserResponseV1_Request{
 		Password:  passwordValue,
 		Email:     emailValue,
 		EmailCode: env.TestConfirmationCode,

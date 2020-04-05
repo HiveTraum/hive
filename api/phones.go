@@ -13,8 +13,8 @@ import (
 	"net/http"
 )
 
-func createPhoneV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
-	b := inout.CreatePhoneRequestV1{}
+func createPhoneV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.CreatePhoneResponseV1) {
+	b := inout.CreatePhoneResponseV1_Request{}
 	err := r.ParseBody(&b)
 
 	if err != nil {
@@ -26,30 +26,40 @@ func createPhoneV1(r *functools.Request, app infrastructure.AppInterface) (int, 
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.CreatePhoneResponseV1{
-			Id:               phone.Id.Bytes(),
-			Created:          phone.Created,
-			UserID:           phone.UserId.Bytes(),
-			Phone:            phone.Value,
-			PhoneCountryCode: phone.CountryCode,
-		}
+			Data: &inout.CreatePhoneResponseV1_Ok{
+				Ok: &inout.Phone{
+					Id:               phone.Id.Bytes(),
+					Created:          phone.Created,
+					UserID:           phone.UserId.Bytes(),
+					Phone:            phone.Value,
+					PhoneCountryCode: phone.CountryCode,
+				}}}
 	case enums.IncorrectPhoneCode:
-		return http.StatusBadRequest, &inout.CreatePhoneBadRequestV1{
-			Code: []string{"Неверный код"},
-		}
+		return http.StatusBadRequest, &inout.CreatePhoneResponseV1{
+			Data: &inout.CreatePhoneResponseV1_ValidationError_{
+				ValidationError: &inout.CreatePhoneResponseV1_ValidationError{
+					Code: []string{"Неверный код"},
+				}}}
 	case enums.PhoneNotFound:
-		return http.StatusBadRequest, &inout.CreatePhoneBadRequestV1{
-			Phone: []string{"Не удалось найти код для данного телефона."},
-		}
+		return http.StatusBadRequest, &inout.CreatePhoneResponseV1{
+			Data: &inout.CreatePhoneResponseV1_ValidationError_{
+				ValidationError: &inout.CreatePhoneResponseV1_ValidationError{
+					Phone: []string{"Не удалось найти код для данного телефона."},
+				}}}
 	case enums.UserNotFound:
-		return http.StatusBadRequest, &inout.CreatePhoneBadRequestV1{
-			UserID: []string{"Такого пользователя не существует"},
-		}
+		return http.StatusBadRequest, &inout.CreatePhoneResponseV1{
+			Data: &inout.CreatePhoneResponseV1_ValidationError_{
+				ValidationError: &inout.CreatePhoneResponseV1_ValidationError{
+					UserID: []string{"Такого пользователя не существует"},
+				}}}
 	case enums.IncorrectPhone:
-		return http.StatusBadRequest, &inout.CreatePhoneBadRequestV1{
-			Phone: []string{"Некорректный номер телефона"},
-		}
+		return http.StatusBadRequest, &inout.CreatePhoneResponseV1{
+			Data: &inout.CreatePhoneResponseV1_ValidationError_{
+				ValidationError: &inout.CreatePhoneResponseV1_ValidationError{
+					Phone: []string{"Некорректный номер телефона"},
+				}}}
 	default:
-		return unhandledStatus(r, status)
+		return unhandledStatus(r, status), nil
 	}
 }
 
@@ -59,9 +69,9 @@ func PhonesAPIV1(app *app.App) middlewares.ResponseControllerHandler {
 	}
 }
 
-func createPhoneConfirmationV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
+func createPhoneConfirmationV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.CreatePhoneConfirmationResponseV1) {
 
-	body := inout.CreatePhoneConfirmationRequestV1{}
+	body := inout.CreatePhoneConfirmationResponseV1_Request{}
 
 	err := r.ParseBody(&body)
 
@@ -74,16 +84,20 @@ func createPhoneConfirmationV1(r *functools.Request, app infrastructure.AppInter
 	switch status {
 	case enums.Ok:
 		return http.StatusCreated, &inout.CreatePhoneConfirmationResponseV1{
-			Created: phoneConfirmation.Created,
-			Expire:  phoneConfirmation.Expire,
-			Phone:   phoneConfirmation.Phone,
-		}
+			Data: &inout.CreatePhoneConfirmationResponseV1_Ok{
+				Ok: &inout.PhoneConfirmation{
+					Created: phoneConfirmation.Created,
+					Expire:  phoneConfirmation.Expire,
+					Phone:   phoneConfirmation.Phone,
+				}}}
 	case enums.IncorrectPhone:
-		return http.StatusBadRequest, &inout.CreatePhoneConfirmationBadRequestV1{
-			Phone: []string{"Некорректный номер телефона"},
-		}
+		return http.StatusBadRequest, &inout.CreatePhoneConfirmationResponseV1{
+			Data: &inout.CreatePhoneConfirmationResponseV1_ValidationError_{
+				ValidationError: &inout.CreatePhoneConfirmationResponseV1_ValidationError{
+					Phone: []string{"Некорректный номер телефона"},
+				}}}
 	default:
-		return unhandledStatus(r, status)
+		return unhandledStatus(r, status), nil
 	}
 }
 

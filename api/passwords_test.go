@@ -21,17 +21,17 @@ func TestCreatePasswordWithoutUserV1(t *testing.T) {
 	t.Parallel()
 	userID := uuid.NewV4()
 
-	body, _ := json.Marshal(&inout.CreatePasswordRequestV1{
+	body, _ := json.Marshal(&inout.CreatePasswordResponseV1_Request{
 		UserID: userID.Bytes(),
 		Value:  "hello",
 	})
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, _, loginController := mocks.InitMockApp(ctrl)
+	app, store, _, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
 
-	loginController.
+	passwordProcessor.
 		EXPECT().
 		EncodePassword(gomock.Any(), "hello").
 		Return("olleh")
@@ -45,17 +45,17 @@ func TestCreatePasswordWithoutUserV1(t *testing.T) {
 	r.Header.Add("Content-Type", "application/json")
 	status, message := createPasswordV1(&functools.Request{Request: r}, app)
 	require.Equal(t, status, http.StatusBadRequest)
-	v, ok := message.(*inout.CreatePasswordBadRequestResponseV1)
-	require.True(t, ok)
-	require.Len(t, v.UserID, 1)
-	require.Len(t, v.Value, 0)
+	validationError := message.GetValidationError()
+	require.NotNil(t, validationError)
+	require.Len(t, validationError.UserID, 1)
+	require.Len(t, validationError.Value, 0)
 }
 
 func TestCreatePasswordWithUserV1(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, esb, passwordProcessor := mocks.InitMockApp(ctrl)
+	app, store, esb, _, passwordProcessor := mocks.InitMockApp(ctrl)
 	ctx := context.Background()
 
 	userID := uuid.NewV4()
@@ -81,7 +81,7 @@ func TestCreatePasswordWithUserV1(t *testing.T) {
 		OnPasswordChanged(userID).
 		Times(1)
 
-	body, _ := json.Marshal(&inout.CreatePasswordRequestV1{
+	body, _ := json.Marshal(&inout.CreatePasswordResponseV1_Request{
 		UserID: userID.Bytes(),
 		Value:  "hello",
 	})
@@ -89,16 +89,16 @@ func TestCreatePasswordWithUserV1(t *testing.T) {
 	r.Header.Add("Content-Type", "application/json")
 	status, message := createPasswordV1(&functools.Request{Request: r}, app)
 	require.Equal(t, status, http.StatusCreated)
-	v, ok := message.(*inout.CreatePasswordResponseV1)
-	require.True(t, ok)
-	require.Equal(t, userID.Bytes(), v.UserID)
+	password := message.GetOk()
+	require.NotNil(t, password)
+	require.Equal(t, userID.Bytes(), password.UserID)
 }
 
 func TestCreatePasswordWithTooLongValueV1(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, esb, passwordProcessor := mocks.InitMockApp(ctrl)
+	app, store, esb, _, passwordProcessor := mocks.InitMockApp(ctrl)
 	ctx := context.Background()
 
 	userID := uuid.NewV4()
@@ -127,7 +127,7 @@ func TestCreatePasswordWithTooLongValueV1(t *testing.T) {
 		OnPasswordChanged(userID).
 		Times(1)
 
-	body, _ := json.Marshal(&inout.CreatePasswordRequestV1{
+	body, _ := json.Marshal(&inout.CreatePasswordResponseV1_Request{
 		UserID: userID.Bytes(),
 		Value: "hellohellohellohellohellohellohellohellohellohellohell" +
 			"ohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohe" +
@@ -139,6 +139,6 @@ func TestCreatePasswordWithTooLongValueV1(t *testing.T) {
 	r.Header.Add("Content-Type", "application/json")
 	status, message := createPasswordV1(&functools.Request{Request: r}, app)
 	require.Equal(t, status, http.StatusCreated)
-	_, ok := message.(*inout.CreatePasswordResponseV1)
-	require.True(t, ok)
+	password := message.GetOk()
+	require.NotNil(t, password)
 }

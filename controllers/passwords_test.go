@@ -15,7 +15,7 @@ func TestCreatePassword(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, esb, passwordProcessor := mocks.InitMockApp(ctrl)
+	app, store, esb, _, passwordProcessor := mocks.InitMockApp(ctrl)
 	ctx := context.Background()
 
 	userID := uuid.NewV4()
@@ -40,7 +40,7 @@ func TestCreatePassword(t *testing.T) {
 		OnPasswordChanged(userID).
 		Times(1)
 
-	status, password := CreatePassword(store, esb, app.GetLoginController(), ctx, userID, "hello")
+	status, password := CreatePassword(store, esb, app.GetPasswordProcessor(), ctx, userID, "hello")
 	require.NotEqual(t, "hello", password.Value)
 	require.NotNil(t, password)
 	require.Equal(t, enums.Ok, status)

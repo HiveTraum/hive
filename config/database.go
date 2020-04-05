@@ -28,7 +28,7 @@ func formatQueryToMessage(query string) string {
 	return replacer.Replace(message)
 }
 
-func (logger *PGXOpenTracingLogger) Log(ctx context.Context, level pgx.LogLevel, msg string, data map[string]interface{}) {
+func (logger *PGXOpenTracingLogger) log(ctx context.Context, level pgx.LogLevel, msg string, data map[string]interface{}) {
 	possibleQuery := data["sql"]
 	possibleRowCount := data["rowCount"]
 	possibleDuration := data["time"]
@@ -86,6 +86,10 @@ func (logger *PGXOpenTracingLogger) Log(ctx context.Context, level pgx.LogLevel,
 
 	span.LogFields(logs...)
 	defer span.Finish()
+}
+
+func (logger *PGXOpenTracingLogger) Log(ctx context.Context, level pgx.LogLevel, msg string, data map[string]interface{}) {
+	go logger.log(ctx, level, msg, data)
 }
 
 func InitPool(tracer opentracing.Tracer) *pgxpool.Pool {

@@ -17,12 +17,12 @@ func (store *DatabaseStore) GetRole(ctx context.Context, id uuid.UUID) (int, *mo
 	return repositories.GetRole(store.Db, ctx, id)
 }
 
-func (store *DatabaseStore) GetRoles(ctx context.Context, query repositories.GetRolesQuery) []*models.Role {
+func (store *DatabaseStore) GetRoles(ctx context.Context, query repositories.GetRolesQuery) ([]*models.Role, *models.PaginationResponse) {
 	return repositories.GetRoles(store.Db, ctx, query)
 }
 
 func (store *DatabaseStore) GetRoleByTitle(ctx context.Context, title string) (int, *models.Role) {
-	roles := store.GetRoles(ctx, repositories.GetRolesQuery{
+	roles, _ := store.GetRoles(ctx, repositories.GetRolesQuery{
 		Pagination: &models.PaginationRequest{
 			Page:  1,
 			Limit: 1,

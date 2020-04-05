@@ -15,12 +15,12 @@ import (
 func TestCreateUser(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
-	_, store, esb, loginController := mocks.InitMockApp(ctrl)
+	_, store, esb, _, passwordProcessor := mocks.InitMockApp(ctrl)
 	ctx := context.Background()
 
 	firstUserID, secondUserID, thirdUserID := uuid.NewV4(), uuid.NewV4(), uuid.NewV4()
 
-	loginController.
+	passwordProcessor.
 		EXPECT().
 		EncodePassword(ctx, "hello").
 		Return("olleh")
@@ -55,7 +55,7 @@ func TestCreateUser(t *testing.T) {
 			Value:   "email@email.com",
 		})
 
-	body := inout.CreateUserRequestV1{
+	body := inout.CreateUserResponseV1_Request{
 		Password:         "hello",
 		Phone:            "71234567890",
 		Email:            "email@email.com",
@@ -66,7 +66,7 @@ func TestCreateUser(t *testing.T) {
 
 	store.
 		EXPECT().
-		CreateUser(ctx, &inout.CreateUserRequestV1{
+		CreateUser(ctx, &inout.CreateUserResponseV1_Request{
 			Password:  "olleh",
 			Phone:     "+71234567890",
 			Email:     body.Email,
@@ -86,7 +86,7 @@ func TestCreateUser(t *testing.T) {
 
 	body.Phone = "71234567890"
 
-	status, user := CreateUser(store, esb, loginController, ctx, &body)
+	status, user := CreateUser(store, esb, passwordProcessor, ctx, &body)
 
 	require.Equal(t, &models.User{
 		Id:      thirdUserID,

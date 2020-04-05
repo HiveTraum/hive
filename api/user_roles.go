@@ -29,10 +29,10 @@ func getUserRolesV1(r *functools.Request, app infrastructure.AppInterface) (int,
 
 	query := GetUserRolesV1Query(r)
 	userRoles, pagination := app.GetStore().GetUserRoles(r.Context(), query)
-	usersData := make([]*inout.GetUserRoleResponseV1, len(userRoles))
+	usersData := make([]*inout.UserRole, len(userRoles))
 
 	for i, userRole := range userRoles {
-		usersData[i] = &inout.GetUserRoleResponseV1{
+		usersData[i] = &inout.UserRole{
 			Id:      userRole.Id.Bytes(),
 			Created: userRole.Created,
 			UserID:  userRole.UserId.Bytes(),
@@ -47,9 +47,9 @@ func getUserRolesV1(r *functools.Request, app infrastructure.AppInterface) (int,
 	}}
 }
 
-func createUserRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
+func createUserRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.CreateUserRoleResponseV1) {
 
-	body := inout.CreateUserRoleRequestV1{}
+	body := inout.CreateUserRoleResponseV1_Request{}
 
 	err := r.ParseBody(&body)
 
@@ -61,31 +61,35 @@ func createUserRoleV1(r *functools.Request, app infrastructure.AppInterface) (in
 
 	switch status {
 	case enums.Ok:
-		return http.StatusCreated, &inout.GetUserRoleResponseV1{
-			Id:      userRole.Id.Bytes(),
-			Created: userRole.Created,
-			UserID:  userRole.UserId.Bytes(),
-			RoleID:  userRole.RoleId.Bytes(),
+		return http.StatusCreated, &inout.CreateUserRoleResponseV1{
+			Data: &inout.CreateUserRoleResponseV1_Ok{Ok: &inout.UserRole{
+				Id:      userRole.Id.Bytes(),
+				Created: userRole.Created,
+				UserID:  userRole.UserId.Bytes(),
+				RoleID:  userRole.RoleId.Bytes(),
+			}},
 		}
 	case enums.RoleNotFound:
-		return http.StatusBadRequest, &inout.CreateUserRoleBadRequestV1{
-			RoleID: []string{"Такой роли не существует"},
+		return http.StatusBadRequest, &inout.CreateUserRoleResponseV1{
+			Data: &inout.CreateUserRoleResponseV1_ValidationError_{
+				ValidationError: &inout.CreateUserRoleResponseV1_ValidationError{
+					RoleID: []string{"Такой роли не существует"},
+				}},
 		}
 	case enums.UserNotFound:
-		return http.StatusBadRequest, &inout.CreateUserRoleBadRequestV1{
-			UserID: []string{"Такого пользователя не существует"},
-		}
+		return http.StatusBadRequest, &inout.CreateUserRoleResponseV1{
+			Data: &inout.CreateUserRoleResponseV1_ValidationError_{
+				ValidationError: &inout.CreateUserRoleResponseV1_ValidationError{
+					UserID: []string{"Такого пользователя не существует"},
+				}}}
 	case enums.UserRoleAlreadyExist:
-		return http.StatusBadRequest, &inout.CreateUserRoleBadRequestV1{
-			Errors: []string{"Данная роль уже есть у пользователя"},
-		}
+		return http.StatusBadRequest, &inout.CreateUserRoleResponseV1{
+			Data: &inout.CreateUserRoleResponseV1_ValidationError_{
+				ValidationError: &inout.CreateUserRoleResponseV1_ValidationError{
+					Errors: []string{"Данная роль уже есть у пользователя"},
+				}}}
 	default:
-		return http.StatusCreated, &inout.GetUserRoleResponseV1{
-			Id:      userRole.Id.Bytes(),
-			Created: userRole.Created,
-			UserID:  userRole.UserId.Bytes(),
-			RoleID:  userRole.RoleId.Bytes(),
-		}
+		return unhandledStatus(r, status), nil
 	}
 }
 

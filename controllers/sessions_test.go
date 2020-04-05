@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"auth/backends"
 	"auth/enums"
 	"auth/mocks"
 	"auth/models"
@@ -17,7 +18,7 @@ func TestCreateSessionFromTokens(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, loginController, _ := mocks.InitMockApp(ctrl)
 
 	userID := uuid.NewV4()
 	fingerprint := "123"
@@ -34,7 +35,7 @@ func TestCreateSessionFromTokens(t *testing.T) {
 		EXPECT().
 		Login(ctx, accessToken).
 		Times(1).
-		Return(enums.Ok, &models.AccessTokenPayload{
+		Return(enums.Ok, &backends.JWTAuthenticationBackendUser{
 			StandardClaims: jwt.StandardClaims{},
 			IsAdmin:        false,
 			Roles:          nil,
@@ -67,7 +68,7 @@ func TestCreateSessionFromTokensWithIncorrectAuth(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, loginController, _ := mocks.InitMockApp(ctrl)
 
 	fingerprint := "123"
 	refreshToken := "321"
@@ -89,7 +90,7 @@ func TestCreateSessionFromTokensWithoutSecret(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, loginController, _ := mocks.InitMockApp(ctrl)
 
 	fingerprint := "123"
 	refreshToken := "321"
@@ -113,7 +114,7 @@ func TestCreateSessionFromEmailAndPassword(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	password := "123"
 	encodedPassword := "321"
@@ -142,13 +143,13 @@ func TestCreateSessionFromEmailAndPassword(t *testing.T) {
 			Value:   encodedPassword,
 		})
 
-	loginController.
+	passwordProcessor.
 		EXPECT().
 		VerifyPassword(ctx, password, encodedPassword).
 		Times(1).
 		Return(true)
 
-	status, loggedUserID := getUserFromEmailAndPassword(store, loginController, ctx, email, password)
+	status, loggedUserID := getUserFromEmailAndPassword(store, passwordProcessor, ctx, email, password)
 	require.Equal(t, enums.Ok, status)
 	require.Equal(t, userID, *loggedUserID)
 }
@@ -158,12 +159,12 @@ func TestCreateSessionFromEmailAndPasswordWithIncorrectEmail(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	password := "123"
 	email := "mail"
 
-	status, loggedUserID := getUserFromEmailAndPassword(store, loginController, ctx, email, password)
+	status, loggedUserID := getUserFromEmailAndPassword(store, passwordProcessor, ctx, email, password)
 	require.Equal(t, enums.IncorrectEmail, status)
 	require.Nil(t, loggedUserID)
 }
@@ -173,7 +174,7 @@ func TestCreateSessionFromEmailAndPasswordWithoutEmail(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	password := "123"
 	email := "mail@mail.com"
@@ -184,7 +185,7 @@ func TestCreateSessionFromEmailAndPasswordWithoutEmail(t *testing.T) {
 		Times(1).
 		Return(enums.Ok, nil)
 
-	status, loggedUserID := getUserFromEmailAndPassword(store, loginController, ctx, email, password)
+	status, loggedUserID := getUserFromEmailAndPassword(store, passwordProcessor, ctx, email, password)
 	require.Equal(t, enums.EmailNotFound, status)
 	require.Nil(t, loggedUserID)
 }
@@ -194,7 +195,7 @@ func TestCreateSessionFromEmailAndPasswordWithoutPassword(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	password := "123"
 	email := "mail@mail.com"
@@ -217,7 +218,7 @@ func TestCreateSessionFromEmailAndPasswordWithoutPassword(t *testing.T) {
 		Times(1).
 		Return(enums.Ok, nil)
 
-	status, loggedUserID := getUserFromEmailAndPassword(store, loginController, ctx, email, password)
+	status, loggedUserID := getUserFromEmailAndPassword(store, passwordProcessor, ctx, email, password)
 	require.Equal(t, enums.PasswordNotFound, status)
 	require.Nil(t, loggedUserID)
 }
@@ -227,7 +228,7 @@ func TestCreateSessionFromEmailAndPasswordWithIncorrectPassword(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	password := "123"
 	encodedPassword := "321"
@@ -256,13 +257,13 @@ func TestCreateSessionFromEmailAndPasswordWithIncorrectPassword(t *testing.T) {
 			Value:   encodedPassword,
 		})
 
-	loginController.
+	passwordProcessor.
 		EXPECT().
 		VerifyPassword(ctx, password, encodedPassword).
 		Times(1).
 		Return(false)
 
-	status, loggedUserID := getUserFromEmailAndPassword(store, loginController, ctx, email, password)
+	status, loggedUserID := getUserFromEmailAndPassword(store, passwordProcessor, ctx, email, password)
 	require.Equal(t, enums.IncorrectPassword, status)
 	require.Nil(t, loggedUserID)
 }
@@ -274,7 +275,7 @@ func TestCreateSessionFromEmailAndCode(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, _ := mocks.InitMockApp(ctrl)
+	_, store, _, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	email := "mail@mail.com"
@@ -307,7 +308,7 @@ func TestCreateSessionFromEmailAndCodeWithIncorrectEmail(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, _ := mocks.InitMockApp(ctrl)
+	_, store, _, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	email := "mail"
@@ -322,7 +323,7 @@ func TestCreateSessionFromEmailAndCodeWithoutCode(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, _ := mocks.InitMockApp(ctrl)
+	_, store, _, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	email := "mail@mail.com"
@@ -343,7 +344,7 @@ func TestCreateSessionFromEmailAndCodeWithIncorrectCode(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, _ := mocks.InitMockApp(ctrl)
+	_, store, _, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	email := "mail@mail.com"
@@ -363,7 +364,7 @@ func TestCreateSessionFromEmailAndCodeWithoutEmail(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, _ := mocks.InitMockApp(ctrl)
+	_, store, _, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	email := "mail@mail.com"
@@ -392,7 +393,7 @@ func TestCreateSessionFromPhoneAndPassword(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	password := "123"
 	encodedPassword := "321"
@@ -421,13 +422,13 @@ func TestCreateSessionFromPhoneAndPassword(t *testing.T) {
 			Value:   encodedPassword,
 		})
 
-	loginController.
+	passwordProcessor.
 		EXPECT().
 		VerifyPassword(ctx, password, encodedPassword).
 		Times(1).
 		Return(true)
 
-	status, loggedUserID := getUserFromPhoneAndPassword(store, loginController, ctx, phone, password, "RU")
+	status, loggedUserID := getUserFromPhoneAndPassword(store, passwordProcessor, ctx, phone, password, "RU")
 	require.Equal(t, enums.Ok, status)
 	require.Equal(t, userID, *loggedUserID)
 }
@@ -437,12 +438,12 @@ func TestCreateSessionFromPhoneAndPasswordWithIncorrectEmail(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	password := "123"
 	phone := "phone"
 
-	status, loggedUserID := getUserFromPhoneAndPassword(store, loginController, ctx, phone, password, "RU")
+	status, loggedUserID := getUserFromPhoneAndPassword(store, passwordProcessor, ctx, phone, password, "RU")
 	require.Equal(t, enums.IncorrectPhone, status)
 	require.Nil(t, loggedUserID)
 }
@@ -452,7 +453,7 @@ func TestCreateSessionFromPhoneAndPasswordWithoutEmail(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	password := "123"
 	phone := "+71234567890"
@@ -463,7 +464,7 @@ func TestCreateSessionFromPhoneAndPasswordWithoutEmail(t *testing.T) {
 		Times(1).
 		Return(enums.Ok, nil)
 
-	status, loggedUserID := getUserFromPhoneAndPassword(store, loginController, ctx, phone, password, "RU")
+	status, loggedUserID := getUserFromPhoneAndPassword(store, passwordProcessor, ctx, phone, password, "RU")
 	require.Equal(t, enums.PhoneNotFound, status)
 	require.Nil(t, loggedUserID)
 }
@@ -473,7 +474,7 @@ func TestCreateSessionFromPhoneAndPasswordWithoutPassword(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	password := "123"
 	phone := "+71234567890"
@@ -496,7 +497,7 @@ func TestCreateSessionFromPhoneAndPasswordWithoutPassword(t *testing.T) {
 		Times(1).
 		Return(enums.Ok, nil)
 
-	status, loggedUserID := getUserFromPhoneAndPassword(store, loginController, ctx, phone, password, "RU")
+	status, loggedUserID := getUserFromPhoneAndPassword(store, passwordProcessor, ctx, phone, password, "RU")
 	require.Equal(t, enums.PasswordNotFound, status)
 	require.Nil(t, loggedUserID)
 }
@@ -506,7 +507,7 @@ func TestCreateSessionFromPhoneAndPasswordWithIncorrectPassword(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, loginController := mocks.InitMockApp(ctrl)
+	_, store, _, _, passwordProcessor := mocks.InitMockApp(ctrl)
 
 	password := "123"
 	encodedPassword := "321"
@@ -535,13 +536,13 @@ func TestCreateSessionFromPhoneAndPasswordWithIncorrectPassword(t *testing.T) {
 			Value:   encodedPassword,
 		})
 
-	loginController.
+	passwordProcessor.
 		EXPECT().
 		VerifyPassword(ctx, password, encodedPassword).
 		Times(1).
 		Return(false)
 
-	status, loggedUserID := getUserFromPhoneAndPassword(store, loginController, ctx, phone, password, "RU")
+	status, loggedUserID := getUserFromPhoneAndPassword(store, passwordProcessor, ctx, phone, password, "RU")
 	require.Equal(t, enums.IncorrectPassword, status)
 	require.Nil(t, loggedUserID)
 }
@@ -553,7 +554,7 @@ func TestCreateSessionFromPhoneAndCode(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, _ := mocks.InitMockApp(ctrl)
+	_, store, _, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	phone := "+71234567890"
@@ -586,7 +587,7 @@ func TestCreateSessionFromPhoneAndCodeWithIncorrectPhone(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, _ := mocks.InitMockApp(ctrl)
+	_, store, _, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	phone := "1"
@@ -601,7 +602,7 @@ func TestCreateSessionFromPhoneAndCodeWithoutCode(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, _ := mocks.InitMockApp(ctrl)
+	_, store, _, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	phone := "+71234567890"
@@ -622,7 +623,7 @@ func TestCreateSessionFromPhoneAndCodeWithIncorrectCode(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, _ := mocks.InitMockApp(ctrl)
+	_, store, _, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	phone := "+71234567890"
@@ -643,7 +644,7 @@ func TestCreateSessionFromPhoneAndCodeWithoutPhone(t *testing.T) {
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	_, store, _, _ := mocks.InitMockApp(ctrl)
+	_, store, _, _, _ := mocks.InitMockApp(ctrl)
 
 	code := "123"
 	phone := "+71234567890"

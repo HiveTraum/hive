@@ -11,7 +11,7 @@ import (
 func CreatePassword(
 	store infrastructure.StoreInterface,
 	esb infrastructure.ESBInterface,
-	passwordProcessor infrastructure.LoginControllerInterface,
+	passwordProcessor infrastructure.PasswordProcessorInterface,
 	ctx context.Context,
 	userId uuid.UUID,
 	value string) (int, *models.Password) {

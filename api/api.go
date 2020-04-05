@@ -3,12 +3,11 @@ package api
 import (
 	"auth/functools"
 	"github.com/getsentry/sentry-go"
-	"github.com/golang/protobuf/proto"
 	"net/http"
 	"strconv"
 )
 
-func unhandledStatus(r *functools.Request, status int) (int, proto.Message) {
+func unhandledStatus(r *functools.Request, status int) int {
 
 	request := sentry.Request{}
 	request.FromHTTPRequest(r.Request)
@@ -20,5 +19,5 @@ func unhandledStatus(r *functools.Request, status int) (int, proto.Message) {
 		Request: request,
 	})
 
-	return http.StatusInternalServerError, nil
+	return http.StatusInternalServerError
 }

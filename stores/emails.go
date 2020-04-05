@@ -18,12 +18,12 @@ func (store *DatabaseStore) GetEmail(ctx context.Context, phone string) (int, *m
 	return repositories.GetEmail(store.Db, ctx, phone)
 }
 
-func (store *DatabaseStore) CreateEmailConfirmationCode(_ context.Context, email string, code string, duration time.Duration) *models.EmailConfirmation {
-	return repositories.CreateEmailConfirmationCode(store.Cache, email, code, duration)
+func (store *DatabaseStore) CreateEmailConfirmationCode(ctx context.Context, email string, code string, duration time.Duration) *models.EmailConfirmation {
+	return repositories.CreateEmailConfirmationCode(ctx, store.Cache, email, code, duration)
 }
 
-func (store *DatabaseStore) GetEmailConfirmationCode(_ context.Context, email string) string {
-	return repositories.GetEmailConfirmationCode(store.Cache, email)
+func (store *DatabaseStore) GetEmailConfirmationCode(ctx context.Context, email string) string {
+	return repositories.GetEmailConfirmationCode(ctx, store.Cache, email)
 }
 
 func (store *DatabaseStore) GetRandomCodeForEmailConfirmation() string {

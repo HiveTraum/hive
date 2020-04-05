@@ -7,7 +7,6 @@ import (
 	"auth/infrastructure"
 	"auth/inout"
 	"auth/middlewares"
-	"auth/models"
 	"auth/repositories"
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/protobuf/proto"
@@ -17,82 +16,102 @@ import (
 	"net/url"
 )
 
-func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, proto.Message) {
+func createUserV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.CreateUserResponseV1) {
 
-	body := &inout.CreateUserRequestV1{}
+	body := &inout.CreateUserResponseV1_Request{}
 	err := r.ParseBody(body)
 
 	if err != nil {
 		return http.StatusBadRequest, nil
 	}
 
-	status, user := controllers.CreateUser(app.GetStore(), app.GetESB(), app.GetLoginController(), r.Context(), body)
+	status, user := controllers.CreateUser(app.GetStore(), app.GetESB(), app.GetPasswordProcessor(), r.Context(), body)
 
 	switch status {
 	case enums.Ok:
-		return http.StatusCreated, &inout.GetUserResponseV1{
-			Id:      user.Id.Bytes(),
-			Created: user.Created,
-		}
+		return http.StatusCreated, &inout.CreateUserResponseV1{
+			Data: &inout.CreateUserResponseV1_Ok{
+				Ok: &inout.User{
+					Id:      user.Id.Bytes(),
+					Created: user.Created,
+				}}}
 	case enums.MinimumOneFieldRequired:
-		return http.StatusBadRequest, &inout.CreateUserBadRequestV1{
-			Errors: []string{"Необходимо указать телефон или почту"},
-		}
+		return http.StatusBadRequest, &inout.CreateUserResponseV1{
+			Data: &inout.CreateUserResponseV1_ValidationError_{
+				ValidationError: &inout.CreateUserResponseV1_ValidationError{
+					Errors: []string{"Необходимо указать телефон или почту"},
+				}}}
 
 	// Password validations
 
 	case enums.PasswordRequired:
-		return http.StatusBadRequest, &inout.CreateUserBadRequestV1{
-			Password: []string{"Необходимо указать пароль"},
-		}
+		return http.StatusBadRequest, &inout.CreateUserResponseV1{
+			Data: &inout.CreateUserResponseV1_ValidationError_{
+				ValidationError: &inout.CreateUserResponseV1_ValidationError{
+					Password: []string{"Необходимо указать пароль"},
+				}}}
 	case enums.IncorrectPassword:
-		return http.StatusBadRequest, &inout.CreateUserBadRequestV1{
-			Password: []string{"Не удалось обработать полученный пароль, попробуйте другой"},
-		}
+		return http.StatusBadRequest, &inout.CreateUserResponseV1{
+			Data: &inout.CreateUserResponseV1_ValidationError_{
+				ValidationError: &inout.CreateUserResponseV1_ValidationError{
+					Password: []string{"Не удалось обработать полученный пароль, попробуйте другой"},
+				}}}
 
 	// Phone Validations
 
 	case enums.IncorrectPhoneCode:
-		return http.StatusBadRequest, &inout.CreateUserBadRequestV1{
-			PhoneCode: []string{"Неверный код"},
-		}
+		return http.StatusBadRequest, &inout.CreateUserResponseV1{
+			Data: &inout.CreateUserResponseV1_ValidationError_{
+				ValidationError: &inout.CreateUserResponseV1_ValidationError{
+					PhoneCode: []string{"Неверный код"},
+				}}}
 	case enums.PhoneNotFound:
-		return http.StatusBadRequest, &inout.CreateUserBadRequestV1{
-			Phone: []string{"Не удалось найти код для данного телефона."},
-		}
+		return http.StatusBadRequest, &inout.CreateUserResponseV1{
+			Data: &inout.CreateUserResponseV1_ValidationError_{
+				ValidationError: &inout.CreateUserResponseV1_ValidationError{
+					Phone: []string{"Не удалось найти код для данного телефона."},
+				}}}
 	case enums.IncorrectPhone:
-		return http.StatusBadRequest, &inout.CreateUserBadRequestV1{
-			Phone: []string{"Некорректный номер телефона"},
-		}
+		return http.StatusBadRequest, &inout.CreateUserResponseV1{
+			Data: &inout.CreateUserResponseV1_ValidationError_{
+				ValidationError: &inout.CreateUserResponseV1_ValidationError{
+					Phone: []string{"Некорректный номер телефона"},
+				}}}
 
 	// Email Validations
 
 	case enums.IncorrectEmailCode:
-		return http.StatusBadRequest, &inout.CreateUserBadRequestV1{
-			EmailCode: []string{"Неверный код"},
-		}
+		return http.StatusBadRequest, &inout.CreateUserResponseV1{
+			Data: &inout.CreateUserResponseV1_ValidationError_{
+				ValidationError: &inout.CreateUserResponseV1_ValidationError{
+					EmailCode: []string{"Неверный код"},
+				}}}
 	case enums.EmailNotFound:
-		return http.StatusBadRequest, &inout.CreateUserBadRequestV1{
-			Email: []string{"Не удалось найти код для данного email."},
-		}
+		return http.StatusBadRequest, &inout.CreateUserResponseV1{
+			Data: &inout.CreateUserResponseV1_ValidationError_{
+				ValidationError: &inout.CreateUserResponseV1_ValidationError{
+					Email: []string{"Не удалось найти код для данного email."},
+				}}}
 	case enums.IncorrectEmail:
-		return http.StatusBadRequest, &inout.CreateUserBadRequestV1{
-			Email: []string{"Некорректный email"},
-		}
+		return http.StatusBadRequest, &inout.CreateUserResponseV1{
+			Data: &inout.CreateUserResponseV1_ValidationError_{
+				ValidationError: &inout.CreateUserResponseV1_ValidationError{
+					Email: []string{"Некорректный email"},
+				}}}
 
 	default:
-		return unhandledStatus(r, status)
+		return unhandledStatus(r, status), nil
 	}
 }
 
-func GetUsersV1Query(query url.Values, payload *models.AccessTokenPayload) repositories.GetUsersQuery {
+func GetUsersV1Query(query url.Values, payload infrastructure.AuthenticationBackendUser) repositories.GetUsersQuery {
 	pagination := functools.GetPagination(query)
 
 	var requestedUserIdentifiers []uuid.UUID
-	if payload.IsAdmin {
+	if payload.GetIsAdmin() {
 		requestedUserIdentifiers = functools.StringsSliceToUUIDSlice(query["id"])
 	} else {
-		requestedUserIdentifiers = []uuid.UUID{payload.UserID}
+		requestedUserIdentifiers = []uuid.UUID{payload.GetUserID()}
 	}
 
 	return repositories.GetUsersQuery{
@@ -104,17 +123,17 @@ func GetUsersV1Query(query url.Values, payload *models.AccessTokenPayload) repos
 
 func getUsersV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.ListUserResponseV1) {
 
-	status, payload := app.GetLoginController().Login(r.Context(), r.GetAccessToken())
-	if status != enums.Ok {
+	status, payload := app.GetLoginController().Login(r.Context(), r.GetAuthorizationHeader())
+	if status != enums.Ok || payload == nil {
 		return http.StatusUnauthorized, nil
 	}
 
 	query := GetUsersV1Query(r.URL.Query(), payload)
 	users := app.GetStore().GetUsers(r.Context(), query)
-	usersData := make([]*inout.GetUserResponseV1, len(users))
+	usersData := make([]*inout.User, len(users))
 
 	for i, user := range users {
-		usersData[i] = &inout.GetUserResponseV1{
+		usersData[i] = &inout.User{
 			Id:      user.Id.Bytes(),
 			Created: user.Created,
 		}
@@ -131,8 +150,10 @@ func getUserV1(r *functools.Request, app infrastructure.AppInterface, id uuid.UU
 	}
 
 	return http.StatusOK, &inout.GetUserResponseV1{
-		Id:      user.Id.Bytes(),
-		Created: user.Created,
+		Data: &inout.User{
+			Id:      user.Id.Bytes(),
+			Created: user.Created,
+		},
 	}
 }
 
@@ -145,13 +166,15 @@ func deleteUserV1(r *functools.Request, app infrastructure.AppInterface, id uuid
 	switch status {
 	case enums.Ok:
 		return http.StatusOK, &inout.GetUserResponseV1{
-			Id:      deletedUser.Id.Bytes(),
-			Created: deletedUser.Created,
+			Data: &inout.User{
+				Id:      deletedUser.Id.Bytes(),
+				Created: deletedUser.Created,
+			},
 		}
 	case enums.UserNotFound:
 		return http.StatusNotFound, nil
 	default:
-		return unhandledStatus(r, status)
+		return unhandledStatus(r, status), nil
 	}
 }
 
@@ -178,11 +201,11 @@ func UserAPIV1(app infrastructure.AppInterface) middlewares.ResponseControllerHa
 			return http.StatusBadRequest, nil
 		}
 
-		status, payload := app.GetLoginController().Login(request.Context(), request.GetAccessToken())
+		status, payload := app.GetLoginController().Login(request.Context(), request.GetAuthorizationHeader())
 		if status != enums.Ok {
 			return http.StatusUnauthorized, nil
 		}
-		if id != payload.UserID || payload.IsAdmin {
+		if id != payload.GetUserID() || payload.GetIsAdmin() {
 			return http.StatusForbidden, nil
 		}
 

@@ -16,7 +16,7 @@ type StoreInterface interface {
 
 	// Users
 
-	CreateUser(ctx context.Context, query *inout.CreateUserRequestV1) (int, *models.User)
+	CreateUser(ctx context.Context, query *inout.CreateUserResponseV1_Request) (int, *models.User)
 	GetUser(context context.Context, id uuid.UUID) *models.User
 	GetUsers(context context.Context, query repositories.GetUsersQuery) []*models.User
 	DeleteUser(ctx context.Context, id uuid.UUID) (int, *models.User)
@@ -58,7 +58,7 @@ type StoreInterface interface {
 
 	CreateRole(context context.Context, title string) (int, *models.Role)
 	GetRole(context context.Context, id uuid.UUID) (int, *models.Role)
-	GetRoles(context context.Context, query repositories.GetRolesQuery) []*models.Role
+	GetRoles(context context.Context, query repositories.GetRolesQuery) ([]*models.Role, *models.PaginationResponse)
 	GetRoleByTitle(ctx context.Context, title string) (int, *models.Role)
 	GetAdminRole(ctx context.Context) (int, *models.Role)
 
@@ -94,13 +94,21 @@ type ESBDispatcherInterface interface {
 	Send(event inout.Event)
 }
 
+type AuthenticationBackendUser interface {
+	GetIsAdmin() bool
+	GetRoles() []string
+	GetUserID() uuid.UUID
+}
+
+type AuthenticationBackend interface {
+	GetUser(ctx context.Context, token string) (int, AuthenticationBackendUser)
+}
+
 type LoginControllerInterface interface {
-	Login(ctx context.Context, accessToken string) (int, *models.AccessTokenPayload)
+	Login(ctx context.Context, authorizationHeader string) (int, AuthenticationBackendUser)
+}
 
-	DecodeAccessToken(ctx context.Context, token string, secret uuid.UUID) (int, *models.AccessTokenPayload)
-	DecodeAccessTokenWithoutValidation(ctx context.Context, tokenValue string) (int, *models.AccessTokenPayload)
-	EncodeAccessToken(ctx context.Context, userID uuid.UUID, roles []string, secret *models.Secret, expire time.Time) string
-
+type PasswordProcessorInterface interface {
 	EncodePassword(context.Context, string) string
 	VerifyPassword(ctx context.Context, password string, encodedPassword string) bool
 }
@@ -109,4 +117,5 @@ type AppInterface interface {
 	GetStore() StoreInterface
 	GetESB() ESBInterface
 	GetLoginController() LoginControllerInterface
+	GetPasswordProcessor() PasswordProcessorInterface
 }

@@ -30,10 +30,10 @@ func getUsersViewV1(r *functools.Request, app infrastructure.AppInterface) (int,
 	query := getUsersViewV1Query(r)
 	users, pagination := app.GetStore().GetUsersView(r.Context(), query)
 
-	userViews := make([]*inout.GetUserViewResponseV1, len(users))
+	userViews := make([]*inout.UserView, len(users))
 
 	for i, u := range users {
-		userViews[i] = &inout.GetUserViewResponseV1{
+		userViews[i] = &inout.UserView{
 			Id:      u.Id.Bytes(),
 			Created: u.Created,
 			Roles:   u.Roles,
@@ -58,12 +58,13 @@ func getUserViewV1(r *functools.Request, app infrastructure.AppInterface, id uui
 	}
 
 	return http.StatusOK, &inout.GetUserViewResponseV1{
-		Id:      userView.Id.Bytes(),
-		Created: userView.Created,
-		Roles:   userView.Roles,
-		Phones:  userView.Phones,
-		Emails:  userView.Emails,
-	}
+		Data: &inout.UserView{
+			Id:      userView.Id.Bytes(),
+			Created: userView.Created,
+			Roles:   userView.Roles,
+			Phones:  userView.Phones,
+			Emails:  userView.Emails,
+		}}
 }
 
 func UsersViewV1(app infrastructure.AppInterface) middlewares.ResponseControllerHandler {

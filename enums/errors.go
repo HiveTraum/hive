@@ -57,4 +57,8 @@ const (
 	// Credentials
 
 	CredentialsNotProvided // 23
+
+	// Auth Backends
+
+	BackendNotFound // 24
 )

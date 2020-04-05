@@ -26,5 +26,6 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/uber/jaeger-client-go v2.20.1+incompatible
 	github.com/uber/jaeger-lib v2.2.0+incompatible // indirect
+	go.elastic.co/apm/module/apmgorilla v1.7.2
 	golang.org/x/crypto v0.0.0-20190911031432-227b76d455e7
 )
