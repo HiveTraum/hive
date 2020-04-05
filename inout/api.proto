@@ -75,6 +75,11 @@ message Password {
     bytes userID = 3;
 }
 
+message User {
+    bytes id = 1;
+    int64 created = 2;
+}
+
 // Roles API
 
 message GetRoleResponseV1 {
@@ -242,32 +247,39 @@ message CreatePasswordResponseV1 {
 
 // Users API
 
-message CreateUserRequestV1 {
-    string password = 1;
-    string phone = 2;
-    string phoneCountryCode = 3;
-    string email = 4;
-    string phoneCode = 5;
-    string emailCode = 6;
-}
+message CreateUserResponseV1 {
 
-message CreateUserBadRequestV1 {
-    repeated string password = 1;
-    repeated string phone = 2;
-    repeated string phoneCountryCode = 3;
-    repeated string email = 4;
-    repeated string phoneCode = 5;
-    repeated string emailCode = 6;
-    repeated string errors = 7;
+    message Request {
+        string password = 1;
+        string phone = 2;
+        string phoneCountryCode = 3;
+        string email = 4;
+        string phoneCode = 5;
+        string emailCode = 6;
+    }
+
+    message ValidationError {
+        repeated string password = 1;
+        repeated string phone = 2;
+        repeated string phoneCountryCode = 3;
+        repeated string email = 4;
+        repeated string phoneCode = 5;
+        repeated string emailCode = 6;
+        repeated string errors = 7;
+    }
+
+    oneof data {
+        User ok = 1;
+        ValidationError validationError = 2;
+    }
 }
 
 message GetUserResponseV1 {
-    bytes id = 1;
-    int64 created = 2;
+    User data = 1;
 }
 
 message ListUserResponseV1 {
-    repeated GetUserResponseV1 data = 1;
+    repeated User data = 1;
 }
 
 // Sessions API

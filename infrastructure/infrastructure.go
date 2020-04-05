@@ -16,7 +16,7 @@ type StoreInterface interface {
 
 	// Users
 
-	CreateUser(ctx context.Context, query *inout.CreateUserRequestV1) (int, *models.User)
+	CreateUser(ctx context.Context, query *inout.CreateUserResponseV1_Request) (int, *models.User)
 	GetUser(context context.Context, id uuid.UUID) *models.User
 	GetUsers(context context.Context, query repositories.GetUsersQuery) []*models.User
 	DeleteUser(ctx context.Context, id uuid.UUID) (int, *models.User)

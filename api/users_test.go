@@ -34,9 +34,9 @@ func TestCreateUserEmptyBody(t *testing.T) {
 	r.Header.Add("Content-Type", "application/json")
 	status, message := createUserV1(&functools.Request{Request: r}, app)
 	require.Equal(t, status, http.StatusBadRequest)
-	v, ok := message.(*inout.CreateUserBadRequestV1)
-	require.True(t, ok)
-	require.Len(t, v.Password, 1)
+	validationError := message.GetValidationError()
+	require.NotNil(t, validationError)
+	require.Len(t, validationError.Password, 1)
 }
 
 func TestCreateUserWithOnlyPassword(t *testing.T) {
@@ -56,9 +56,9 @@ func TestCreateUserWithOnlyPassword(t *testing.T) {
 	r.Header.Add("Content-Type", "application/json")
 	status, message := createUserV1(&functools.Request{Request: r}, app)
 	require.Equal(t, status, http.StatusBadRequest)
-	v, ok := message.(*inout.CreateUserBadRequestV1)
-	require.True(t, ok)
-	require.Len(t, v.Errors, 1)
+	validationError := message.GetValidationError()
+	require.NotNil(t, validationError)
+	require.Len(t, validationError.Errors, 1)
 }
 
 func TestCreateUserWithOnlyEmail(t *testing.T) {
@@ -90,9 +90,9 @@ func TestCreateUserWithOnlyEmail(t *testing.T) {
 	r.Header.Add("Content-Type", "application/json")
 	status, message := createUserV1(&functools.Request{Request: r}, app)
 	require.Equal(t, status, http.StatusBadRequest)
-	v, ok := message.(*inout.CreateUserBadRequestV1)
-	require.True(t, ok)
-	require.Len(t, v.Email, 1)
+	validationError := message.GetValidationError()
+	require.NotNil(t, validationError)
+	require.Len(t, validationError.Email, 1)
 }
 
 func TestCreateUserWithEmailAndEmailCode(t *testing.T) {
@@ -124,9 +124,9 @@ func TestCreateUserWithEmailAndEmailCode(t *testing.T) {
 	r.Header.Add("Content-Type", "application/json")
 	status, message := createUserV1(&functools.Request{Request: r}, app)
 	require.Equal(t, status, http.StatusBadRequest)
-	v, ok := message.(*inout.CreateUserBadRequestV1)
-	require.True(t, ok)
-	require.Len(t, v.Email, 1)
+	validationError := message.GetValidationError()
+	require.NotNil(t, validationError)
+	require.Len(t, validationError.Email, 1)
 }
 
 func TestCreateUserWithEmailAndEmailCodeAfterIncorrectEmailConfirmationCodeReceived(t *testing.T) {
@@ -158,9 +158,9 @@ func TestCreateUserWithEmailAndEmailCodeAfterIncorrectEmailConfirmationCodeRecei
 	r.Header.Add("Content-Type", "application/json")
 	status, message := createUserV1(&functools.Request{Request: r}, app)
 	require.Equal(t, status, http.StatusBadRequest)
-	v, ok := message.(*inout.CreateUserBadRequestV1)
-	require.True(t, ok)
-	require.Len(t, v.EmailCode, 1)
+	validationError := message.GetValidationError()
+	require.NotNil(t, validationError)
+	require.Len(t, validationError.EmailCode, 1)
 }
 
 func TestSuccessfulCreateUserWithEmail(t *testing.T) {
@@ -199,7 +199,7 @@ func TestSuccessfulCreateUserWithEmail(t *testing.T) {
 
 	store.
 		EXPECT().
-		CreateUser(gomock.Any(), &inout.CreateUserRequestV1{
+		CreateUser(gomock.Any(), &inout.CreateUserResponseV1_Request{
 			Password:  "olleh",
 			Email:     "mail@mail.com",
 			EmailCode: "123456",
@@ -218,9 +218,8 @@ func TestSuccessfulCreateUserWithEmail(t *testing.T) {
 	r.Header.Add("Content-Type", "application/json")
 	status, message := createUserV1(&functools.Request{Request: r}, app)
 	require.Equal(t, status, http.StatusCreated)
-	v, ok := message.(*inout.GetUserResponseV1)
-	require.True(t, ok)
-	require.NotNil(t, v)
+	user := message.GetOk()
+	require.NotNil(t, user)
 }
 
 func TestGetUsersV1QueryForAdminUser(t *testing.T) {

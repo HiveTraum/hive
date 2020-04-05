@@ -26,7 +26,7 @@ func createPasswordForUser(tx repositories.DB, ctx context.Context, password str
 	return status
 }
 
-func (store *DatabaseStore) CreateUser(ctx context.Context, query *inout.CreateUserRequestV1) (int, *models.User) {
+func (store *DatabaseStore) CreateUser(ctx context.Context, query *inout.CreateUserResponseV1_Request) (int, *models.User) {
 	tx, err := store.Db.Begin(ctx)
 
 	if tx == nil {

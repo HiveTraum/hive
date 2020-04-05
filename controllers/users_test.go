@@ -55,7 +55,7 @@ func TestCreateUser(t *testing.T) {
 			Value:   "email@email.com",
 		})
 
-	body := inout.CreateUserRequestV1{
+	body := inout.CreateUserResponseV1_Request{
 		Password:         "hello",
 		Phone:            "71234567890",
 		Email:            "email@email.com",
@@ -66,7 +66,7 @@ func TestCreateUser(t *testing.T) {
 
 	store.
 		EXPECT().
-		CreateUser(ctx, &inout.CreateUserRequestV1{
+		CreateUser(ctx, &inout.CreateUserResponseV1_Request{
 			Password:  "olleh",
 			Phone:     "+71234567890",
 			Email:     body.Email,

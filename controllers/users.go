@@ -15,7 +15,7 @@ func CreateUser(
 	esb infrastructure.ESBInterface,
 	passwordProcessor infrastructure.PasswordProcessorInterface,
 	ctx context.Context,
-	body *inout.CreateUserRequestV1) (int, *models.User) {
+	body *inout.CreateUserResponseV1_Request) (int, *models.User) {
 
 	var identifiers []uuid.UUID
 

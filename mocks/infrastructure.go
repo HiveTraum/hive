@@ -40,7 +40,7 @@ func (m *MockStoreInterface) EXPECT() *MockStoreInterfaceMockRecorder {
 }
 
 // CreateUser mocks base method
-func (m *MockStoreInterface) CreateUser(ctx context.Context, query *inout.CreateUserRequestV1) (int, *models.User) {
+func (m *MockStoreInterface) CreateUser(ctx context.Context, query *inout.CreateUserResponseV1_Request) (int, *models.User) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", ctx, query)
 	ret0, _ := ret[0].(int)
