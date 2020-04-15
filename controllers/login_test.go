@@ -172,7 +172,7 @@ func TestLoginController_LoginByTokens(t *testing.T) {
 		})
 
 	encodedToken := "Bearer " + backend.EncodeAccessToken(ctx, userID, []string{"admin"}, secret, time.Now().Add(time.Second))
-	status, payload := controller.Login(ctx, encodedToken)
+	status, payload, ctx := controller.Login(ctx, encodedToken)
 	require.Equal(t, enums.Ok, status)
 	require.NotNil(t, payload)
 	require.True(t, payload.GetIsAdmin())
@@ -187,7 +187,7 @@ func TestLoginController_LoginByIncorrectTokens(t *testing.T) {
 	ctx := context.Background()
 	controller := LoginController{Backends: map[string]infrastructure.AuthenticationBackend{"Bearer": backends.JWTAuthenticationBackend{}}}
 
-	status, payload := controller.Login(ctx, "Bearer 123")
+	status, payload, ctx := controller.Login(ctx, "Bearer 123")
 	require.Equal(t, enums.IncorrectToken, status)
 	require.Nil(t, payload)
 }
@@ -215,7 +215,44 @@ func TestLoginController_LoginByTokensWithoutSecret(t *testing.T) {
 		Return(nil)
 
 	encodedToken := backend.EncodeAccessToken(ctx, userID, []string{"admin"}, secret, time.Now().Add(time.Second))
-	status, payload := controller.Login(ctx, "Bearer "+encodedToken)
+	status, payload, ctx := controller.Login(ctx, "Bearer "+encodedToken)
 	require.Equal(t, enums.SecretNotFound, status)
 	require.Nil(t, payload)
+}
+
+func TestLoginController_LoginUserCaching(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	_, store, _, _, _ := mocks.InitMockApp(ctrl)
+	backend := backends.JWTAuthenticationBackend{Store: store}
+	controller := LoginController{Backends: map[string]infrastructure.AuthenticationBackend{"Bearer": backend}}
+
+	userID := uuid.NewV4()
+	secret := &models.Secret{
+		Id:      uuid.NewV4(),
+		Created: 0,
+		Value:   uuid.NewV4(),
+	}
+
+	store.
+		EXPECT().
+		GetSecret(ctx, secret.Id).
+		Times(1).
+		Return(&models.Secret{
+			Id:      secret.Id,
+			Created: 1,
+			Value:   secret.Value,
+		})
+
+	encodedToken := "Bearer " + backend.EncodeAccessToken(ctx, userID, []string{"admin"}, secret, time.Now().Add(time.Second))
+	status, payload, ctx := controller.Login(ctx, encodedToken)
+	_, _, _ = controller.Login(ctx, encodedToken)
+	_, _, _ = controller.Login(ctx, encodedToken)
+	require.Equal(t, enums.Ok, status)
+	require.NotNil(t, payload)
+	require.True(t, payload.GetIsAdmin())
+	require.Equal(t, userID, payload.GetUserID())
+	require.Equal(t, []string{"admin"}, payload.GetRoles())
 }

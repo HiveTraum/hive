@@ -35,6 +35,7 @@ func (app *App) GetLoginController() infrastructure.LoginControllerInterface {
 
 func InitApp(tracer opentracing.Tracer) *App {
 	config.InitSentry()
+	env := config.GetEnvironment()
 	pool := config.InitPool(tracer)
 	redis := config.InitRedis()
 	inMemoryCache := config.InitInMemoryCache()
@@ -43,7 +44,7 @@ func InitApp(tracer opentracing.Tracer) *App {
 		"Bearer": backends.JWTAuthenticationBackend{Store: store},
 		"Basic":  backends.BasicAuthenticationBackend{Store: store},
 	}
-	loginController := &controllers.LoginController{Backends: authBackends}
+	loginController := &controllers.LoginController{Backends: authBackends, RequestContextUserKey: env.RequestContextUserKey}
 	passwordProcessor := &processors.PasswordProcessor{}
 	esb := InitESB(store)
 	InitialAdminRole(store)

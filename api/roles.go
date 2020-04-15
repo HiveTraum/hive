@@ -34,8 +34,7 @@ func getRoleV1(r *functools.Request, app *app.App, id uuid.UUID) (int, proto.Mes
 				Id:      role.Id.Bytes(),
 				Created: role.Created,
 				Title:   role.Title,
-			},
-		}
+			}}
 	case enums.RoleNotFound:
 		return http.StatusNotFound, &inout.GetRoleResponseV1{}
 	default:

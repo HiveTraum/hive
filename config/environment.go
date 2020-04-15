@@ -24,6 +24,7 @@ type Environment struct {
 	TestConfirmationCode   string `env:"TEST_CONFIRMATION_CODE" envDefault:"111111"`
 	InitialAdmin           string `env:"INITIAL_ADMIN"`
 	AdminRole              string `env:"ADMIN_ROLE" envDefault:"admin"`
+	RequestContextUserKey  string `env:"REQUEST_CONTEXT_USER_KEY" envDefault:"UserContextKey"`
 }
 
 var cfg Environment

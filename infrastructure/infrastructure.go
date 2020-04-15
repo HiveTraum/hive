@@ -105,7 +105,7 @@ type AuthenticationBackend interface {
 }
 
 type LoginControllerInterface interface {
-	Login(ctx context.Context, authorizationHeader string) (int, AuthenticationBackendUser)
+	Login(ctx context.Context, authorizationHeader string) (int, AuthenticationBackendUser, context.Context)
 }
 
 type PasswordProcessorInterface interface {

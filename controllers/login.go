@@ -8,7 +8,8 @@ import (
 )
 
 type LoginController struct {
-	Backends map[string]infrastructure.AuthenticationBackend
+	Backends              map[string]infrastructure.AuthenticationBackend
+	RequestContextUserKey string
 }
 
 func (controller *LoginController) GetToken(authorizationHeader string) (string, string) {
@@ -28,18 +29,27 @@ func (controller *LoginController) GetToken(authorizationHeader string) (string,
 
 // Login
 
-func (controller *LoginController) Login(ctx context.Context, authorizationHeader string) (int, infrastructure.AuthenticationBackendUser) {
+func (controller *LoginController) Login(ctx context.Context, authorizationHeader string) (int, infrastructure.AuthenticationBackendUser, context.Context) {
+
+	if user, ok := ctx.Value(controller.RequestContextUserKey).(infrastructure.AuthenticationBackendUser); ok {
+		return enums.Ok, user, ctx
+	}
 
 	tokenType, token := controller.GetToken(authorizationHeader)
 
 	if tokenType == "" || token == "" {
-		return enums.Ok, nil
+		return enums.Ok, nil, ctx
 	}
 
 	backend := controller.Backends[tokenType]
 	if backend == nil {
-		return enums.BackendNotFound, nil
+		return enums.BackendNotFound, nil, ctx
 	}
 
-	return backend.GetUser(ctx, token)
+	status, user := backend.GetUser(ctx, token)
+	if status == enums.Ok || user != nil {
+		ctx = context.WithValue(ctx, controller.RequestContextUserKey, user)
+	}
+
+	return status, user, ctx
 }
