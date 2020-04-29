@@ -75,7 +75,7 @@ func createRoleV1(r *functools.Request, app infrastructure.AppInterface) (int, p
 
 	ctx := r.Context()
 
-	status, payload := app.GetLoginController().Login(ctx, r.GetAuthorizationHeader())
+	status, payload, ctx := app.GetLoginController().Login(ctx, r.GetAuthorizationHeader())
 	if status != enums.Ok || payload == nil {
 		return http.StatusUnauthorized, &inout.CreateRoleResponseV1{
 			Data: &inout.CreateRoleResponseV1_Error{

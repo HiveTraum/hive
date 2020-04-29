@@ -3,8 +3,6 @@ module auth
 go 1.13
 
 require (
-	github.com/Applifier/go-libphonenumber v0.0.0-20161107150900-64e099bc8ad4 // indirect
-	github.com/DATA-DOG/go-sqlmock v1.3.3 // indirect
 	github.com/badoux/checkmail v0.0.0-20181210160741-9661bd69e9ad
 	github.com/caarlos0/env/v6 v6.1.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -22,7 +20,6 @@ require (
 	github.com/opentracing/opentracing-go v1.1.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/satori/go.uuid v1.2.0
-	github.com/smacker/opentracing-go-redis v0.0.0-20190628101507-6225d3249491 // indirect
 	github.com/stretchr/testify v1.4.0
 	github.com/uber/jaeger-client-go v2.20.1+incompatible
 	github.com/uber/jaeger-lib v2.2.0+incompatible // indirect

@@ -15,7 +15,7 @@ import (
 
 func getUserFromTokens(store infrastructure.StoreInterface, controller infrastructure.LoginControllerInterface, ctx context.Context, accessToken string, fingerprint string, refreshToken string) (int, *uuid.UUID) {
 
-	status, payload := controller.Login(ctx, accessToken)
+	status, payload, ctx := controller.Login(ctx, accessToken)
 	if status != enums.Ok {
 		return status, nil
 	}

@@ -15,6 +15,12 @@ message ChangedUserViewsEventV1 {
     repeated string identifiers = 1;
 }
 
+message CreateSecretEventV1 {
+    bytes id = 1;
+    int64 created = 2;
+    bytes value = 3;
+}
+
 message Event {
     string sender = 1;
     string object = 2;
@@ -25,5 +31,6 @@ message Event {
         CreatePhoneConfirmationEventV1 phoneConfirmationEvent = 6;
         CreateEmailConfirmationEventV1 emailConfirmationEvent = 7;
         ChangedUserViewsEventV1 changedUserViewsEvent = 8;
+        CreateSecretEventV1 createSecretEventV1 = 9;
     }
 }

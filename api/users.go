@@ -123,7 +123,8 @@ func GetUsersV1Query(query url.Values, payload infrastructure.AuthenticationBack
 
 func getUsersV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.ListUserResponseV1) {
 
-	status, payload := app.GetLoginController().Login(r.Context(), r.GetAuthorizationHeader())
+	ctx := r.Context()
+	status, payload, ctx := app.GetLoginController().Login(ctx, r.GetAuthorizationHeader())
 	if status != enums.Ok || payload == nil {
 		return http.StatusUnauthorized, nil
 	}
@@ -201,7 +202,7 @@ func UserAPIV1(app infrastructure.AppInterface) middlewares.ResponseControllerHa
 			return http.StatusBadRequest, nil
 		}
 
-		status, payload := app.GetLoginController().Login(request.Context(), request.GetAuthorizationHeader())
+		status, payload, _ := app.GetLoginController().Login(request.Context(), request.GetAuthorizationHeader())
 		if status != enums.Ok {
 			return http.StatusUnauthorized, nil
 		}
