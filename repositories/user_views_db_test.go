@@ -76,8 +76,8 @@ func TestCreateOrUpdateUsersViewWithTheSamePhone(t *testing.T) {
 func TestDatabaseStore_GetUsersViewPagination(t *testing.T) {
 	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
-	config.PurgeUsers(pool, ctx)
-	config.PurgeUserViews(pool, ctx)
+	PurgeUsers(pool, ctx)
+	PurgeUserViews(pool, ctx)
 
 	CreateUser(pool, ctx)
 	CreateUser(pool, ctx)
@@ -97,8 +97,8 @@ func TestDatabaseStore_GetUsersViewPagination(t *testing.T) {
 func TestDatabaseStore_GetUsersViewPaginationWithLimit(t *testing.T) {
 	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
-	config.PurgeUsers(pool, ctx)
-	config.PurgeUserViews(pool, ctx)
+	PurgeUsers(pool, ctx)
+	PurgeUserViews(pool, ctx)
 
 	user := CreateUser(pool, ctx)
 	CreateUser(pool, ctx)
@@ -119,8 +119,8 @@ func TestDatabaseStore_GetUsersViewPaginationWithLimit(t *testing.T) {
 func TestDatabaseStore_GetUsersViewPaginationWithLimitWithoutNext(t *testing.T) {
 	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
-	config.PurgeUsers(pool, ctx)
-	config.PurgeUserViews(pool, ctx)
+	PurgeUsers(pool, ctx)
+	PurgeUserViews(pool, ctx)
 
 	CreateUser(pool, ctx)
 
