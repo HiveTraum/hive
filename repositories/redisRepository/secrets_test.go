@@ -1,4 +1,4 @@
-package repositories
+package redisRepository
 
 import (
 	"auth/config"
@@ -12,6 +12,7 @@ import (
 
 func TestCacheSecret(t *testing.T) {
 	cache := config.InitRedis(config.InitEnvironment())
+	repo := InitRedisRepository(cache)
 	cache.FlushAll()
 	ctx := context.Background()
 	secret := &models.Secret{
@@ -19,12 +20,13 @@ func TestCacheSecret(t *testing.T) {
 		Created: 1,
 		Value:   uuid.NewV4(),
 	}
-	err := CacheSecret(cache, ctx, secret, time.Millisecond)
+	err := repo.CacheSecret(ctx, secret, time.Millisecond)
 	require.Nil(t, err)
 }
 
 func TestGetSecretByIDSecret(t *testing.T) {
 	cache := config.InitRedis(config.InitEnvironment())
+	repo := InitRedisRepository(cache)
 	cache.FlushAll()
 	ctx := context.Background()
 
@@ -36,15 +38,16 @@ func TestGetSecretByIDSecret(t *testing.T) {
 		Value:   uuid.NewV4(),
 	}
 
-	_ = CacheSecret(cache, ctx, secret, time.Millisecond)
+	_ = repo.CacheSecret(ctx, secret, time.Millisecond)
 
-	cachedSecret := GetSecretByIDFromCache(cache, ctx, id)
+	cachedSecret := repo.GetSecret(ctx, id)
 	require.NotNil(t, cachedSecret)
 	require.Equal(t, secret, cachedSecret)
 }
 
 func TestGetExpiredSecretByIDSecret(t *testing.T) {
 	cache := config.InitRedis(config.InitEnvironment())
+	repo := InitRedisRepository(cache)
 	cache.FlushAll()
 	ctx := context.Background()
 
@@ -56,14 +59,15 @@ func TestGetExpiredSecretByIDSecret(t *testing.T) {
 		Value:   uuid.NewV4(),
 	}
 
-	_ = CacheSecret(cache, ctx, secret, time.Millisecond)
+	_ = repo.CacheSecret(ctx, secret, time.Millisecond)
 	time.Sleep(time.Millisecond * 2)
-	cachedSecret := GetSecretByIDFromCache(cache, ctx, id)
+	cachedSecret := repo.GetSecret(ctx, id)
 	require.Nil(t, cachedSecret)
 }
 
 func TestCacheActualSecret(t *testing.T) {
 	cache := config.InitRedis(config.InitEnvironment())
+	repo := InitRedisRepository(cache)
 	cache.FlushAll()
 	ctx := context.Background()
 
@@ -72,12 +76,13 @@ func TestCacheActualSecret(t *testing.T) {
 		Created: 1,
 		Value:   uuid.NewV4(),
 	}
-	err := CacheActualSecret(cache, ctx, secret, time.Millisecond)
+	err := repo.CacheActualSecret(ctx, secret, time.Millisecond)
 	require.Nil(t, err)
 }
 
 func TestGetActualSecret(t *testing.T) {
 	cache := config.InitRedis(config.InitEnvironment())
+	repo := InitRedisRepository(cache)
 	cache.FlushAll()
 	ctx := context.Background()
 	secret := &models.Secret{
@@ -85,8 +90,8 @@ func TestGetActualSecret(t *testing.T) {
 		Created: 1,
 		Value:   uuid.NewV4(),
 	}
-	_ = CacheActualSecret(cache, ctx, secret, time.Millisecond)
-	cachedSecret := GetActualSecretFromCache(cache, ctx)
+	_ = repo.CacheActualSecret(ctx, secret, time.Millisecond)
+	cachedSecret := repo.GetActualSecret(ctx)
 	require.NotNil(t, cachedSecret)
 	require.Equal(t, secret, cachedSecret)
 }

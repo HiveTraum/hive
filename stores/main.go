@@ -4,6 +4,9 @@ import (
 	"auth/config"
 	"auth/models"
 	"auth/repositories"
+	"auth/repositories/inMemoryRepository"
+	"auth/repositories/postgresRepository"
+	"auth/repositories/redisRepository"
 	"context"
 	"github.com/go-redis/redis/v7"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -85,17 +88,30 @@ type IStore interface {
 }
 
 type DatabaseStore struct {
-	db            *pgxpool.Pool
-	cache         *redis.Client
-	inMemoryCache *cache.Cache
-	environment   *config.Environment
+	db                 *pgxpool.Pool
+	cache              *redis.Client
+	inMemoryCache      *cache.Cache
+	environment        *config.Environment
+	postgresRepository postgresRepository.IPostgresRepository
+	redisRepository    redisRepository.IRedisRepository
+	inMemoryRepository inMemoryRepository.IInMemoryRepository
 }
 
-func InitStore(db *pgxpool.Pool, cache *redis.Client, inMemoryCache *cache.Cache, environment *config.Environment) *DatabaseStore {
+func InitStore(
+	db *pgxpool.Pool,
+	cache *redis.Client,
+	inMemoryCache *cache.Cache,
+	environment *config.Environment,
+	postgresRepository postgresRepository.IPostgresRepository,
+	redisRepository redisRepository.IRedisRepository,
+	inMemoryRepository inMemoryRepository.IInMemoryRepository) *DatabaseStore {
 	return &DatabaseStore{
-		db:            db,
-		cache:         cache,
-		inMemoryCache: inMemoryCache,
-		environment:   environment,
+		db:                 db,
+		cache:              cache,
+		inMemoryCache:      inMemoryCache,
+		environment:        environment,
+		postgresRepository: postgresRepository,
+		redisRepository:    redisRepository,
+		inMemoryRepository: inMemoryRepository,
 	}
 }

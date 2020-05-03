@@ -7,8 +7,7 @@ import (
 )
 
 func (controller *Controller) GetSecret(ctx context.Context, id uuid.UUID) *models.Secret {
-	secret := controller.store.GetSecret(ctx, id)
-	return secret
+	return controller.store.GetSecret(ctx, id)
 }
 
 func (controller *Controller) GetActualSecret(ctx context.Context) *models.Secret {

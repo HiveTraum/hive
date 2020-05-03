@@ -30,6 +30,7 @@ type Environment struct {
 	RequestContextUserKey  string `env:"REQUEST_CONTEXT_USER_KEY" envDefault:"UserContextKey"`
 	ServerAddress          string `env:"SERVER_ADDRESS" envDefault:":8080"`
 	ServiceName            string `env:"SERVICE_NAME" envDefault:"auth"`
+	LocalNetworkNamespace  string `env:"LOCAL_NETWORK_NAMESPACE" envDefault:"127.0.0"`
 }
 
 var cfg Environment

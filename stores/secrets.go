@@ -2,7 +2,6 @@ package stores
 
 import (
 	"auth/models"
-	"auth/repositories"
 	"context"
 	"github.com/getsentry/sentry-go"
 	uuid "github.com/satori/go.uuid"
@@ -11,23 +10,26 @@ import (
 
 func (store *DatabaseStore) GetSecret(ctx context.Context, id uuid.UUID) *models.Secret {
 
-	secret := repositories.GetSecretByIDFromInMemoryCache(store.inMemoryCache, ctx, id)
+	secret := store.inMemoryRepository.GetSecret(ctx, id)
 	if secret != nil {
 		return secret
 	}
 
-	secret = repositories.GetSecretByIDFromCache(store.cache, ctx, id)
+	secret = store.redisRepository.GetSecret(ctx, id)
 	if secret != nil {
-		repositories.CacheSecretInMemory(store.inMemoryCache, ctx, secret, time.Hour*24)
+		store.inMemoryRepository.CacheSecret(ctx, secret, time.Hour*24)
 		return secret
 	}
 
-	secret = repositories.GetSecretFromDB(store.db, ctx, id)
-	err := repositories.CacheSecret(store.cache, ctx, secret, time.Hour*48)
-	if err != nil {
-		sentry.CaptureException(err)
+	secret = store.postgresRepository.GetSecret(ctx, id)
+	if secret != nil {
+		err := store.redisRepository.CacheSecret(ctx, secret, time.Hour*48)
+		if err != nil {
+			sentry.CaptureException(err)
+		}
+		store.inMemoryRepository.CacheSecret(ctx, secret, time.Hour*24)
 	}
-	repositories.CacheSecretInMemory(store.inMemoryCache, ctx, secret, time.Hour*24)
+
 	return secret
 }
 
@@ -35,14 +37,14 @@ func (store *DatabaseStore) GetActualSecret(ctx context.Context) *models.Secret 
 
 	env := store.environment
 
-	actualSecret := repositories.GetActualSecretFromInMemoryCache(store.inMemoryCache, ctx)
+	actualSecret := store.inMemoryRepository.GetActualSecret(ctx)
 	if actualSecret != nil {
 		return actualSecret
 	}
 
-	actualSecret = repositories.GetActualSecretFromCache(store.cache, ctx)
+	actualSecret = store.redisRepository.GetActualSecret(ctx)
 	if actualSecret != nil {
-		repositories.CacheActualSecretInMemory(store.inMemoryCache, ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
+		store.inMemoryRepository.CacheActualSecret(ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
 		return actualSecret
 	}
 
@@ -53,16 +55,16 @@ func (store *DatabaseStore) CreateSecret(ctx context.Context) *models.Secret {
 
 	env := store.environment
 
-	actualSecret := repositories.CreateSecret(store.db, ctx)
-	err := repositories.CacheActualSecret(store.cache, ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
+	actualSecret := store.postgresRepository.CreateSecret(ctx)
+	err := store.redisRepository.CacheActualSecret(ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
 	if err != nil {
 		sentry.CaptureException(err)
 	}
-	err = repositories.CacheSecret(store.cache, ctx, actualSecret, time.Hour*time.Duration(env.RefreshTokenLifetime)*24)
+	err = store.redisRepository.CacheSecret(ctx, actualSecret, time.Hour*time.Duration(env.RefreshTokenLifetime)*24)
 	if err != nil {
 		sentry.CaptureException(err)
 	}
-	repositories.CacheActualSecretInMemory(store.inMemoryCache, ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
-	repositories.CacheSecretInMemory(store.inMemoryCache, ctx, actualSecret, time.Hour*time.Duration(env.RefreshTokenLifetime))
+	store.inMemoryRepository.CacheActualSecret(ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
+	store.inMemoryRepository.CacheSecret(ctx, actualSecret, time.Hour*time.Duration(env.RefreshTokenLifetime))
 	return actualSecret
 }

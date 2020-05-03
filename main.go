@@ -10,6 +10,9 @@ import (
 	"auth/eventDispatchers"
 	"auth/middlewares"
 	"auth/passwordProcessors"
+	"auth/repositories/inMemoryRepository"
+	"auth/repositories/postgresRepository"
+	"auth/repositories/redisRepository"
 	"auth/stores"
 	"context"
 	"fmt"
@@ -63,7 +66,10 @@ func main() {
 	inMemoryCache := config.InitInMemoryCache()
 	producer := config.InitNSQProducer(environment)
 	passwordProcessor := passwordProcessors.InitPasswordProcessor()
-	store := stores.InitStore(pool, redis, inMemoryCache, environment)
+	postgresRepo := postgresRepository.InitPostgresRepository(pool)
+	redisRepo := redisRepository.InitRedisRepository(redis)
+	inMemoryRepo := inMemoryRepository.InitInMemoryRepository(inMemoryCache)
+	store := stores.InitStore(pool, redis, inMemoryCache, environment, postgresRepo, redisRepo, inMemoryRepo)
 	jwtAuthenticationBackend := backends.InitJWTAuthenticationBackend(store)
 	basicAuthenticationBackend := backends.InitBasicAuthenticationBackend(store, passwordProcessor)
 	authenticationController := auth.InitAuthController(map[string]backends.IAuthenticationBackend{
@@ -77,6 +83,7 @@ func main() {
 	InitialAdmin(environment, store)
 
 	authentication := middlewares.AuthenticationMiddleware(authenticationController)
+	isLocalRequest := middlewares.IsLocalRequestMiddleware(environment.LocalNetworkNamespace)
 
 	// Init Routing
 
@@ -105,7 +112,7 @@ func main() {
 
 	CreateSessionV1 := authentication(http.HandlerFunc(API.CreateSessionV1))
 
-	GetSecretV1 := http.HandlerFunc(API.GetSecretV1)
+	GetSecretV1 := isLocalRequest(http.HandlerFunc(API.GetSecretV1))
 
 	GetUserViewV1 := authentication(http.HandlerFunc(API.GetUserViewV1))
 	GetUsersViewV1 := authentication(http.HandlerFunc(API.GetUsersViewV1))

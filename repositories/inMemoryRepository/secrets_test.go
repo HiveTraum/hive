@@ -1,4 +1,4 @@
-package repositories
+package inMemoryRepository
 
 import (
 	"auth/config"
@@ -12,6 +12,7 @@ import (
 
 func TestGetActualSecretFromInMemoryCache(t *testing.T) {
 	cache := config.InitInMemoryCache()
+	repo := InitInMemoryRepository(cache)
 	cache.Flush()
 	ctx := context.Background()
 	secret := &models.Secret{
@@ -19,14 +20,15 @@ func TestGetActualSecretFromInMemoryCache(t *testing.T) {
 		Created: 1,
 		Value:   uuid.NewV4(),
 	}
-	CacheActualSecretInMemory(cache, ctx, secret, time.Millisecond)
-	secretFromCache := GetActualSecretFromInMemoryCache(cache, ctx)
+	repo.CacheActualSecret(ctx, secret, time.Millisecond)
+	secretFromCache := repo.GetActualSecret(ctx)
 	require.NotNil(t, secretFromCache)
 	require.Equal(t, secret, secretFromCache)
 }
 
 func TestGetExpiredActualSecretFromInMemoryCache(t *testing.T) {
 	cache := config.InitInMemoryCache()
+	repo := InitInMemoryRepository(cache)
 	cache.Flush()
 	ctx := context.Background()
 	secret := &models.Secret{
@@ -34,14 +36,15 @@ func TestGetExpiredActualSecretFromInMemoryCache(t *testing.T) {
 		Created: 1,
 		Value:   uuid.NewV4(),
 	}
-	CacheActualSecretInMemory(cache, ctx, secret, time.Millisecond)
+	repo.CacheActualSecret(ctx, secret, time.Millisecond)
 	time.Sleep(time.Millisecond * 2)
-	secretFromCache := GetActualSecretFromInMemoryCache(cache, ctx)
+	secretFromCache := repo.GetActualSecret(ctx)
 	require.Nil(t, secretFromCache)
 }
 
 func TestGetSecretByIDFromInMemoryCache(t *testing.T) {
 	cache := config.InitInMemoryCache()
+	repo := InitInMemoryRepository(cache)
 	cache.Flush()
 	ctx := context.Background()
 	secret := &models.Secret{
@@ -49,14 +52,15 @@ func TestGetSecretByIDFromInMemoryCache(t *testing.T) {
 		Created: 1,
 		Value:   uuid.NewV4(),
 	}
-	CacheSecretInMemory(cache, ctx, secret, time.Millisecond)
-	secretFromCache := GetSecretByIDFromInMemoryCache(cache, ctx, secret.Id)
+	repo.CacheSecret(ctx, secret, time.Millisecond)
+	secretFromCache := repo.GetSecret(ctx, secret.Id)
 	require.NotNil(t, secretFromCache)
 	require.Equal(t, secret, secretFromCache)
 }
 
 func TestGetExpiredSecretByIDFromInMemoryCache(t *testing.T) {
 	cache := config.InitInMemoryCache()
+	repo := InitInMemoryRepository(cache)
 	cache.Flush()
 	ctx := context.Background()
 	secret := &models.Secret{
@@ -64,8 +68,8 @@ func TestGetExpiredSecretByIDFromInMemoryCache(t *testing.T) {
 		Created: 1,
 		Value:   uuid.NewV4(),
 	}
-	CacheSecretInMemory(cache, ctx, secret, time.Millisecond)
+	repo.CacheSecret(ctx, secret, time.Millisecond)
 	time.Sleep(time.Millisecond * 2)
-	secretFromCache := GetSecretByIDFromInMemoryCache(cache, ctx, secret.Id)
+	secretFromCache := repo.GetSecret(ctx, secret.Id)
 	require.Nil(t, secretFromCache)
 }

@@ -3,6 +3,7 @@ package repositories
 import (
 	"auth/config"
 	"auth/enums"
+	"auth/repositories/postgresRepository"
 	"context"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -10,11 +11,12 @@ import (
 
 func TestCreateSession(t *testing.T) {
 	pool := config.InitPool(nil, config.InitEnvironment())
+	postgresRepo := postgresRepository.InitPostgresRepository(pool)
 	ctx := context.Background()
 	PurgeSessions(pool, ctx)
 	PurgeSecrets(pool, ctx)
 	PurgeUsers(pool, ctx)
-	secret := CreateSecret(pool, ctx)
+	secret := postgresRepo.CreateSecret(ctx)
 	user := CreateUser(pool, ctx)
 	status, session := CreateSession(pool, ctx, "123", user.Id, secret.Id, "chrome")
 	require.Equal(t, enums.Ok, status)
@@ -28,11 +30,12 @@ func TestCreateSession(t *testing.T) {
 
 func TestGetSession(t *testing.T) {
 	pool := config.InitPool(nil, config.InitEnvironment())
+	postgresRepo := postgresRepository.InitPostgresRepository(pool)
 	ctx := context.Background()
 	PurgeSessions(pool, ctx)
 	PurgeSecrets(pool, ctx)
 	PurgeUsers(pool, ctx)
-	secret := CreateSecret(pool, ctx)
+	secret := postgresRepo.CreateSecret(ctx)
 	user := CreateUser(pool, ctx)
 	_, createdSession := CreateSession(pool, ctx, "123", user.Id, secret.Id, "chrome")
 	session := GetSession(pool, ctx, "123", createdSession.RefreshToken, user.Id)

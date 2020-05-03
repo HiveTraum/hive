@@ -1,4 +1,4 @@
-package repositories
+package postgresRepository
 
 import (
 	"auth/functools"
@@ -34,14 +34,14 @@ func scanSecret(row pgx.Row) *models.Secret {
 	return secret
 }
 
-func CreateSecret(db DB, ctx context.Context) *models.Secret {
+func (repository *PostgresRepository) CreateSecret(ctx context.Context) *models.Secret {
 	sql := createSecretSQL()
-	row := db.QueryRow(ctx, sql, uuid.NewV4())
+	row := repository.pool.QueryRow(ctx, sql, uuid.NewV4())
 	return scanSecret(row)
 }
 
-func GetSecretFromDB(db DB, ctx context.Context, id uuid.UUID) *models.Secret {
+func (repository *PostgresRepository) GetSecret(ctx context.Context, id uuid.UUID) *models.Secret {
 	sql := getSecretsSQL()
-	row := db.QueryRow(ctx, sql, functools.StringsToPGArray([]string{id.String()}), 1)
+	row := repository.pool.QueryRow(ctx, sql, functools.StringsToPGArray([]string{id.String()}), 1)
 	return scanSecret(row)
 }
