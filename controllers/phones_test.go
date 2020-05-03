@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"auth/enums"
+	"auth/functools"
 	"auth/inout"
 	"auth/models"
 	"context"
@@ -15,47 +16,52 @@ func TestCreatePhoneConfirmation(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	controller, store, dispatcher, _ := InitControllerWithMockedInternals(ctrl)
+	controller := InitControllerWithMockedInternals(ctrl)
 	ctx := context.Background()
 
-	store.
+	phone := "+79234567890"
+	formattedPhone := functools.NormalizePhone(phone)
+
+	controller.
+		Store.
 		EXPECT().
 		GetRandomCodeForPhoneConfirmation().
 		Return("123456").
 		Times(1)
 
-	store.
+	controller.
+		Store.
 		EXPECT().
-		CreatePhoneConfirmationCode(ctx, "+71234567890", "123456", time.Minute*15).
+		CreatePhoneConfirmationCode(ctx, formattedPhone, "123456", time.Minute*15).
 		Return(&models.PhoneConfirmation{
 			Created: 0,
 			Expire:  0,
-			Phone:   "+71234567890",
+			Phone:   formattedPhone,
 			Code:    "123456",
 		})
 
-	dispatcher.
+	controller.
+		Dispatcher.
 		EXPECT().
-		Send("phoneConfirmation", 1, &inout.CreatePhoneConfirmationEventV1{
-			Phone: "+71234567890",
+		Send("phoneConfirmation", int32(1), &inout.CreatePhoneConfirmationEventV1{
+			Phone: formattedPhone,
 			Code:  "123456",
 		})
 
-	phone := "71234567890"
-	status, confirmation := controller.CreatePhoneConfirmation(ctx, phone)
-	require.Equal(t, "+71234567890", confirmation.Phone)
-	require.NotNil(t, confirmation)
+	status, confirmation := controller.Controller.CreatePhoneConfirmation(ctx, phone)
 	require.Equal(t, enums.Ok, status)
+	require.NotNil(t, confirmation)
+	require.Equal(t, formattedPhone, confirmation.Phone)
 }
 
 func TestCreatePhoneConfirmationWithIncorrectPhone(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	controller, _, _, _ := InitControllerWithMockedInternals(ctrl)
+	controller := InitControllerWithMockedInternals(ctrl)
 	ctx := context.Background()
 	phone := "qwerty"
-	status, confirmation := controller.CreatePhoneConfirmation(ctx, phone)
+	status, confirmation := controller.Controller.CreatePhoneConfirmation(ctx, phone)
 	require.Nil(t, confirmation)
 	require.Equal(t, enums.IncorrectPhone, status)
 }

@@ -92,10 +92,22 @@ func InitController(store stores.IStore, passwordProcessor passwordProcessors.IP
 	}
 }
 
-func InitControllerWithMockedInternals(ctrl *gomock.Controller) (*Controller, *stores.MockIStore, *eventDispatchers.MockIEventDispatcher, *passwordProcessors.MockIPasswordProcessor) {
+type ControllerWithMockedInternals struct {
+	Controller        *Controller
+	Dispatcher        *eventDispatchers.MockIEventDispatcher
+	Store             *stores.MockIStore
+	PasswordProcessor *passwordProcessors.MockIPasswordProcessor
+}
+
+func InitControllerWithMockedInternals(ctrl *gomock.Controller) *ControllerWithMockedInternals {
 	dispatcher := eventDispatchers.NewMockIEventDispatcher(ctrl)
 	store := stores.NewMockIStore(ctrl)
 	passwordProcessor := passwordProcessors.NewMockIPasswordProcessor(ctrl)
 	environment := config.InitEnvironment()
-	return InitController(store, passwordProcessor, dispatcher, environment), store, dispatcher, passwordProcessor
+	return &ControllerWithMockedInternals{
+		Controller:        InitController(store, passwordProcessor, dispatcher, environment),
+		Dispatcher:        dispatcher,
+		Store:             store,
+		PasswordProcessor: passwordProcessor,
+	}
 }

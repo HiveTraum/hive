@@ -100,15 +100,15 @@ func (controller *Controller) onSecretCreatedV1(secret *models.Secret) {
 // Public methods / Header
 
 func (controller *Controller) OnEmailCodeConfirmationCreated(email string, code string) {
-	go controller.onEmailCodeConfirmationCreated(email, code)
+	controller.onEmailCodeConfirmationCreated(email, code)
 }
 
 func (controller *Controller) OnPhoneCodeConfirmationCreated(phone string, code string) {
-	go controller.onPhoneCodeConfirmationCreated(phone, code)
+	controller.onPhoneCodeConfirmationCreated(phone, code)
 }
 
 func (controller *Controller) OnUsersViewChanged(usersView []*models.UserView) {
-	go controller.onUsersViewChanged(usersView)
+	controller.onUsersViewChanged(usersView)
 }
 
 func (controller *Controller) OnPasswordChanged(userId uuid.UUID) {
@@ -116,21 +116,21 @@ func (controller *Controller) OnPasswordChanged(userId uuid.UUID) {
 }
 
 func (controller *Controller) OnUserChanged(id []uuid.UUID) {
-	go controller.onUserChanged(id)
+	controller.onUserChanged(id)
 }
 
 func (controller *Controller) OnEmailChanged(userId []uuid.UUID) {
-	go controller.onEmailChanged(userId)
+	controller.onEmailChanged(userId)
 }
 
 func (controller *Controller) OnPhoneChanged(userId []uuid.UUID) {
-	go controller.onPhoneChanged(userId)
+	controller.onPhoneChanged(userId)
 }
 
 func (controller *Controller) OnRoleChanged(roleId []uuid.UUID) {
-	go controller.onRoleChanged(roleId)
+	controller.onRoleChanged(roleId)
 }
 
 func (controller *Controller) OnSecretCreatedV1(secret *models.Secret) {
-	go controller.onSecretCreatedV1(secret)
+	controller.onSecretCreatedV1(secret)
 }

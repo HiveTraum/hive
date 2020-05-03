@@ -17,7 +17,7 @@ func InitNSQEventDispatcher(producer *nsq.Producer, environment *config.Environm
 	return &NSQEventDispatcher{producer: producer, environment: environment}
 }
 
-func (dispatcher NSQEventDispatcher) Send(object string, version int32, payload proto.Message) {
+func (dispatcher NSQEventDispatcher) send(object string, version int32, payload proto.Message) {
 	topic := fmt.Sprintf("%s-%s-%d", dispatcher.environment.ESBSender, object, version)
 
 	data, err := proto.Marshal(payload)
@@ -33,4 +33,8 @@ func (dispatcher NSQEventDispatcher) Send(object string, version int32, payload 
 		sentry.CaptureException(err)
 		return
 	}
+}
+
+func (dispatcher NSQEventDispatcher) Send(object string, version int32, payload proto.Message) {
+	go dispatcher.send(object, version, payload)
 }

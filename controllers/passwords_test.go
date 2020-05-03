@@ -14,17 +14,17 @@ func TestCreatePassword(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	controller, store, _, passwordProcessor := InitControllerWithMockedInternals(ctrl)
+	controller := InitControllerWithMockedInternals(ctrl)
 	ctx := context.Background()
 
 	userID := uuid.NewV4()
 
-	passwordProcessor.
+	controller.PasswordProcessor.
 		EXPECT().
 		EncodePassword(ctx, "hello").
 		Return("olleh")
 
-	store.
+	controller.Store.
 		EXPECT().
 		CreatePassword(ctx, userID, gomock.Not("hello")).
 		Return(enums.Ok, &models.Password{
@@ -34,7 +34,7 @@ func TestCreatePassword(t *testing.T) {
 			Value:   "",
 		})
 
-	status, password := controller.CreatePassword(ctx, userID, "hello")
+	status, password := controller.Controller.CreatePassword(ctx, userID, "hello")
 	require.NotEqual(t, "hello", password.Value)
 	require.NotNil(t, password)
 	require.Equal(t, enums.Ok, status)
