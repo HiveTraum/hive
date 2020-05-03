@@ -49,46 +49,24 @@ func TestCreateSessionFromTokens(t *testing.T) {
 	require.Equal(t, userID, loggedUser.GetUserID())
 }
 
-func TestCreateSessionFromTokensWithIncorrectAuth(t *testing.T) {
+func TestCreateSessionFromTokensWithoutSecret(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	backend := InitJWTAuthenticationBackendWithMockedInternals(ctrl)
 
-	fingerprint := "123"
-	refreshToken := "321"
 	accessToken := "123321"
+	secretID := uuid.NewV4()
 
-	backend.loginController.
+	backend.
+		Store.
 		EXPECT().
-		Login(ctx, accessToken).
-		Times(1).
-		Return(enums.IncorrectToken, nil, ctx)
+		GetSecret(ctx, secretID).
+		Return(nil).
+		Times(1)
 
-	status, loggedUserID := controller.getUserFromTokens(ctx, accessToken, fingerprint, refreshToken)
-	require.Equal(t, enums.IncorrectToken, status)
-	require.Nil(t, loggedUserID)
-}
-
-func TestCreateSessionFromTokensWithoutSecret(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	controller, _, _, loginController, _ := InitControllerWithMockedInternals(ctrl)
-
-	fingerprint := "123"
-	refreshToken := "321"
-	accessToken := "123321"
-
-	loginController.
-		EXPECT().
-		Login(ctx, accessToken).
-		Times(1).
-		Return(enums.SecretNotFound, nil, ctx)
-
-	status, loggedUserID := controller.getUserFromTokens(ctx, accessToken, fingerprint, refreshToken)
+	status, loggedUserID := backend.Backend.GetUser(ctx, accessToken, "")
 	require.Equal(t, enums.SecretNotFound, status)
 	require.Nil(t, loggedUserID)
 }

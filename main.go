@@ -8,7 +8,6 @@ import (
 	"auth/controllers"
 	"auth/enums"
 	"auth/eventDispatchers"
-	"auth/inout"
 	"auth/middlewares"
 	"auth/passwordProcessors"
 	"auth/stores"
@@ -39,11 +38,7 @@ func InitialAdmin(environment *config.Environment, store stores.IStore) {
 	}
 
 	store.CreateEmailConfirmationCode(ctx, emailValue, environment.TestConfirmationCode, time.Minute)
-	_, user := store.CreateUser(ctx, &inout.CreateUserResponseV1_Request{
-		Password:  passwordValue,
-		Email:     emailValue,
-		EmailCode: environment.TestConfirmationCode,
-	})
+	_, user := store.CreateUser(ctx, passwordValue, emailValue, "")
 	_, role := store.GetAdminRole(ctx)
 	store.CreateUserRole(ctx, user.Id, role.Id)
 }

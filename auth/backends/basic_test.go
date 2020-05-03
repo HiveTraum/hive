@@ -2,6 +2,7 @@ package backends
 
 import (
 	"auth/enums"
+	"auth/functools"
 	"auth/models"
 	"context"
 	"github.com/golang/mock/gomock"
@@ -305,18 +306,19 @@ func TestCreateSessionFromPhoneAndPassword(t *testing.T) {
 
 	password := "123"
 	encodedPassword := "321"
-	phone := "+71234567890"
+	phone := "+79234567890"
+	formattedPhone := functools.NormalizePhone(phone)
 	userID := uuid.NewV4()
 
 	backend.Store.
 		EXPECT().
-		GetPhone(ctx, phone).
+		GetPhone(ctx, formattedPhone).
 		Times(1).
 		Return(enums.Ok, &models.Phone{
 			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
-			Value:   phone,
+			Value:   formattedPhone,
 		})
 
 	backend.Store.
@@ -364,11 +366,12 @@ func TestCreateSessionFromPhoneAndPasswordWithoutEmail(t *testing.T) {
 	backend := InitBasicAuthenticationWithMockedInternals(ctrl)
 
 	password := "123"
-	phone := "+71234567890"
+	phone := "+79234567890"
+	formattedPhone := functools.NormalizePhone(phone)
 
 	backend.Store.
 		EXPECT().
-		GetPhone(ctx, phone).
+		GetPhone(ctx, formattedPhone).
 		Times(1).
 		Return(enums.Ok, nil)
 
@@ -385,12 +388,13 @@ func TestCreateSessionFromPhoneAndPasswordWithoutPassword(t *testing.T) {
 	backend := InitBasicAuthenticationWithMockedInternals(ctrl)
 
 	password := "123"
-	phone := "+71234567890"
+	phone := "+79234567890"
+	formattedPhone := functools.NormalizePhone(phone)
 	userID := uuid.NewV4()
 
 	backend.Store.
 		EXPECT().
-		GetPhone(ctx, phone).
+		GetPhone(ctx, formattedPhone).
 		Times(1).
 		Return(enums.Ok, &models.Phone{
 			Id:      uuid.NewV4(),
@@ -419,21 +423,23 @@ func TestCreateSessionFromPhoneAndPasswordWithIncorrectPassword(t *testing.T) {
 
 	password := "123"
 	encodedPassword := "321"
-	phone := "+71234567890"
+	phone := "+79234567890"
+	formattedPhone := functools.NormalizePhone(phone)
 	userID := uuid.NewV4()
 
 	backend.Store.
 		EXPECT().
-		GetPhone(ctx, phone).
+		GetPhone(ctx, formattedPhone).
 		Times(1).
 		Return(enums.Ok, &models.Phone{
 			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
-			Value:   phone,
+			Value:   formattedPhone,
 		})
 
-	backend.Store.
+	backend.
+		Store.
 		EXPECT().
 		GetLatestPassword(ctx, userID).
 		Times(1).
@@ -444,7 +450,8 @@ func TestCreateSessionFromPhoneAndPasswordWithIncorrectPassword(t *testing.T) {
 			Value:   encodedPassword,
 		})
 
-	backend.PasswordProcessor.
+	backend.
+		PasswordProcessor.
 		EXPECT().
 		VerifyPassword(ctx, password, encodedPassword).
 		Times(1).
@@ -465,23 +472,26 @@ func TestCreateSessionFromPhoneAndCode(t *testing.T) {
 	backend := InitBasicAuthenticationWithMockedInternals(ctrl)
 
 	code := "123"
-	phone := "+71234567890"
+	phone := "+79234567890"
+	formattedPhone := functools.NormalizePhone(phone)
 	userID := uuid.NewV4()
 
-	backend.Store.
+	backend.
+		Store.
 		EXPECT().
-		GetPhone(ctx, phone).
+		GetPhone(ctx, formattedPhone).
 		Times(1).
 		Return(enums.Ok, &models.Phone{
 			Id:      uuid.NewV4(),
 			Created: 1,
 			UserId:  userID,
-			Value:   phone,
+			Value:   formattedPhone,
 		})
 
-	backend.Store.
+	backend.
+		Store.
 		EXPECT().
-		GetPhoneConfirmationCode(ctx, phone).
+		GetPhoneConfirmationCode(ctx, formattedPhone).
 		Times(1).
 		Return(code)
 
@@ -513,11 +523,12 @@ func TestCreateSessionFromPhoneAndCodeWithoutCode(t *testing.T) {
 	backend := InitBasicAuthenticationWithMockedInternals(ctrl)
 
 	code := "123"
-	phone := "+71234567890"
+	phone := "+79234567890"
+	formattedPhone := functools.NormalizePhone(phone)
 
 	backend.Store.
 		EXPECT().
-		GetPhoneConfirmationCode(ctx, phone).
+		GetPhoneConfirmationCode(ctx, formattedPhone).
 		Times(1).
 		Return("")
 
@@ -534,11 +545,12 @@ func TestCreateSessionFromPhoneAndCodeWithIncorrectCode(t *testing.T) {
 	backend := InitBasicAuthenticationWithMockedInternals(ctrl)
 
 	code := "123"
-	phone := "+71234567890"
+	phone := "+79234567890"
+	formattedPhone := functools.NormalizePhone(phone)
 
 	backend.Store.
 		EXPECT().
-		GetPhoneConfirmationCode(ctx, phone).
+		GetPhoneConfirmationCode(ctx, formattedPhone).
 		Times(1).
 		Return("321")
 
@@ -555,17 +567,18 @@ func TestCreateSessionFromPhoneAndCodeWithoutPhone(t *testing.T) {
 	backend := InitBasicAuthenticationWithMockedInternals(ctrl)
 
 	code := "123"
-	phone := "+71234567890"
+	phone := "+79234567890"
+	formattedPhone := functools.NormalizePhone(phone)
 
 	backend.Store.
 		EXPECT().
-		GetPhoneConfirmationCode(ctx, phone).
+		GetPhoneConfirmationCode(ctx, formattedPhone).
 		Times(1).
 		Return(code)
 
 	backend.Store.
 		EXPECT().
-		GetPhone(ctx, phone).
+		GetPhone(ctx, formattedPhone).
 		Times(1).
 		Return(enums.Ok, nil)
 
