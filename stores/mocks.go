@@ -5,7 +5,6 @@
 package stores
 
 import (
-	inout "auth/inout"
 	models "auth/models"
 	repositories "auth/repositories"
 	context "context"
@@ -39,18 +38,18 @@ func (m *MockIStore) EXPECT() *MockIStoreMockRecorder {
 }
 
 // CreateUser mocks base method
-func (m *MockIStore) CreateUser(ctx context.Context, query *inout.CreateUserResponseV1_Request) (int, *models.User) {
+func (m *MockIStore) CreateUser(ctx context.Context, password, email, phone string) (int, *models.User) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUser", ctx, query)
+	ret := m.ctrl.Call(m, "CreateUser", ctx, password, email, phone)
 	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(*models.User)
 	return ret0, ret1
 }
 
 // CreateUser indicates an expected call of CreateUser
-func (mr *MockIStoreMockRecorder) CreateUser(ctx, query interface{}) *gomock.Call {
+func (mr *MockIStoreMockRecorder) CreateUser(ctx, password, email, phone interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockIStore)(nil).CreateUser), ctx, query)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockIStore)(nil).CreateUser), ctx, password, email, phone)
 }
 
 // GetUser mocks base method

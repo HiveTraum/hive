@@ -3,11 +3,11 @@ package presenters
 import (
 	"auth/enums"
 	"auth/repositories"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/getsentry/sentry-go"
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 	"io/ioutil"
 	"net/http"
 )
@@ -49,9 +49,7 @@ func (p *Parser) Parse(r *http.Request, w http.ResponseWriter, message proto.Mes
 
 func InitParser() *Parser {
 	return &Parser{contentTypeParsers: map[enums.ContentType]Reader{
-		enums.JSONContentType: func(bytes []byte, message proto.Message) error {
-			return json.Unmarshal(bytes, message)
-		},
+		enums.JSONContentType: protojson.Unmarshal,
 		enums.BinaryContentType: proto.Unmarshal,
 	}}
 }

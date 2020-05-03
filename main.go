@@ -77,7 +77,7 @@ func main() {
 	}, environment)
 	dispatcher := eventDispatchers.InitNSQEventDispatcher(producer, environment)
 	controller := controllers.InitController(store, passwordProcessor, dispatcher, environment)
-	API := api2.InitAPI(controller, authenticationController)
+	API := api2.InitAPI(controller, authenticationController, environment)
 	InitialAdminRole(environment, store)
 	InitialAdmin(environment, store)
 

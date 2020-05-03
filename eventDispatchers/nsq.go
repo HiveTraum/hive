@@ -4,8 +4,8 @@ import (
 	"auth/config"
 	"fmt"
 	"github.com/getsentry/sentry-go"
-	"github.com/golang/protobuf/proto"
 	"github.com/nsqio/go-nsq"
+	"google.golang.org/protobuf/proto"
 )
 
 type NSQEventDispatcher struct {

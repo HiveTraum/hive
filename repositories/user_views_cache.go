@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"github.com/getsentry/sentry-go"
 	"github.com/go-redis/redis/v7"
-	"github.com/golang/protobuf/proto"
 	uuid "github.com/satori/go.uuid"
+	"google.golang.org/protobuf/proto"
 	"time"
 )
 

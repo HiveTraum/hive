@@ -6,7 +6,7 @@ package eventDispatchers
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	proto "github.com/golang/protobuf/proto"
+	proto "google.golang.org/protobuf/proto"
 	reflect "reflect"
 )
 

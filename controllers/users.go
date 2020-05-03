@@ -3,32 +3,31 @@ package controllers
 import (
 	"auth/enums"
 	"auth/functools"
-	"auth/inout"
 	"auth/models"
 	"auth/repositories"
 	"context"
 	uuid "github.com/satori/go.uuid"
 )
 
-func (controller *Controller) CreateUser(ctx context.Context, body *inout.CreateUserResponseV1_Request) (int, *models.User) {
+func (controller *Controller) CreateUser(ctx context.Context, password, email, emailCode, phone, phoneCode string) (int, *models.User) {
 
 	var identifiers []uuid.UUID
 
-	if body.Password == "" {
+	if password == "" {
 		return enums.PasswordRequired, nil
 	}
 
-	if body.Email == "" && body.Phone == "" {
+	if email == "" && phone == "" {
 		return enums.MinimumOneFieldRequired, nil
 	}
 
-	body.Password = controller.passwordProcessor.EncodePassword(ctx, body.Password)
-	if body.Password == "" {
+	password = controller.passwordProcessor.EncodePassword(ctx, password)
+	if password == "" {
 		return enums.IncorrectPassword, nil
 	}
 
-	if len(body.Phone) > 0 {
-		phone := functools.NormalizePhone(body.Phone)
+	if len(phone) > 0 {
+		phone := functools.NormalizePhone(phone)
 		if phone == "" {
 			return enums.IncorrectPhone, nil
 		}
@@ -36,31 +35,29 @@ func (controller *Controller) CreateUser(ctx context.Context, body *inout.Create
 		cachedCode := controller.store.GetPhoneConfirmationCode(ctx, phone)
 		if cachedCode == "" {
 			return enums.PhoneNotFound, nil
-		} else if cachedCode != body.PhoneCode {
+		} else if cachedCode != phoneCode {
 			return enums.IncorrectPhoneCode, nil
 		}
 
-		body.Phone = phone
 		_, oldPhone := controller.store.GetPhone(ctx, phone)
 		if oldPhone != nil {
 			identifiers = append(identifiers, oldPhone.UserId)
 		}
 	}
 
-	if len(body.Email) > 0 {
-		emailStatus, email := controller.validateEmail(ctx, body.Email, body.EmailCode)
+	if len(email) > 0 {
+		emailStatus, email := controller.validateEmail(ctx, email, emailCode)
 		if emailStatus != enums.Ok {
 			return emailStatus, nil
 		}
 
-		body.Email = email
 		_, oldEmail := controller.store.GetEmail(ctx, email)
 		if oldEmail != nil {
 			identifiers = append(identifiers, oldEmail.UserId)
 		}
 	}
 
-	status, user := controller.store.CreateUser(ctx, body)
+	status, user := controller.store.CreateUser(ctx, password, email, phone)
 	identifiers = append(identifiers, user.Id)
 	controller.OnUserChanged(identifiers)
 	return status, user

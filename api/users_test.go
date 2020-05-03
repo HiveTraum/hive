@@ -5,203 +5,155 @@ import (
 	"auth/enums"
 	"auth/functools"
 	"auth/inout"
+	"auth/models"
 	"auth/repositories"
 	"bytes"
 	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/proto"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/encoding/protojson"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
-func TestCreateUserEmptyBody(t *testing.T) {
+func TestCreateUserParsingJSON(t *testing.T) {
+	t.Parallel()
+	body := "{\"password\": \"password\", \"email\": \"email\", \"emailCode\": \"emailCode\", \"phone\": \"phone\", \"phoneCode\": \"phoneCode\"}"
+	ctrl := gomock.NewController(t)
+	api := InitAPIWithMockedInternals(ctrl)
+
+	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
+	request.Header.Add("Content-Type", "application/json")
+	ctx := request.Context()
+
+	api.
+		Controller.
+		EXPECT().
+		CreateUser(ctx, "password", "email", "emailCode", "phone", "phoneCode").
+		Return(enums.Ok, &models.User{})
+
+	api.API.CreateUserV1(httptest.NewRecorder(), request)
+
+	ctrl.Finish()
+}
+
+func TestCreateUserParsingJSONPB(t *testing.T) {
+	t.Parallel()
+	body, _ := protojson.Marshal(&inout.CreateUserResponseV1_Request{
+		Password:  "password",
+		Phone:     "phone",
+		Email:     "email",
+		PhoneCode: "phoneCode",
+		EmailCode: "emailCode",
+	})
+	ctrl := gomock.NewController(t)
+	api := InitAPIWithMockedInternals(ctrl)
+
+	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+	request.Header.Add("Content-Type", "application/json")
+	ctx := request.Context()
+
+	api.
+		Controller.
+		EXPECT().
+		CreateUser(ctx, "password", "email", "emailCode", "phone", "phoneCode").
+		Return(enums.Ok, &models.User{})
+
+	api.API.CreateUserV1(httptest.NewRecorder(), request)
+
+	ctrl.Finish()
+}
+
+func TestCreateUserParsingBinary(t *testing.T) {
+	t.Parallel()
+	body, _ := proto.Marshal(&inout.CreateUserResponseV1_Request{
+		Password:  "password",
+		Phone:     "phone",
+		Email:     "email",
+		PhoneCode: "phoneCode",
+		EmailCode: "emailCode",
+	})
+	ctrl := gomock.NewController(t)
+	api := InitAPIWithMockedInternals(ctrl)
+
+	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+	request.Header.Add("Content-Type", "application/octet-stream")
+	ctx := request.Context()
+
+	api.
+		Controller.
+		EXPECT().
+		CreateUser(ctx, "password", "email", "emailCode", "phone", "phoneCode").
+		Return(enums.Ok, &models.User{})
+
+	api.API.CreateUserV1(httptest.NewRecorder(), request)
+
+	ctrl.Finish()
+}
+
+func TestCreateUserRenderingJSON(t *testing.T) {
 	t.Parallel()
 	body := "{}"
+	userID := uuid.NewV4()
+
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	api, controller, _ := InitAPIWithMockedInternals(ctrl)
+	api := InitAPIWithMockedInternals(ctrl)
 
 	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
+	request.Header.Add("Content-Type", "application/json")
 	ctx := request.Context()
 
-	controller.
+	api.
+		Controller.
 		EXPECT().
-		CreateUser(ctx, &inout.CreateUserResponseV1_Request{}).
-		Return(enums.PasswordRequired, nil)
+		CreateUser(ctx, gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		Return(enums.Ok, &models.User{Id: userID, Created: 1})
 
-	request.Header.Add("Content-Type", "application/json")
 	recorder := httptest.NewRecorder()
-	api.CreateUserV1(recorder, request)
+	api.API.CreateUserV1(recorder, request)
 	response := recorder.Result()
 	responseBody, _ := ioutil.ReadAll(response.Body)
-	var message *inout.CreateUserResponseV1
-	_ = proto.Unmarshal(responseBody, message)
-	require.Equal(t, response.StatusCode, http.StatusBadRequest)
-	validationError := message.GetValidationError()
-	require.NotNil(t, validationError)
-	require.Len(t, validationError.Password, 1)
-}
-
-func TestCreateUserWithOnlyPassword(t *testing.T) {
-	t.Parallel()
-	body := "{\"password\": \"hello\"}"
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	api, controller, _ := InitAPIWithMockedInternals(ctrl)
-
-	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
-	ctx := request.Context()
-
-	controller.
-		EXPECT().
-		CreateUser(ctx, &inout.CreateUserResponseV1_Request{
-			Password: "hello",
-		}).
-		Return(enums.MinimumOneFieldRequired, nil)
-
-	request.Header.Add("Content-Type", "application/json")
-	recorder := httptest.NewRecorder()
-	api.CreateUserV1(recorder, request)
-	response := recorder.Result()
-	responseBody, _ := ioutil.ReadAll(response.Body)
-	var message *inout.CreateUserResponseV1
-	_ = proto.Unmarshal(responseBody, message)
-	require.Equal(t, response.StatusCode, http.StatusBadRequest)
-	validationError := message.GetValidationError()
-	require.NotNil(t, validationError)
-	require.Len(t, validationError.Errors, 1)
-}
-
-func TestCreateUserWithOnlyEmail(t *testing.T) {
-	t.Parallel()
-	body := "{\"password\": \"hello\", \"email\": \"mail@mail.com\"}"
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
-	ctx := request.Context()
-
-	api, controller, _ := InitAPIWithMockedInternals(ctrl)
-
-	controller.
-		EXPECT().
-		CreateUser(ctx, &inout.CreateUserResponseV1_Request{
-			Password: "hello",
-			Email:    "mail@mail.com",
-		}).
-		Return(enums.EmailConfirmationCodeNotFound, nil)
-
-	request.Header.Add("Content-Type", "application/json")
-	recorder := httptest.NewRecorder()
-	api.CreateUserV1(recorder, request)
-	response := recorder.Result()
-	responseBody, _ := ioutil.ReadAll(response.Body)
-	var message *inout.CreateUserResponseV1
-	_ = proto.Unmarshal(responseBody, message)
-	require.Equal(t, response.StatusCode, http.StatusBadRequest)
-	validationError := message.GetValidationError()
-	require.NotNil(t, validationError)
-	require.Len(t, validationError.EmailCode, 1)
-}
-
-func TestCreateUserWithEmailAndEmailCode(t *testing.T) {
-	t.Parallel()
-	body := "{\"password\": \"hello\", \"email\": \"mail@mail.com\", \"emailCode\": \"123456\"}"
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
-	ctx := request.Context()
-
-	api, controller, _ := InitAPIWithMockedInternals(ctrl)
-
-	controller.
-		EXPECT().
-		CreateUser(ctx, &inout.CreateUserResponseV1_Request{
-			Password:  "hello",
-			Email:     "mail@mail.com",
-			EmailCode: "123456",
-		}).
-		Return(enums.EmailConfirmationCodeNotFound, nil)
-
-	request.Header.Add("Content-Type", "application/json")
-	recorder := httptest.NewRecorder()
-	api.CreateUserV1(recorder, request)
-	response := recorder.Result()
-	responseBody, _ := ioutil.ReadAll(response.Body)
-	var message *inout.CreateUserResponseV1
-	_ = proto.Unmarshal(responseBody, message)
-	require.Equal(t, response.StatusCode, http.StatusBadRequest)
-	validationError := message.GetValidationError()
-	require.NotNil(t, validationError)
-	require.Len(t, validationError.Email, 1)
-}
-
-func TestCreateUserWithEmailAndEmailCodeAfterIncorrectEmailConfirmationCodeReceived(t *testing.T) {
-	t.Parallel()
-	body := "{\"password\": \"hello\", \"email\": \"mail@mail.com\", \"emailCode\": \"123456\"}"
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
-	ctx := request.Context()
-
-	api, controller, _ := InitAPIWithMockedInternals(ctrl)
-
-	controller.
-		EXPECT().
-		CreateUser(ctx, &inout.CreateUserResponseV1_Request{
-			Password: "hello",
-			Email:    "mail@mail.com",
-		}).
-		Return(enums.EmailNotFound, nil)
-
-	request.Header.Add("Content-Type", "application/json")
-	recorder := httptest.NewRecorder()
-	api.CreateUserV1(recorder, request)
-	response := recorder.Result()
-	responseBody, _ := ioutil.ReadAll(response.Body)
-	var message *inout.CreateUserResponseV1
-	_ = proto.Unmarshal(responseBody, message)
-	require.Equal(t, response.StatusCode, http.StatusBadRequest)
-	validationError := message.GetValidationError()
-	require.NotNil(t, validationError)
-	require.Len(t, validationError.EmailCode, 1)
-}
-
-func TestSuccessfulCreateUserWithEmail(t *testing.T) {
-	t.Parallel()
-	body := "{\"password\": \"hello\", \"email\": \"mail@mail.com\", \"emailCode\": \"123456\"}"
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
-	ctx := request.Context()
-
-	api, controller, _ := InitAPIWithMockedInternals(ctrl)
-
-	controller.
-		EXPECT().
-		CreateUser(ctx, &inout.CreateUserResponseV1_Request{
-			Password:  "hello",
-			Email:     "mail@mail.com",
-			EmailCode: "123456",
-		}).
-		Return(enums.Ok, nil)
-
-	request.Header.Add("Content-Type", "application/json")
-	recorder := httptest.NewRecorder()
-	api.CreateUserV1(recorder, request)
-	response := recorder.Result()
-	responseBody, _ := ioutil.ReadAll(response.Body)
-	var message *inout.CreateUserResponseV1
-	_ = proto.Unmarshal(responseBody, message)
-	require.Equal(t, response.StatusCode, http.StatusCreated)
+	var message inout.CreateUserResponseV1
+	_ = protojson.Unmarshal(responseBody, &message)
 	user := message.GetOk()
 	require.NotNil(t, user)
+	require.Equal(t, userID.Bytes(), user.Id)
+	require.Equal(t, int64(1), user.Created)
+	ctrl.Finish()
+}
+
+func TestCreateUserRenderingBinary(t *testing.T) {
+	t.Parallel()
+	body, _ := proto.Marshal(&inout.CreateUserResponseV1_Request{})
+	userID := uuid.NewV4()
+
+	ctrl := gomock.NewController(t)
+	api := InitAPIWithMockedInternals(ctrl)
+
+	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+	request.Header.Add("Content-Type", "application/octet-stream")
+	ctx := request.Context()
+
+	api.
+		Controller.
+		EXPECT().
+		CreateUser(ctx, gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		Return(enums.Ok, &models.User{Id: userID, Created: 1})
+
+	recorder := httptest.NewRecorder()
+	api.API.CreateUserV1(recorder, request)
+	response := recorder.Result()
+	responseBody, _ := ioutil.ReadAll(response.Body)
+	var message inout.CreateUserResponseV1
+	_ = proto.Unmarshal(responseBody, &message)
+	user := message.GetOk()
+	require.NotNil(t, user)
+	require.Equal(t, userID.Bytes(), user.Id)
+	require.Equal(t, int64(1), user.Created)
+	ctrl.Finish()
 }
 
 func TestGetUsersV1QueryForAdminUser(t *testing.T) {

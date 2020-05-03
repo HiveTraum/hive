@@ -21,7 +21,7 @@ func (api *API) CreateUserV1(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	status, user := api.Controller.CreateUser(r.Context(), body)
+	status, user := api.Controller.CreateUser(r.Context(), body.Password, body.Email, body.EmailCode, body.Phone, body.PhoneCode)
 
 	switch status {
 	case enums.Ok:

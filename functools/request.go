@@ -5,7 +5,7 @@ import (
 	"auth/models"
 	"encoding/json"
 	"github.com/getsentry/sentry-go"
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 	"io/ioutil"
 	"net/http"
 	"net/url"

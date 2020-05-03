@@ -10,12 +10,12 @@ require (
 	github.com/getsentry/sentry-go v0.3.0
 	github.com/go-redis/redis/v7 v7.0.0-beta.4
 	github.com/golang/mock v1.3.1
-	github.com/golang/protobuf v1.3.2
+	github.com/golang/protobuf v1.4.0-rc.4.0.20200313231945-b860323f09d0
+	github.com/google/uuid v1.1.1
 	github.com/gorilla/mux v1.7.3
 	github.com/jackc/pgconn v1.1.0
 	github.com/jackc/pgx/v4 v4.1.2
 	github.com/joho/godotenv v1.3.0
-	github.com/leanovate/gopter v0.2.7
 	github.com/nsqio/go-nsq v1.0.8
 	github.com/opentracing-contrib/go-gorilla v0.0.0-20190110000444-ced666783644
 	github.com/opentracing-contrib/go-stdlib v0.0.0-20190519235532-cf7a6c988dc9 // indirect
@@ -29,4 +29,5 @@ require (
 	github.com/uber/jaeger-lib v2.2.0+incompatible // indirect
 	golang.org/x/crypto v0.0.0-20190911031432-227b76d455e7
 	golang.org/x/sys v0.0.0-20191204072324-ce4227a45e2e // indirect
+	google.golang.org/protobuf v1.21.0
 )

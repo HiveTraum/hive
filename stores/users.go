@@ -3,7 +3,6 @@ package stores
 import (
 	"auth/enums"
 	"auth/functools"
-	"auth/inout"
 	"auth/models"
 	"auth/repositories"
 	"context"
@@ -26,7 +25,7 @@ func createPasswordForUser(tx repositories.DB, ctx context.Context, password str
 	return status
 }
 
-func (store *DatabaseStore) CreateUser(ctx context.Context, query *inout.CreateUserResponseV1_Request) (int, *models.User) {
+func (store *DatabaseStore) CreateUser(ctx context.Context, password, email, phone string) (int, *models.User) {
 	tx, err := store.db.Begin(ctx)
 
 	if tx == nil {
@@ -46,16 +45,16 @@ func (store *DatabaseStore) CreateUser(ctx context.Context, query *inout.CreateU
 
 	var statuses []int
 
-	if query.Phone != "" {
-		statuses = append(statuses, createPhoneForUser(tx, ctx, query.Phone, user.Id))
+	if phone != "" {
+		statuses = append(statuses, createPhoneForUser(tx, ctx, phone, user.Id))
 	}
 
-	if query.Email != "" {
-		statuses = append(statuses, createEmailForUser(tx, ctx, query.Email, user.Id))
+	if email != "" {
+		statuses = append(statuses, createEmailForUser(tx, ctx, email, user.Id))
 	}
 
-	if query.Password != "" {
-		statuses = append(statuses, createPasswordForUser(tx, ctx, query.Password, user.Id))
+	if password != "" {
+		statuses = append(statuses, createPasswordForUser(tx, ctx, password, user.Id))
 	}
 
 	if repositories.Rollback(tx, ctx, !functools.All(enums.Ok, statuses)) {

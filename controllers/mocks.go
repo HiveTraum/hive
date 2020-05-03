@@ -5,7 +5,6 @@
 package controllers
 
 import (
-	inout "auth/inout"
 	models "auth/models"
 	repositories "auth/repositories"
 	context "context"
@@ -126,18 +125,18 @@ func (mr *MockIControllerMockRecorder) CreateEmail(ctx, email, code, userId inte
 }
 
 // CreateUser mocks base method
-func (m *MockIController) CreateUser(ctx context.Context, body *inout.CreateUserResponseV1_Request) (int, *models.User) {
+func (m *MockIController) CreateUser(ctx context.Context, password, email, emailCode, phone, phoneCode string) (int, *models.User) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUser", ctx, body)
+	ret := m.ctrl.Call(m, "CreateUser", ctx, password, email, emailCode, phone, phoneCode)
 	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(*models.User)
 	return ret0, ret1
 }
 
 // CreateUser indicates an expected call of CreateUser
-func (mr *MockIControllerMockRecorder) CreateUser(ctx, body interface{}) *gomock.Call {
+func (mr *MockIControllerMockRecorder) CreateUser(ctx, password, email, emailCode, phone, phoneCode interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockIController)(nil).CreateUser), ctx, body)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockIController)(nil).CreateUser), ctx, password, email, emailCode, phone, phoneCode)
 }
 
 // GetUsers mocks base method

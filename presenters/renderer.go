@@ -3,11 +3,11 @@ package presenters
 import (
 	"auth/enums"
 	"auth/repositories"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/getsentry/sentry-go"
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 	"net/http"
 	"reflect"
 )
@@ -28,14 +28,14 @@ func (renderer *Renderer) render(w http.ResponseWriter, r *http.Request, status 
 	}
 
 	if data != nil && !reflect.ValueOf(data).IsNil() {
-		bytes, err := contentTypeRenderer(data)
+		dataBytes, err := contentTypeRenderer(data)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return err
 		} else {
 			w.WriteHeader(status)
-			_, _ = w.Write(bytes)
+			_, _ = w.Write(dataBytes)
 		}
 	} else {
 		w.WriteHeader(status)
@@ -52,10 +52,9 @@ func (renderer *Renderer) Render(w http.ResponseWriter, r *http.Request, status 
 }
 
 func InitRenderer() *Renderer {
+
 	return &Renderer{contentTypeParsers: map[enums.ContentType]Writer{
-		enums.JSONContentType: func(message proto.Message) ([]byte, error) {
-			return json.Marshal(message)
-		},
+		enums.JSONContentType:   protojson.Marshal,
 		enums.BinaryContentType: proto.Marshal,
 	}}
 }

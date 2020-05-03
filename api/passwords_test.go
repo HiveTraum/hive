@@ -5,135 +5,152 @@ import (
 	"auth/inout"
 	"auth/models"
 	"bytes"
-	"context"
-	"encoding/json"
+	"encoding/base64"
+	"fmt"
 	"github.com/golang/mock/gomock"
-	"github.com/golang/protobuf/proto"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
-func TestCreatePasswordWithoutUserV1(t *testing.T) {
+func TestCreatePasswordParsingJSON(t *testing.T) {
 	t.Parallel()
 	userID := uuid.NewV4()
+	encodedUserID := base64.StdEncoding.EncodeToString(userID.Bytes())
+	body := fmt.Sprintf("{\"userID\": \"%s\", \"value\": \"password\"}", encodedUserID)
 
-	body, _ := json.Marshal(&inout.CreatePasswordResponseV1_Request{
-		UserID: userID.Bytes(),
-		Value:  "hello",
-	})
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	app, store, _, _, passwordProcessor := mocks.InitMockApp(ctrl)
+	api := InitAPIWithMockedInternals(ctrl)
 
-	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
+	request.Header.Add("Content-Type", "application/json")
 	ctx := request.Context()
 
-	controller.
+	api.
+		Controller.
 		EXPECT().
-		CreatePassword(ctx, userID, "hello").
-		Return(enums.UserNotFound, nil).
-		Times(1)
+		CreatePassword(ctx, userID, "password").
+		Return(enums.Ok, &models.Password{})
 
-	request.Header.Add("Content-Type", string(enums.JSONContentType))
+	api.API.CreatePasswordV1(httptest.NewRecorder(), request)
+
+	ctrl.Finish()
+}
+
+func TestCreatePasswordParsingJSONPB(t *testing.T) {
+	t.Parallel()
+	userID := uuid.NewV4()
+	body, _ := protojson.Marshal(&inout.CreatePasswordResponseV1_Request{
+		UserID: userID.Bytes(),
+		Value:  "password",
+	})
+	ctrl := gomock.NewController(t)
+	api := InitAPIWithMockedInternals(ctrl)
+
+	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+	request.Header.Add("Content-Type", "application/json")
+	ctx := request.Context()
+
+	api.
+		Controller.
+		EXPECT().
+		CreatePassword(ctx, userID, "password").
+		Return(enums.Ok, &models.Password{})
+
+	api.API.CreatePasswordV1(httptest.NewRecorder(), request)
+
+	ctrl.Finish()
+}
+
+func TestCreatePasswordParsingBinary(t *testing.T) {
+	t.Parallel()
+	userID := uuid.NewV4()
+	body, _ := proto.Marshal(&inout.CreatePasswordResponseV1_Request{
+		UserID: userID.Bytes(),
+		Value:  "password",
+	})
+	ctrl := gomock.NewController(t)
+	api := InitAPIWithMockedInternals(ctrl)
+
+	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+	request.Header.Add("Content-Type", "application/octet-stream")
+	ctx := request.Context()
+
+	api.
+		Controller.
+		EXPECT().
+		CreatePassword(ctx, userID, "password").
+		Return(enums.Ok, &models.Password{})
+
+	api.API.CreatePasswordV1(httptest.NewRecorder(), request)
+
+	ctrl.Finish()
+}
+
+func TestCreatePasswordRenderingJSON(t *testing.T) {
+	t.Parallel()
+	body := "{}"
+	userID := uuid.NewV4()
+
+	ctrl := gomock.NewController(t)
+	api := InitAPIWithMockedInternals(ctrl)
+
+	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(body)))
+	request.Header.Add("Content-Type", "application/json")
+	ctx := request.Context()
+
+	api.
+		Controller.
+		EXPECT().
+		CreatePassword(ctx, gomock.Any(), gomock.Any()).
+		Return(enums.Ok, &models.Password{Id: userID, Created: 1})
+
 	recorder := httptest.NewRecorder()
-	api.CreatePasswordV1(recorder, request)
+	api.API.CreatePasswordV1(recorder, request)
 	response := recorder.Result()
 	responseBody, _ := ioutil.ReadAll(response.Body)
 	var message inout.CreatePasswordResponseV1
-	_ = json.Unmarshal(responseBody, &message)
-	require.Equal(t, response.StatusCode, http.StatusBadRequest)
-	validationError := message.GetValidationError()
-	require.NotNil(t, validationError)
-	require.Len(t, validationError.UserID, 1)
-	require.Len(t, validationError.Value, 0)
+	_ = protojson.Unmarshal(responseBody, &message)
+	user := message.GetOk()
+	require.NotNil(t, user)
+	require.Equal(t, userID.Bytes(), user.Id)
+	require.Equal(t, int64(1), user.Created)
+	ctrl.Finish()
 }
 
-func TestCreatePasswordWithUserV1(t *testing.T) {
+func TestCreatePasswordRenderingBinary(t *testing.T) {
 	t.Parallel()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	api, controller, _ := InitAPIWithMockedInternals(ctrl)
-
+	body, _ := proto.Marshal(&inout.CreatePasswordResponseV1_Request{})
 	userID := uuid.NewV4()
 
-	body, _ := json.Marshal(&inout.CreatePasswordResponseV1_Request{
-		UserID: userID.Bytes(),
-		Value:  "hello",
-	})
+	ctrl := gomock.NewController(t)
+	api := InitAPIWithMockedInternals(ctrl)
 
 	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
-	request.Header.Add("Content-Type", "application/json")
+	request.Header.Add("Content-Type", "application/octet-stream")
 	ctx := request.Context()
 
-	controller.
+	api.
+		Controller.
 		EXPECT().
-		CreatePassword(ctx, userID, "hello").
-		Return(enums.Ok, &models.Password{
-			Id:      uuid.NewV4(),
-			Created: 1,
-			UserId:  userID,
-			Value:   "hello",
-		})
+		CreatePassword(ctx, gomock.Any(), gomock.Any()).
+		Return(enums.Ok, &models.Password{Id: userID, Created: 1})
 
 	recorder := httptest.NewRecorder()
-	api.CreatePasswordV1(recorder, request)
+	api.API.CreatePasswordV1(recorder, request)
 	response := recorder.Result()
 	responseBody, _ := ioutil.ReadAll(response.Body)
-	var message *inout.CreatePasswordResponseV1
-	_ = proto.Unmarshal(responseBody, message)
-	require.Equal(t, response.Status, http.StatusCreated)
-	password := message.GetOk()
-	require.NotNil(t, password)
-	require.Equal(t, userID.Bytes(), password.UserID)
-}
-
-func TestCreatePasswordWithTooLongValueV1(t *testing.T) {
-	t.Parallel()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	api, controller, _ := InitAPIWithMockedInternals(ctrl)
-	ctx := context.Background()
-
-	userID := uuid.NewV4()
-
-	controller.
-		EXPECT().
-		CreatePassword(ctx, userID, "hellohellohellohellohellohellohellohellohellohellohell"+
-			"ohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohe"+
-			"llohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello"+
-			"hellohellohellohellohellohello").
-		Return(enums.Ok, &models.Password{
-			Id:      uuid.NewV4(),
-			Created: 1,
-			UserId:  userID,
-			Value: "hellohellohellohellohellohellohellohellohellohellohell" +
-				"ohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohe" +
-				"llohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello" +
-				"hellohellohellohellohellohello",
-		})
-
-	body, _ := json.Marshal(&inout.CreatePasswordResponseV1_Request{
-		UserID: userID.Bytes(),
-		Value: "hellohellohellohellohellohellohellohellohellohellohell" +
-			"ohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohe" +
-			"llohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello" +
-			"hellohellohellohellohellohello",
-	})
-
-	request := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
-	request.Header.Add("Content-Type", "application/json")
-	recorder := httptest.NewRecorder()
-	api.CreatePasswordV1(recorder, request)
-	response := recorder.Result()
-	responseBody, _ := ioutil.ReadAll(response.Body)
-	var message *inout.CreatePasswordResponseV1
-	_ = proto.Unmarshal(responseBody, message)
-	require.Equal(t, response.StatusCode, http.StatusCreated)
-	require.NotNil(t, message)
-	password := message.GetOk()
-	require.NotNil(t, password)
+	var message inout.CreatePasswordResponseV1
+	_ = proto.Unmarshal(responseBody, &message)
+	user := message.GetOk()
+	require.Equal(t, http.StatusCreated, response.StatusCode)
+	require.NotNil(t, user)
+	require.Equal(t, userID.Bytes(), user.Id)
+	require.Equal(t, int64(1), user.Created)
+	ctrl.Finish()
 }

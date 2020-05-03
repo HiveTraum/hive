@@ -3,7 +3,6 @@ package controllers
 import (
 	"auth/config"
 	"auth/eventDispatchers"
-	"auth/inout"
 	"auth/models"
 	"auth/passwordProcessors"
 	"auth/repositories"
@@ -35,7 +34,7 @@ type IController interface {
 
 	// Users
 
-	CreateUser(ctx context.Context, body *inout.CreateUserResponseV1_Request) (int, *models.User)
+	CreateUser(ctx context.Context, password, email, emailCode, phone, phoneCode string) (int, *models.User)
 	GetUsers(ctx context.Context, query repositories.GetUsersQuery) []*models.User
 	DeleteUser(ctx context.Context, id uuid.UUID) (int, *models.User)
 	GetUser(ctx context.Context, id uuid.UUID) *models.User

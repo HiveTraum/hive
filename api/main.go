@@ -67,7 +67,7 @@ type API struct {
 	authenticationController auth.IAuthenticationController
 	Parser                   *presenters.Parser
 	Renderer                 *presenters.Renderer
-	Environment              *config.Environment
+	environment              *config.Environment
 }
 
 func (api *API) GetLoginController() auth.IAuthenticationController {
@@ -80,12 +80,12 @@ func InitAPI(controller controllers.IController, authenticationController auth.I
 		authenticationController: authenticationController,
 		Parser:                   presenters.InitParser(),
 		Renderer:                 presenters.InitRenderer(),
-		Environment:              environment,
+		environment:              environment,
 	}
 }
 
 type APIWithMockedInternals struct {
-	API                      IAPI
+	API                      *API
 	Controller               *controllers.MockIController
 	AuthenticationController *auth.MockIAuthenticationController
 }
