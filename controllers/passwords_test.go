@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"auth/enums"
-	"auth/mocks"
 	"auth/models"
 	"context"
 	"github.com/golang/mock/gomock"
@@ -15,7 +14,7 @@ func TestCreatePassword(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	app, store, esb, _, passwordProcessor := mocks.InitMockApp(ctrl)
+	controller, store, _, passwordProcessor := InitControllerWithMockedInternals(ctrl)
 	ctx := context.Background()
 
 	userID := uuid.NewV4()
@@ -35,12 +34,7 @@ func TestCreatePassword(t *testing.T) {
 			Value:   "",
 		})
 
-	esb.
-		EXPECT().
-		OnPasswordChanged(userID).
-		Times(1)
-
-	status, password := CreatePassword(store, esb, app.GetPasswordProcessor(), ctx, userID, "hello")
+	status, password := controller.CreatePassword(ctx, userID, "hello")
 	require.NotEqual(t, "hello", password.Value)
 	require.NotNil(t, password)
 	require.Equal(t, enums.Ok, status)

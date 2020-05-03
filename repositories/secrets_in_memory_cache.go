@@ -29,14 +29,14 @@ func getSecretFromInMemoryCache(cache *cache.Cache, key string) *models.Secret {
 }
 
 func CacheActualSecretInMemory(cache *cache.Cache, ctx context.Context, secret *models.Secret, timeout time.Duration) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Cache actual secret in memory")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "cache actual secret in memory")
 	cacheSecretInMemory(cache, secret, enums.ActualSecret, timeout)
 	span.LogFields(log.String("secret_id", secret.Id.String()))
 	span.Finish()
 }
 
 func CacheSecretInMemory(cache *cache.Cache, ctx context.Context, secret *models.Secret, timeout time.Duration) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Cache secret in memory")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "cache secret in memory")
 	cacheSecretInMemory(cache, secret, getSecretKey(secret.Id), timeout)
 	span.LogFields(log.String("secret_id", secret.Id.String()))
 	span.Finish()

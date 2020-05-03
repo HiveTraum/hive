@@ -2,27 +2,31 @@ package controllers
 
 import (
 	"auth/enums"
-	"auth/infrastructure"
 	"auth/models"
+	"auth/repositories"
 	"context"
 	uuid "github.com/satori/go.uuid"
 )
 
-func CreateUserRole(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, userId uuid.UUID, roleID uuid.UUID) (int, *models.UserRole) {
-	status, userRole := store.CreateUserRole(ctx, userId, roleID)
+func (controller *Controller) CreateUserRole(ctx context.Context, userId uuid.UUID, roleID uuid.UUID) (int, *models.UserRole) {
+	status, userRole := controller.store.CreateUserRole(ctx, userId, roleID)
 
 	if status == enums.Ok {
-		esb.OnUserChanged([]uuid.UUID{userRole.UserId})
+		controller.OnUserChanged([]uuid.UUID{userRole.UserId})
 	}
 
 	return status, userRole
 }
 
-func DeleteUserRole(store infrastructure.StoreInterface, esb infrastructure.ESBInterface, ctx context.Context, id uuid.UUID) (int, *models.UserRole) {
-	status, userRole := store.DeleteUserRole(ctx, id)
+func (controller *Controller) GetUserRoles(ctx context.Context, query repositories.GetUserRoleQuery) ([]*models.UserRole, *models.PaginationResponse) {
+	return controller.store.GetUserRoles(ctx, query)
+}
+
+func (controller *Controller) DeleteUserRole(ctx context.Context, id uuid.UUID) (int, *models.UserRole) {
+	status, userRole := controller.store.DeleteUserRole(ctx, id)
 
 	if status == enums.Ok {
-		esb.OnUserChanged([]uuid.UUID{userRole.UserId})
+		controller.OnUserChanged([]uuid.UUID{userRole.UserId})
 	}
 
 	return status, userRole

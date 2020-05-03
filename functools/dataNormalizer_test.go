@@ -25,7 +25,7 @@ func TestNormalizeIncorrectEmail(t *testing.T) {
 func TestNormalizePhone(t *testing.T) {
 	t.Parallel()
 	phone := "+71234567890"
-	normalizedPhone := NormalizePhone(phone, "RU")
+	normalizedPhone := NormalizePhone(phone)
 	require.NotEmpty(t, normalizedPhone)
 	require.Equal(t, phone, normalizedPhone)
 }
@@ -33,7 +33,7 @@ func TestNormalizePhone(t *testing.T) {
 func TestNormalizeIncorrectPhone(t *testing.T) {
 	t.Parallel()
 	phone := "+123"
-	normalizedPhone := NormalizePhone(phone, "RU")
+	normalizedPhone := NormalizePhone(phone)
 	require.Empty(t, normalizedPhone)
 	require.NotEqual(t, phone, normalizedPhone)
 	require.Equal(t, "", normalizedPhone)

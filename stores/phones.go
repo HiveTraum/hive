@@ -11,20 +11,20 @@ import (
 	"time"
 )
 
-func (store *DatabaseStore) CreatePhone(ctx context.Context, userId uuid.UUID, value string, countryCode string) (int, *models.Phone) {
-	return repositories.CreatePhone(store.Db, ctx, userId, value, countryCode)
+func (store *DatabaseStore) CreatePhone(ctx context.Context, userId uuid.UUID, value string) (int, *models.Phone) {
+	return repositories.CreatePhone(store.db, ctx, userId, value)
 }
 
 func (store *DatabaseStore) GetPhone(ctx context.Context, phone string) (int, *models.Phone) {
-	return repositories.GetPhone(store.Db, ctx, phone)
+	return repositories.GetPhone(store.db, ctx, phone)
 }
 
 func (store *DatabaseStore) CreatePhoneConfirmationCode(ctx context.Context, phone string, code string, duration time.Duration) *models.PhoneConfirmation {
-	return repositories.CreatePhoneConfirmationCode(store.Cache, ctx, phone, code, duration)
+	return repositories.CreatePhoneConfirmationCode(store.cache, ctx, phone, code, duration)
 }
 
 func (store *DatabaseStore) GetPhoneConfirmationCode(ctx context.Context, phone string) string {
-	return repositories.GetPhoneConfirmationCode(store.Cache, ctx, phone)
+	return repositories.GetPhoneConfirmationCode(store.cache, ctx, phone)
 }
 
 func (store *DatabaseStore) GetRandomCodeForPhoneConfirmation() string {

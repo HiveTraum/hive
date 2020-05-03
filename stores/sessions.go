@@ -8,9 +8,9 @@ import (
 )
 
 func (store *DatabaseStore) CreateSession(ctx context.Context, fingerprint string, userID uuid.UUID, secretID uuid.UUID, userAgent string) (int, *models.Session) {
-	return repositories.CreateSession(store.Db, ctx, fingerprint, userID, secretID, userAgent)
+	return repositories.CreateSession(store.db, ctx, fingerprint, userID, secretID, userAgent)
 }
 
 func (store *DatabaseStore) GetSession(ctx context.Context, fingerprint string, refreshToken string, userID uuid.UUID) *models.Session {
-	return repositories.GetSession(store.Db, ctx, fingerprint, refreshToken, userID)
+	return repositories.GetSession(store.db, ctx, fingerprint, refreshToken, userID)
 }

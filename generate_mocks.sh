@@ -1,4 +1,14 @@
 #!/bin/bash
 
-cd infrastructure || exit
-mockgen -source=infrastructure.go -destination=../mocks/infrastructure.go -package=mocks
+cd api || exit
+mockgen -source=main.go -destination=../api/mocks.go -package=api
+cd ../controllers || exit
+mockgen -source=main.go -destination=../controllers/mocks.go -package=controllers
+cd ../eventDispatchers || exit
+mockgen -source=main.go -destination=../eventDispatchers/mocks.go -package=eventDispatchers
+cd ../passwordProcessors || exit
+mockgen -source=main.go -destination=../passwordProcessors/mocks.go -package=passwordProcessors
+cd ../stores || exit
+mockgen -source=main.go -destination=../stores/mocks.go -package=stores
+cd ../auth || exit
+mockgen -source=main.go -destination=../auth/mocks.go -package=auth

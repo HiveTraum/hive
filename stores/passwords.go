@@ -8,13 +8,13 @@ import (
 )
 
 func (store *DatabaseStore) CreatePassword(ctx context.Context, userId uuid.UUID, value string) (int, *models.Password) {
-	return repositories.CreatePassword(store.Db, ctx, userId, value)
+	return repositories.CreatePassword(store.db, ctx, userId, value)
 }
 
 func (store *DatabaseStore) GetPasswords(ctx context.Context, userId uuid.UUID) []*models.Password {
-	return repositories.GetPasswords(store.Db, ctx, userId)
+	return repositories.GetPasswords(store.db, ctx, userId)
 }
 
 func (store *DatabaseStore) GetLatestPassword(ctx context.Context, userId uuid.UUID) (int, *models.Password) {
-	return repositories.GetLatestPassword(store.Db, ctx, userId)
+	return repositories.GetLatestPassword(store.db, ctx, userId)
 }

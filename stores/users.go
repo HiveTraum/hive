@@ -11,8 +11,8 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func createPhoneForUser(tx repositories.DB, ctx context.Context, phone string, userId uuid.UUID, countryCode string) int {
-	status, _ := repositories.CreatePhone(tx, ctx, userId, phone, countryCode)
+func createPhoneForUser(tx repositories.DB, ctx context.Context, phone string, userId uuid.UUID) int {
+	status, _ := repositories.CreatePhone(tx, ctx, userId, phone)
 	return status
 }
 
@@ -27,7 +27,7 @@ func createPasswordForUser(tx repositories.DB, ctx context.Context, password str
 }
 
 func (store *DatabaseStore) CreateUser(ctx context.Context, query *inout.CreateUserResponseV1_Request) (int, *models.User) {
-	tx, err := store.Db.Begin(ctx)
+	tx, err := store.db.Begin(ctx)
 
 	if tx == nil {
 		return enums.NotOk, nil
@@ -47,7 +47,7 @@ func (store *DatabaseStore) CreateUser(ctx context.Context, query *inout.CreateU
 	var statuses []int
 
 	if query.Phone != "" {
-		statuses = append(statuses, createPhoneForUser(tx, ctx, query.Phone, user.Id, query.PhoneCountryCode))
+		statuses = append(statuses, createPhoneForUser(tx, ctx, query.Phone, user.Id))
 	}
 
 	if query.Email != "" {
@@ -73,13 +73,13 @@ func (store *DatabaseStore) CreateUser(ctx context.Context, query *inout.CreateU
 }
 
 func (store *DatabaseStore) GetUser(context context.Context, id uuid.UUID) *models.User {
-	return repositories.GetUser(store.Db, context, id)
+	return repositories.GetUser(store.db, context, id)
 }
 
 func (store *DatabaseStore) GetUsers(context context.Context, query repositories.GetUsersQuery) []*models.User {
-	return repositories.GetUsers(store.Db, context, query)
+	return repositories.GetUsers(store.db, context, query)
 }
 
 func (store *DatabaseStore) DeleteUser(ctx context.Context, id uuid.UUID) (int, *models.User) {
-	return repositories.DeleteUser(store.Db, ctx, id)
+	return repositories.DeleteUser(store.db, ctx, id)
 }

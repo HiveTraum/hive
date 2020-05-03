@@ -10,15 +10,15 @@ import (
 )
 
 func (store *DatabaseStore) CreateRole(ctx context.Context, title string) (int, *models.Role) {
-	return repositories.CreateRole(store.Db, ctx, title)
+	return repositories.CreateRole(store.db, ctx, title)
 }
 
 func (store *DatabaseStore) GetRole(ctx context.Context, id uuid.UUID) (int, *models.Role) {
-	return repositories.GetRole(store.Db, ctx, id)
+	return repositories.GetRole(store.db, ctx, id)
 }
 
 func (store *DatabaseStore) GetRoles(ctx context.Context, query repositories.GetRolesQuery) ([]*models.Role, *models.PaginationResponse) {
-	return repositories.GetRoles(store.Db, ctx, query)
+	return repositories.GetRoles(store.db, ctx, query)
 }
 
 func (store *DatabaseStore) GetRoleByTitle(ctx context.Context, title string) (int, *models.Role) {

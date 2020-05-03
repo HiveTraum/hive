@@ -1,7 +1,6 @@
 package stores
 
 import (
-	"auth/config"
 	"auth/models"
 	"auth/repositories"
 	"context"
@@ -12,51 +11,58 @@ import (
 
 func (store *DatabaseStore) GetSecret(ctx context.Context, id uuid.UUID) *models.Secret {
 
-	secret := repositories.GetSecretByIDFromInMemoryCache(store.InMemoryCache, ctx, id)
+	secret := repositories.GetSecretByIDFromInMemoryCache(store.inMemoryCache, ctx, id)
 	if secret != nil {
 		return secret
 	}
 
-	secret = repositories.GetSecretByIDFromCache(store.Cache, ctx, id)
+	secret = repositories.GetSecretByIDFromCache(store.cache, ctx, id)
 	if secret != nil {
-		repositories.CacheSecretInMemory(store.InMemoryCache, ctx, secret, time.Hour*24)
+		repositories.CacheSecretInMemory(store.inMemoryCache, ctx, secret, time.Hour*24)
 		return secret
 	}
 
-	secret = repositories.GetSecretFromDB(store.Db, ctx, id)
-	err := repositories.CacheSecret(store.Cache, ctx, secret, time.Hour*48)
+	secret = repositories.GetSecretFromDB(store.db, ctx, id)
+	err := repositories.CacheSecret(store.cache, ctx, secret, time.Hour*48)
 	if err != nil {
 		sentry.CaptureException(err)
 	}
-	repositories.CacheSecretInMemory(store.InMemoryCache, ctx, secret, time.Hour*24)
+	repositories.CacheSecretInMemory(store.inMemoryCache, ctx, secret, time.Hour*24)
 	return secret
 }
 
 func (store *DatabaseStore) GetActualSecret(ctx context.Context) *models.Secret {
 
-	env := config.GetEnvironment()
+	env := store.environment
 
-	actualSecret := repositories.GetActualSecretFromInMemoryCache(store.InMemoryCache, ctx)
+	actualSecret := repositories.GetActualSecretFromInMemoryCache(store.inMemoryCache, ctx)
 	if actualSecret != nil {
 		return actualSecret
 	}
 
-	actualSecret = repositories.GetActualSecretFromCache(store.Cache, ctx)
+	actualSecret = repositories.GetActualSecretFromCache(store.cache, ctx)
 	if actualSecret != nil {
-		repositories.CacheActualSecretInMemory(store.InMemoryCache, ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
+		repositories.CacheActualSecretInMemory(store.inMemoryCache, ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
 		return actualSecret
 	}
 
-	actualSecret = repositories.CreateSecret(store.Db, ctx)
-	err := repositories.CacheActualSecret(store.Cache, ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
+	return nil
+}
+
+func (store *DatabaseStore) CreateSecret(ctx context.Context) *models.Secret {
+
+	env := store.environment
+
+	actualSecret := repositories.CreateSecret(store.db, ctx)
+	err := repositories.CacheActualSecret(store.cache, ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
 	if err != nil {
 		sentry.CaptureException(err)
 	}
-	err = repositories.CacheSecret(store.Cache, ctx, actualSecret, time.Hour*time.Duration(env.RefreshTokenLifetime)*24)
+	err = repositories.CacheSecret(store.cache, ctx, actualSecret, time.Hour*time.Duration(env.RefreshTokenLifetime)*24)
 	if err != nil {
 		sentry.CaptureException(err)
 	}
-	repositories.CacheActualSecretInMemory(store.InMemoryCache, ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
-	repositories.CacheSecretInMemory(store.InMemoryCache, ctx, actualSecret, time.Hour*time.Duration(env.RefreshTokenLifetime))
+	repositories.CacheActualSecretInMemory(store.inMemoryCache, ctx, actualSecret, time.Minute*time.Duration(env.ActualSecretLifetime))
+	repositories.CacheSecretInMemory(store.inMemoryCache, ctx, actualSecret, time.Hour*time.Duration(env.RefreshTokenLifetime))
 	return actualSecret
 }
