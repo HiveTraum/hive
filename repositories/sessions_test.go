@@ -9,7 +9,7 @@ import (
 )
 
 func TestCreateSession(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeSessions(pool, ctx)
 	PurgeSecrets(pool, ctx)
@@ -27,7 +27,7 @@ func TestCreateSession(t *testing.T) {
 }
 
 func TestGetSession(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeSessions(pool, ctx)
 	PurgeSecrets(pool, ctx)

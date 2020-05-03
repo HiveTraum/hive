@@ -40,7 +40,7 @@ func unwrapPhoneScanError(err error) int {
 func scanPhone(row pgx.Row) (int, *models.Phone) {
 	phone := &models.Phone{}
 
-	err := row.Scan(&phone.Id, &phone.Created, &phone.UserId, &phone.Value, &phone.CountryCode)
+	err := row.Scan(&phone.Id, &phone.Created, &phone.UserId, &phone.Value)
 	if err != nil {
 		return unwrapPhoneScanError(err), nil
 	}

@@ -11,7 +11,7 @@ import (
 )
 
 func TestCreateUserRole(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -24,7 +24,7 @@ func TestCreateUserRole(t *testing.T) {
 }
 
 func TestCreateUserRoleWithoutRole(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -36,7 +36,7 @@ func TestCreateUserRoleWithoutRole(t *testing.T) {
 }
 
 func TestCreateUserRoleWithoutUser(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -48,7 +48,7 @@ func TestCreateUserRoleWithoutUser(t *testing.T) {
 }
 
 func TestCreateUserRoleWithoutUserAndRole(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -59,7 +59,7 @@ func TestCreateUserRoleWithoutUserAndRole(t *testing.T) {
 }
 
 func TestCreateUserRoleThatAlreadyExist(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -73,7 +73,7 @@ func TestCreateUserRoleThatAlreadyExist(t *testing.T) {
 }
 
 func TestGetUserRolesWithTwoRoles(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -92,7 +92,7 @@ func TestGetUserRolesWithTwoRoles(t *testing.T) {
 }
 
 func TestDeleteUserRole(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -111,7 +111,7 @@ func TestDeleteUserRole(t *testing.T) {
 }
 
 func TestGetUserRolesWithLimitedPagination(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -130,7 +130,7 @@ func TestGetUserRolesWithLimitedPagination(t *testing.T) {
 }
 
 func TestGetUserRolesWithPagination(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -148,7 +148,7 @@ func TestGetUserRolesWithPagination(t *testing.T) {
 }
 
 func TestGetUserRolesWithLimitedPaginationAndSecondPage(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)

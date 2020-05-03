@@ -12,7 +12,7 @@ import (
 )
 
 func TestCreateOrUpdateAllUsersViewOnUserCreation(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	PurgeUserViews(pool, ctx)
@@ -25,7 +25,7 @@ func TestCreateOrUpdateAllUsersViewOnUserCreation(t *testing.T) {
 }
 
 func TestCreateOrUpdateUsersViewOnUserCreation(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	PurgeUserViews(pool, ctx)
@@ -48,20 +48,21 @@ func TestCreateOrUpdateUsersViewOnUserCreation(t *testing.T) {
 }
 
 func TestCreateOrUpdateUsersViewWithTheSamePhone(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserViews(pool, ctx)
 	PurgeUsers(pool, ctx)
 	PurgePhones(pool, ctx)
+	phoneValue := functools.NormalizePhone("+79234567890")
 	firstUser := CreateUser(pool, ctx)
-	status, phone := CreatePhone(pool, ctx, firstUser.Id, "+71234567890", "RU")
+	status, phone := CreatePhone(pool, ctx, firstUser.Id, phoneValue)
 	require.Equal(t, enums.Ok, status)
 	views := CreateOrUpdateUsersView(pool, ctx, CreateOrUpdateUsersViewStoreQuery{Id: []uuid.UUID{firstUser.Id}})
 	require.Len(t, views, 1)
 	require.Len(t, views[0].Phones, 1)
 	require.Equal(t, phone.Value, views[0].Phones[0])
 	secondsUserWithTheSamePhone := CreateUser(pool, ctx)
-	status, phone = CreatePhone(pool, ctx, secondsUserWithTheSamePhone.Id, phone.Value, "RU")
+	status, phone = CreatePhone(pool, ctx, secondsUserWithTheSamePhone.Id, phone.Value)
 	require.Equal(t, enums.Ok, status)
 	require.Equal(t, secondsUserWithTheSamePhone.Id, phone.UserId)
 	views = CreateOrUpdateUsersView(pool, ctx, CreateOrUpdateUsersViewStoreQuery{
@@ -73,7 +74,7 @@ func TestCreateOrUpdateUsersViewWithTheSamePhone(t *testing.T) {
 }
 
 func TestDatabaseStore_GetUsersViewPagination(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	config.PurgeUsers(pool, ctx)
 	config.PurgeUserViews(pool, ctx)
@@ -94,7 +95,7 @@ func TestDatabaseStore_GetUsersViewPagination(t *testing.T) {
 }
 
 func TestDatabaseStore_GetUsersViewPaginationWithLimit(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	config.PurgeUsers(pool, ctx)
 	config.PurgeUserViews(pool, ctx)
@@ -116,7 +117,7 @@ func TestDatabaseStore_GetUsersViewPaginationWithLimit(t *testing.T) {
 }
 
 func TestDatabaseStore_GetUsersViewPaginationWithLimitWithoutNext(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	config.PurgeUsers(pool, ctx)
 	config.PurgeUserViews(pool, ctx)
@@ -142,7 +143,7 @@ func TestDatabaseStore_GetUsersViewPaginationWithLimitWithoutNext(t *testing.T) 
 }
 
 func BenchmarkCreateOrUpdateUsersView(b *testing.B) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserViews(pool, ctx)
 	PurgeUsers(pool, ctx)
@@ -158,7 +159,7 @@ func BenchmarkCreateOrUpdateUsersView(b *testing.B) {
 }
 
 func TestGetUsersViewIndexUsageFilteringByIdentifier(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	SetSeqScan(pool, ctx, false)
 	PurgeUserViews(pool, ctx)
@@ -173,7 +174,7 @@ func TestGetUsersViewIndexUsageFilteringByIdentifier(t *testing.T) {
 }
 
 func TestGetUsersViewIndexUsageFilteringBy(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	SetSeqScan(pool, ctx, false)
 	PurgeUserViews(pool, ctx)

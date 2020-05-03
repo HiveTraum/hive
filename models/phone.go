@@ -7,7 +7,6 @@ type Phone struct {
 	Created     int64
 	UserId      uuid.UUID
 	Value       string
-	CountryCode string
 }
 
 type PhoneConfirmation struct {

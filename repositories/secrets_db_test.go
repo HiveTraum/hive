@@ -9,7 +9,7 @@ import (
 )
 
 func TestCreateSecret(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeSecrets(pool, ctx)
 	secret := CreateSecret(pool, ctx)
@@ -18,7 +18,7 @@ func TestCreateSecret(t *testing.T) {
 }
 
 func TestGetSecretFromDB(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeSecrets(pool, ctx)
 	createdSecret := CreateSecret(pool, ctx)
@@ -28,7 +28,7 @@ func TestGetSecretFromDB(t *testing.T) {
 }
 
 func TestGetSecretFromDBWithoutSecret(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeSecrets(pool, ctx)
 	secret := GetSecretFromDB(pool, ctx, uuid.NewV4())

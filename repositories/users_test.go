@@ -80,7 +80,7 @@ func TestGetRawQueryWithId(t *testing.T) {
 }
 
 func TestGetUser(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	user := CreateUser(pool, ctx)
@@ -91,7 +91,7 @@ func TestGetUser(t *testing.T) {
 
 
 func TestGetUserWithoutUser(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	userFromDB := GetUser(pool, ctx, uuid.NewV4())
@@ -99,7 +99,7 @@ func TestGetUserWithoutUser(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	user := CreateUser(pool, ctx)
@@ -109,7 +109,7 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestDeleteUserWithoutUser(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	status, deletedUser := DeleteUser(pool, ctx, uuid.NewV4())
@@ -119,7 +119,7 @@ func TestDeleteUserWithoutUser(t *testing.T) {
 
 
 func BenchmarkCreateUser(b *testing.B) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	tx, _ := pool.Begin(ctx)

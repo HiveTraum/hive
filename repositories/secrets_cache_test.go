@@ -11,7 +11,7 @@ import (
 )
 
 func TestCacheSecret(t *testing.T) {
-	cache := config.InitRedis()
+	cache := config.InitRedis(config.InitEnvironment())
 	cache.FlushAll()
 	ctx := context.Background()
 	secret := &models.Secret{
@@ -24,7 +24,7 @@ func TestCacheSecret(t *testing.T) {
 }
 
 func TestGetSecretByIDSecret(t *testing.T) {
-	cache := config.InitRedis()
+	cache := config.InitRedis(config.InitEnvironment())
 	cache.FlushAll()
 	ctx := context.Background()
 
@@ -44,7 +44,7 @@ func TestGetSecretByIDSecret(t *testing.T) {
 }
 
 func TestGetExpiredSecretByIDSecret(t *testing.T) {
-	cache := config.InitRedis()
+	cache := config.InitRedis(config.InitEnvironment())
 	cache.FlushAll()
 	ctx := context.Background()
 
@@ -63,7 +63,7 @@ func TestGetExpiredSecretByIDSecret(t *testing.T) {
 }
 
 func TestCacheActualSecret(t *testing.T) {
-	cache := config.InitRedis()
+	cache := config.InitRedis(config.InitEnvironment())
 	cache.FlushAll()
 	ctx := context.Background()
 
@@ -77,7 +77,7 @@ func TestCacheActualSecret(t *testing.T) {
 }
 
 func TestGetActualSecret(t *testing.T) {
-	cache := config.InitRedis()
+	cache := config.InitRedis(config.InitEnvironment())
 	cache.FlushAll()
 	ctx := context.Background()
 	secret := &models.Secret{

@@ -10,7 +10,7 @@ import (
 )
 
 func TestCreatePassword(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	PurgePasswords(pool, ctx)
@@ -21,7 +21,7 @@ func TestCreatePassword(t *testing.T) {
 }
 
 func TestCreatePasswordWithoutUser(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	PurgePasswords(pool, ctx)
@@ -31,7 +31,7 @@ func TestCreatePasswordWithoutUser(t *testing.T) {
 }
 
 func TestGetPasswords(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	PurgePasswords(pool, ctx)
@@ -43,7 +43,7 @@ func TestGetPasswords(t *testing.T) {
 }
 
 func TestGetLatestPassword(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	PurgePasswords(pool, ctx)

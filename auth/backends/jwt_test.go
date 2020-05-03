@@ -8,6 +8,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestCreateSessionFromTokens(t *testing.T) {
@@ -18,9 +19,6 @@ func TestCreateSessionFromTokens(t *testing.T) {
 	backend := InitJWTAuthenticationBackendWithMockedInternals(ctrl)
 
 	userID := uuid.NewV4()
-	fingerprint := "123"
-	refreshToken := "321"
-	accessToken := "123321"
 
 	secret := &models.Secret{
 		Id:      uuid.NewV4(),
@@ -28,20 +26,14 @@ func TestCreateSessionFromTokens(t *testing.T) {
 		Value:   uuid.NewV4(),
 	}
 
+	accessToken := backend.Backend.EncodeAccessToken(ctx, userID, []string{}, secret, time.Now().Add(time.Microsecond))
+
 	backend.
 		Store.
 		EXPECT().
-		GetSession(ctx, fingerprint, refreshToken, userID).
+		GetSecret(ctx, secret.Id).
 		Times(1).
-		Return(&models.Session{
-			RefreshToken: refreshToken,
-			Fingerprint:  fingerprint,
-			UserID:       userID,
-			SecretID:     secret.Id,
-			Created:      1,
-			UserAgent:    "chrome",
-			AccessToken:  accessToken,
-		})
+		Return(secret)
 
 	status, loggedUser := backend.Backend.GetUser(ctx, accessToken, "")
 	require.Equal(t, enums.Ok, status)
@@ -56,13 +48,20 @@ func TestCreateSessionFromTokensWithoutSecret(t *testing.T) {
 	defer ctrl.Finish()
 	backend := InitJWTAuthenticationBackendWithMockedInternals(ctrl)
 
-	accessToken := "123321"
-	secretID := uuid.NewV4()
+	userID := uuid.NewV4()
+
+	secret := &models.Secret{
+		Id:      uuid.NewV4(),
+		Created: 1,
+		Value:   uuid.NewV4(),
+	}
+
+	accessToken := backend.Backend.EncodeAccessToken(ctx, userID, []string{}, secret, time.Now().Add(time.Microsecond))
 
 	backend.
 		Store.
 		EXPECT().
-		GetSecret(ctx, secretID).
+		GetSecret(ctx, secret.Id).
 		Return(nil).
 		Times(1)
 

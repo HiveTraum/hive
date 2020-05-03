@@ -21,11 +21,10 @@ func (api *API) CreatePhoneV1(w http.ResponseWriter, r *http.Request) {
 		api.Renderer.Render(w, r, http.StatusCreated, &inout.CreatePhoneResponseV1{
 			Data: &inout.CreatePhoneResponseV1_Ok{
 				Ok: &inout.Phone{
-					Id:               phone.Id.Bytes(),
-					Created:          phone.Created,
-					UserID:           phone.UserId.Bytes(),
-					Phone:            phone.Value,
-					PhoneCountryCode: phone.CountryCode,
+					Id:      phone.Id.Bytes(),
+					Created: phone.Created,
+					UserID:  phone.UserId.Bytes(),
+					Phone:   phone.Value,
 				}}})
 	case enums.IncorrectPhoneCode:
 		api.Renderer.Render(w, r, http.StatusBadRequest, &inout.CreatePhoneResponseV1{
