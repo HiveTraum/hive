@@ -2,13 +2,13 @@
 -- +goose StatementBegin
 CREATE TABLE users
 (
-    id      UUID   DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id      UUID PRIMARY KEY,
     created bigint DEFAULT extract(epoch from now()) * 1000
 );
 
 CREATE TABLE passwords
 (
-    id      UUID   DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id      UUID PRIMARY KEY,
     created BIGINT DEFAULT extract(epoch from now()) * 1000,
     user_id UUID,
     value   varchar(255),
@@ -17,7 +17,7 @@ CREATE TABLE passwords
 
 CREATE TABLE emails
 (
-    id      UUID   DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id      UUID PRIMARY KEY,
     created BIGINT DEFAULT extract(epoch from now()) * 1000,
     user_id UUID,
     value   varchar(255) UNIQUE,
@@ -26,7 +26,7 @@ CREATE TABLE emails
 
 CREATE TABLE phones
 (
-    id      UUID   DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id      UUID PRIMARY KEY,
     created BIGINT DEFAULT extract(epoch from now()) * 1000,
     user_id UUID,
     value   varchar(50) UNIQUE,
@@ -35,7 +35,7 @@ CREATE TABLE phones
 
 CREATE TABLE roles
 (
-    id      UUID   DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id      UUID PRIMARY KEY,
     created BIGINT DEFAULT extract(epoch from now()) * 1000,
     title   VARCHAR(255) UNIQUE
 );

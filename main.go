@@ -49,7 +49,7 @@ func InitialAdmin(environment *config.Environment, store stores.IStore) {
 func InitialAdminRole(environment *config.Environment, store stores.IStore) {
 	ctx := context.Background()
 	_, role := store.GetAdminRole(ctx)
-	if role != nil {
+	if role == nil {
 		_, _ = store.CreateRole(ctx, environment.AdminRole)
 	}
 }

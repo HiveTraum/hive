@@ -26,7 +26,7 @@ func getRolesSQL() string {
 }
 
 func createRoleSQL() string {
-	return "INSERT INTO roles (title) VALUES ($1) RETURNING id, created, title, 0;"
+	return "INSERT INTO roles (id, title) VALUES ($1, $2) RETURNING id, created, title, 0;"
 }
 
 func unwrapRoleScanError(err error) int {
@@ -106,7 +106,7 @@ func convertGetRolesQueryToRaw(query GetRolesQuery) getRolesRawQuery {
 
 func CreateRole(db DB, context context.Context, title string) (int, *models.Role) {
 	sql := createRoleSQL()
-	row := db.QueryRow(context, sql, title)
+	row := db.QueryRow(context, sql, uuid.NewV4(), title)
 	status, role, _ := scanRole(row)
 	return status, role
 }
