@@ -1,6 +1,7 @@
 package postgresRepository
 
 import (
+	"auth/config"
 	"auth/models"
 	"context"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -13,14 +14,21 @@ type IPostgresRepository interface {
 
 	CreateSecret(ctx context.Context) *models.Secret
 	GetSecret(ctx context.Context, id uuid.UUID) *models.Secret
+
+	// Sessions
+
+	CreateSession(ctx context.Context, userID uuid.UUID, secretID uuid.UUID, fingerprint string, userAgent string) *models.Session
+	DeleteSession(ctx context.Context, id uuid.UUID) *models.Session
 }
 
 type PostgresRepository struct {
-	pool *pgxpool.Pool
+	pool        *pgxpool.Pool
+	environment *config.Environment
 }
 
-func InitPostgresRepository(pool *pgxpool.Pool) *PostgresRepository {
+func InitPostgresRepository(pool *pgxpool.Pool, environment *config.Environment) *PostgresRepository {
 	return &PostgresRepository{
-		pool: pool,
+		pool:        pool,
+		environment: environment,
 	}
 }

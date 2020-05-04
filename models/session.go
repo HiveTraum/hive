@@ -3,7 +3,8 @@ package models
 import uuid "github.com/satori/go.uuid"
 
 type Session struct {
-	RefreshToken string
+	Id           uuid.UUID
+	RefreshToken uuid.UUID
 	Fingerprint  string
 	UserID       uuid.UUID
 	SecretID     uuid.UUID

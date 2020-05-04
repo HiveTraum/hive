@@ -36,7 +36,7 @@ message UserRole {
 }
 
 message Session {
-    string refreshToken = 1;
+    bytes refreshToken = 1;
     string accessToken = 2;
     int64 created = 3;
     int64 expired = 4;

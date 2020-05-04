@@ -41,7 +41,7 @@ func (user JWTAuthenticationBackendUser) GetUserID() uuid.UUID {
 	return user.UserID
 }
 
-func (backend JWTAuthenticationBackend) EncodeAccessToken(_ context.Context, userID uuid.UUID, roles []string, secret *models.Secret, expires time.Time) string {
+func (backend JWTAuthenticationBackend) EncodeAccessToken(_ context.Context, userID uuid.UUID, roles []string, secret *models.Secret, expires int64) string {
 
 	claims := JWTAuthenticationBackendUser{
 		UserID:   userID,
@@ -49,7 +49,7 @@ func (backend JWTAuthenticationBackend) EncodeAccessToken(_ context.Context, use
 		IsAdmin:  functools.Contains(backend.environment.AdminRole, roles),
 		SecretID: secret.Id,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expires.Unix(),
+			ExpiresAt: expires,
 			NotBefore: time.Now().Unix(),
 		},
 	}

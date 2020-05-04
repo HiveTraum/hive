@@ -33,14 +33,6 @@ func PurgeRoles(pool *pgxpool.Pool, ctx context.Context) {
 	PurgeTable(pool, ctx, "roles")
 }
 
-func PurgeSessions(pool *pgxpool.Pool, ctx context.Context) {
-	PurgeTable(pool, ctx, "sessions")
-}
-
-func PurgeSecrets(pool *pgxpool.Pool, ctx context.Context) {
-	PurgeTable(pool, ctx, "secrets")
-}
-
 func PurgeUserRoles(pool *pgxpool.Pool, ctx context.Context) {
 	PurgeTable(pool, ctx, "user_roles")
 }

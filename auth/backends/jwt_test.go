@@ -26,7 +26,7 @@ func TestCreateSessionFromTokens(t *testing.T) {
 		Value:   uuid.NewV4(),
 	}
 
-	accessToken := backend.Backend.EncodeAccessToken(ctx, userID, []string{}, secret, time.Now().Add(time.Microsecond))
+	accessToken := backend.Backend.EncodeAccessToken(ctx, userID, []string{}, secret, time.Now().Add(time.Microsecond).Unix())
 
 	backend.
 		Store.
@@ -56,7 +56,7 @@ func TestCreateSessionFromTokensWithoutSecret(t *testing.T) {
 		Value:   uuid.NewV4(),
 	}
 
-	accessToken := backend.Backend.EncodeAccessToken(ctx, userID, []string{}, secret, time.Now().Add(time.Microsecond))
+	accessToken := backend.Backend.EncodeAccessToken(ctx, userID, []string{}, secret, time.Now().Add(time.Microsecond).Unix())
 
 	backend.
 		Store.

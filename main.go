@@ -66,7 +66,7 @@ func main() {
 	inMemoryCache := config.InitInMemoryCache()
 	producer := config.InitNSQProducer(environment)
 	passwordProcessor := passwordProcessors.InitPasswordProcessor()
-	postgresRepo := postgresRepository.InitPostgresRepository(pool)
+	postgresRepo := postgresRepository.InitPostgresRepository(pool, environment)
 	redisRepo := redisRepository.InitRedisRepository(redis)
 	inMemoryRepo := inMemoryRepository.InitInMemoryRepository(inMemoryCache)
 	store := stores.InitStore(pool, redis, inMemoryCache, environment, postgresRepo, redisRepo, inMemoryRepo)
@@ -77,7 +77,7 @@ func main() {
 		"Bearer": jwtAuthenticationBackend,
 	}, environment)
 	dispatcher := eventDispatchers.InitNSQEventDispatcher(producer, environment)
-	controller := controllers.InitController(store, passwordProcessor, dispatcher, environment)
+	controller := controllers.InitController(store, passwordProcessor, dispatcher, environment, jwtAuthenticationBackend.EncodeAccessToken)
 	API := api2.InitAPI(controller, authenticationController, environment)
 	InitialAdminRole(environment, store)
 	InitialAdmin(environment, store)
@@ -90,32 +90,32 @@ func main() {
 	router := mux.NewRouter().StrictSlash(false)
 
 	CreateUserV1 := http.HandlerFunc(API.CreateUserV1)
-	GetUsersV1 := authentication(http.HandlerFunc(API.GetUsersV1))
-	GetUserV1 := authentication(http.HandlerFunc(API.GetUserV1))
-	DeleteUserV1 := authentication(http.HandlerFunc(API.DeleteUserV1))
+	GetUsersV1 := authentication(http.HandlerFunc(API.GetUsersV1), true)
+	GetUserV1 := authentication(http.HandlerFunc(API.GetUserV1), true)
+	DeleteUserV1 := authentication(http.HandlerFunc(API.DeleteUserV1), true)
 
-	CreatePasswordV1 := authentication(http.HandlerFunc(API.CreatePasswordV1))
+	CreatePasswordV1 := authentication(http.HandlerFunc(API.CreatePasswordV1), true)
 
-	CreateEmailV1 := authentication(http.HandlerFunc(API.CreateEmailV1))
+	CreateEmailV1 := authentication(http.HandlerFunc(API.CreateEmailV1), true)
 	CreateEmailConfirmationV1 := http.HandlerFunc(API.CreateEmailConfirmationV1)
 
-	CreateRoleV1 := authentication(http.HandlerFunc(API.CreateRoleV1))
-	GetRolesV1 := authentication(http.HandlerFunc(API.GetRolesV1))
-	GetRoleV1 := authentication(http.HandlerFunc(API.GetRoleV1))
+	CreateRoleV1 := authentication(http.HandlerFunc(API.CreateRoleV1), true)
+	GetRolesV1 := authentication(http.HandlerFunc(API.GetRolesV1), true)
+	GetRoleV1 := authentication(http.HandlerFunc(API.GetRoleV1), true)
 
-	CreateUserRoleV1 := authentication(http.HandlerFunc(API.CreateUserRoleV1))
-	GetUserRolesV1 := authentication(http.HandlerFunc(API.GetUserRolesV1))
-	DeleteUserRoleV1 := authentication(http.HandlerFunc(API.DeleteUserRoleV1))
+	CreateUserRoleV1 := authentication(http.HandlerFunc(API.CreateUserRoleV1), true)
+	GetUserRolesV1 := authentication(http.HandlerFunc(API.GetUserRolesV1), true)
+	DeleteUserRoleV1 := authentication(http.HandlerFunc(API.DeleteUserRoleV1), true)
 
 	CreatePhoneConfirmationV1 := http.HandlerFunc(API.CreatePhoneConfirmationV1)
-	CreatePhoneV1 := authentication(http.HandlerFunc(API.CreatePhoneV1))
+	CreatePhoneV1 := authentication(http.HandlerFunc(API.CreatePhoneV1), true)
 
-	CreateSessionV1 := authentication(http.HandlerFunc(API.CreateSessionV1))
+	CreateSessionV1 := authentication(http.HandlerFunc(API.CreateSessionV1), false)
 
 	GetSecretV1 := isLocalRequest(http.HandlerFunc(API.GetSecretV1))
 
-	GetUserViewV1 := authentication(http.HandlerFunc(API.GetUserViewV1))
-	GetUsersViewV1 := authentication(http.HandlerFunc(API.GetUsersViewV1))
+	GetUserViewV1 := authentication(http.HandlerFunc(API.GetUserViewV1), true)
+	GetUsersViewV1 := authentication(http.HandlerFunc(API.GetUsersViewV1), true)
 
 	uuidRE := "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}"
 

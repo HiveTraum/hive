@@ -8,13 +8,21 @@ import (
 	"time"
 )
 
-func (controller *Controller) CreateSession(ctx context.Context, userID uuid.UUID, userAgent string, fingerprint string) (int, *models.Session) {
+func (controller *Controller) CreateSession(ctx context.Context, userID uuid.UUID, fingerprint, userAgent string) *models.Session {
 	secret := controller.GetActualSecret(ctx)
-	status, session := controller.store.CreateSession(ctx, fingerprint, userID, secret.Id, userAgent)
-	if status != enums.Ok {
-		return status, nil
+	session := controller.store.CreateSession(ctx, userID, secret.Id, fingerprint, userAgent)
+	user := controller.GetUserView(ctx, userID)
+	session.AccessToken = controller.accessTokenEncoder(ctx, user.Id, user.Roles, secret, session.Expires)
+	return session
+}
+
+func (controller *Controller) UpdateSession(ctx context.Context, id uuid.UUID, fingerprint, userAgent string) (int, *models.Session) {
+	oldSession := controller.store.DeleteSession(ctx, id)
+	if oldSession == nil ||
+		oldSession.Fingerprint != fingerprint ||
+		oldSession.Expires <= time.Now().Unix() {
+		return enums.SessionNotFound, nil
 	}
-	expires := time.Now().Add(time.Minute * time.Duration(controller.environment.AccessTokenLifetime))
-	session.Expires = expires.Unix()
-	return status, session
+
+	return enums.Ok, controller.CreateSession(ctx, oldSession.UserID, fingerprint, userAgent)
 }

@@ -2,15 +2,14 @@ package stores
 
 import (
 	"auth/models"
-	"auth/repositories"
 	"context"
 	uuid "github.com/satori/go.uuid"
 )
 
-func (store *DatabaseStore) CreateSession(ctx context.Context, fingerprint string, userID uuid.UUID, secretID uuid.UUID, userAgent string) (int, *models.Session) {
-	return repositories.CreateSession(store.db, ctx, fingerprint, userID, secretID, userAgent)
+func (store *DatabaseStore) CreateSession(ctx context.Context, userID uuid.UUID, secretID uuid.UUID, fingerprint string, userAgent string) *models.Session {
+	return store.postgresRepository.CreateSession(ctx, userID, secretID, fingerprint, userAgent)
 }
 
-func (store *DatabaseStore) GetSession(ctx context.Context, fingerprint string, refreshToken string, userID uuid.UUID) *models.Session {
-	return repositories.GetSession(store.db, ctx, fingerprint, refreshToken, userID)
+func (store *DatabaseStore) DeleteSession(ctx context.Context, id uuid.UUID) *models.Session {
+	return store.postgresRepository.DeleteSession(ctx, id)
 }

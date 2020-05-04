@@ -21,7 +21,8 @@ type IController interface {
 
 	// Sessions
 
-	CreateSession(ctx context.Context, userID uuid.UUID, userAgent string, fingerprint string) (int, *models.Session)
+	CreateSession(ctx context.Context, userID uuid.UUID, fingerprint, userAgent string) *models.Session
+	UpdateSession(ctx context.Context, id uuid.UUID, fingerprint, userAgent string) (int, *models.Session)
 
 	// Passwords
 
@@ -77,18 +78,20 @@ type IController interface {
 }
 
 type Controller struct {
-	store             stores.IStore
-	passwordProcessor passwordProcessors.IPasswordProcessor
-	dispatcher        eventDispatchers.IEventDispatcher
-	environment       *config.Environment
+	store              stores.IStore
+	passwordProcessor  passwordProcessors.IPasswordProcessor
+	dispatcher         eventDispatchers.IEventDispatcher
+	environment        *config.Environment
+	accessTokenEncoder models.AccessTokenEncoder
 }
 
-func InitController(store stores.IStore, passwordProcessor passwordProcessors.IPasswordProcessor, dispatcher eventDispatchers.IEventDispatcher, environment *config.Environment) *Controller {
+func InitController(store stores.IStore, passwordProcessor passwordProcessors.IPasswordProcessor, dispatcher eventDispatchers.IEventDispatcher, environment *config.Environment, accessTokenEncoder models.AccessTokenEncoder) *Controller {
 	return &Controller{
-		store:             store,
-		passwordProcessor: passwordProcessor,
-		dispatcher:        dispatcher,
-		environment:       environment,
+		store:              store,
+		passwordProcessor:  passwordProcessor,
+		dispatcher:         dispatcher,
+		environment:        environment,
+		accessTokenEncoder: accessTokenEncoder,
 	}
 }
 
@@ -105,7 +108,9 @@ func InitControllerWithMockedInternals(ctrl *gomock.Controller) *ControllerWithM
 	passwordProcessor := passwordProcessors.NewMockIPasswordProcessor(ctrl)
 	environment := config.InitEnvironment()
 	return &ControllerWithMockedInternals{
-		Controller:        InitController(store, passwordProcessor, dispatcher, environment),
+		Controller: InitController(store, passwordProcessor, dispatcher, environment, func(_ context.Context, userID uuid.UUID, roles []string, secret *models.Secret, expires int64) string {
+			return ""
+		}),
 		Dispatcher:        dispatcher,
 		Store:             store,
 		PasswordProcessor: passwordProcessor,

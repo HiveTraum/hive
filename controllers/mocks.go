@@ -65,18 +65,32 @@ func (mr *MockIControllerMockRecorder) GetSecret(ctx, id interface{}) *gomock.Ca
 }
 
 // CreateSession mocks base method
-func (m *MockIController) CreateSession(ctx context.Context, userID go_uuid.UUID, userAgent, fingerprint string) (int, *models.Session) {
+func (m *MockIController) CreateSession(ctx context.Context, userID go_uuid.UUID, fingerprint, userAgent string) *models.Session {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateSession", ctx, userID, userAgent, fingerprint)
+	ret := m.ctrl.Call(m, "CreateSession", ctx, userID, fingerprint, userAgent)
+	ret0, _ := ret[0].(*models.Session)
+	return ret0
+}
+
+// CreateSession indicates an expected call of CreateSession
+func (mr *MockIControllerMockRecorder) CreateSession(ctx, userID, fingerprint, userAgent interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSession", reflect.TypeOf((*MockIController)(nil).CreateSession), ctx, userID, fingerprint, userAgent)
+}
+
+// UpdateSession mocks base method
+func (m *MockIController) UpdateSession(ctx context.Context, id go_uuid.UUID, fingerprint, userAgent string) (int, *models.Session) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSession", ctx, id, fingerprint, userAgent)
 	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(*models.Session)
 	return ret0, ret1
 }
 
-// CreateSession indicates an expected call of CreateSession
-func (mr *MockIControllerMockRecorder) CreateSession(ctx, userID, userAgent, fingerprint interface{}) *gomock.Call {
+// UpdateSession indicates an expected call of UpdateSession
+func (mr *MockIControllerMockRecorder) UpdateSession(ctx, id, fingerprint, userAgent interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSession", reflect.TypeOf((*MockIController)(nil).CreateSession), ctx, userID, userAgent, fingerprint)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSession", reflect.TypeOf((*MockIController)(nil).UpdateSession), ctx, id, fingerprint, userAgent)
 }
 
 // CreatePassword mocks base method

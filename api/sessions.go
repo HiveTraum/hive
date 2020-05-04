@@ -3,6 +3,7 @@ package api
 import (
 	"auth/enums"
 	"auth/inout"
+	"auth/models"
 	"auth/repositories"
 	"net/http"
 	"time"
@@ -18,23 +19,38 @@ func (api *API) CreateSessionV1(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	user := repositories.GetUserFromContext(ctx)
-	status, session := api.Controller.CreateSession(ctx, user.GetUserID(), body.UserAgent, body.Fingerprint)
+	refreshToken := repositories.GetRefreshTokenCookie(r, api.environment)
+
+	var status int
+	var session *models.Session
+
+	if user != nil {
+		session = api.Controller.CreateSession(ctx, user.GetUserID(), body.Fingerprint, body.UserAgent)
+		status = enums.Ok
+	} else if refreshToken != nil {
+		status, session = api.Controller.UpdateSession(ctx, *refreshToken, body.Fingerprint, body.UserAgent)
+	} else {
+		api.Renderer.Render(w, r, http.StatusUnauthorized, nil)
+		return
+	}
 
 	switch status {
 	case enums.Ok:
+
 		http.SetCookie(w, &http.Cookie{
 			Name:     enums.RefreshToken,
-			Value:    session.RefreshToken,
+			Value:    session.RefreshToken.String(),
 			Domain:   r.Referer(),
 			Expires:  time.Now().Add(time.Hour * 24 * time.Duration(api.environment.RefreshTokenLifetime)),
 			Secure:   true,
 			HttpOnly: true,
 			Path:     "/api/v1/sessions",
 		})
+
 		api.Renderer.Render(w, r, http.StatusCreated, &inout.CreateSessionResponseV1{
 			Data: &inout.CreateSessionResponseV1_Ok{
 				Ok: &inout.Session{
-					RefreshToken: session.RefreshToken,
+					RefreshToken: session.RefreshToken.Bytes(),
 					AccessToken:  session.AccessToken,
 					Created:      session.Created,
 					Expired:      session.Expires,

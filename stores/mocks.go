@@ -557,30 +557,29 @@ func (mr *MockIStoreMockRecorder) CreateSecret(ctx interface{}) *gomock.Call {
 }
 
 // CreateSession mocks base method
-func (m *MockIStore) CreateSession(ctx context.Context, fingerprint string, userID, secretID go_uuid.UUID, userAgent string) (int, *models.Session) {
+func (m *MockIStore) CreateSession(ctx context.Context, userID, secretID go_uuid.UUID, fingerprint, userAgent string) *models.Session {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateSession", ctx, fingerprint, userID, secretID, userAgent)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(*models.Session)
-	return ret0, ret1
-}
-
-// CreateSession indicates an expected call of CreateSession
-func (mr *MockIStoreMockRecorder) CreateSession(ctx, fingerprint, userID, secretID, userAgent interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSession", reflect.TypeOf((*MockIStore)(nil).CreateSession), ctx, fingerprint, userID, secretID, userAgent)
-}
-
-// GetSession mocks base method
-func (m *MockIStore) GetSession(ctx context.Context, fingerprint, refreshToken string, userID go_uuid.UUID) *models.Session {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSession", ctx, fingerprint, refreshToken, userID)
+	ret := m.ctrl.Call(m, "CreateSession", ctx, userID, secretID, fingerprint, userAgent)
 	ret0, _ := ret[0].(*models.Session)
 	return ret0
 }
 
-// GetSession indicates an expected call of GetSession
-func (mr *MockIStoreMockRecorder) GetSession(ctx, fingerprint, refreshToken, userID interface{}) *gomock.Call {
+// CreateSession indicates an expected call of CreateSession
+func (mr *MockIStoreMockRecorder) CreateSession(ctx, userID, secretID, fingerprint, userAgent interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSession", reflect.TypeOf((*MockIStore)(nil).GetSession), ctx, fingerprint, refreshToken, userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSession", reflect.TypeOf((*MockIStore)(nil).CreateSession), ctx, userID, secretID, fingerprint, userAgent)
+}
+
+// DeleteSession mocks base method
+func (m *MockIStore) DeleteSession(ctx context.Context, id go_uuid.UUID) *models.Session {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteSession", ctx, id)
+	ret0, _ := ret[0].(*models.Session)
+	return ret0
+}
+
+// DeleteSession indicates an expected call of DeleteSession
+func (mr *MockIStoreMockRecorder) DeleteSession(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSession", reflect.TypeOf((*MockIStore)(nil).DeleteSession), ctx, id)
 }

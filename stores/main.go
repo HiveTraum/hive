@@ -83,8 +83,8 @@ type IStore interface {
 
 	// Sessions
 
-	CreateSession(ctx context.Context, fingerprint string, userID uuid.UUID, secretID uuid.UUID, userAgent string) (int, *models.Session)
-	GetSession(ctx context.Context, fingerprint string, refreshToken string, userID uuid.UUID) *models.Session
+	CreateSession(ctx context.Context, userID uuid.UUID, secretID uuid.UUID, fingerprint string, userAgent string) *models.Session
+	DeleteSession(ctx context.Context, id uuid.UUID) *models.Session
 }
 
 type DatabaseStore struct {

@@ -10,7 +10,7 @@ import (
 )
 
 func createSecretSQL() string {
-	return "INSERT INTO secrets (id, created, value) VALUES ($1, default, default) RETURNING id, created, value;"
+	return "INSERT INTO secrets (id, created, value) VALUES ($1, default, $2) RETURNING id, created, value;"
 }
 
 func getSecretsSQL() string {
@@ -36,7 +36,7 @@ func scanSecret(row pgx.Row) *models.Secret {
 
 func (repository *PostgresRepository) CreateSecret(ctx context.Context) *models.Secret {
 	sql := createSecretSQL()
-	row := repository.pool.QueryRow(ctx, sql, uuid.NewV4())
+	row := repository.pool.QueryRow(ctx, sql, uuid.NewV4(), uuid.NewV4())
 	return scanSecret(row)
 }
 

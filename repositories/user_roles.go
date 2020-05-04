@@ -15,8 +15,8 @@ import (
 
 func createUserRoleSQL() string {
 	return `
-		INSERT INTO user_roles(user_id, role_id) 
-		VALUES ($1, $2) 
+		INSERT INTO user_roles(id, user_id, role_id) 
+		VALUES ($1, $2, $3) 
 		RETURNING id, created, user_id, role_id, 0;
 		`
 }
@@ -115,7 +115,7 @@ func convertGetUserRoleQueryToRaw(query GetUserRoleQuery) getUserRoleRawQuery {
 
 func CreateUserRole(db DB, ctx context.Context, userID uuid.UUID, roleID uuid.UUID) (int, *models.UserRole) {
 	sql := createUserRoleSQL()
-	row := db.QueryRow(ctx, sql, userID, roleID)
+	row := db.QueryRow(ctx, sql, uuid.NewV4(), userID, roleID)
 	status, userRole, _ := scanUserRole(row)
 	return status, userRole
 }

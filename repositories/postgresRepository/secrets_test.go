@@ -9,8 +9,9 @@ import (
 )
 
 func TestCreateSecret(t *testing.T) {
-	pool := config.InitPool(nil, config.InitEnvironment())
-	repo := InitPostgresRepository(pool)
+	env := config.InitEnvironment()
+	pool := config.InitPool(nil, env)
+	repo := InitPostgresRepository(pool, env)
 	ctx := context.Background()
 	PurgeSecrets(pool, ctx)
 	secret := repo.CreateSecret(ctx)
@@ -19,8 +20,9 @@ func TestCreateSecret(t *testing.T) {
 }
 
 func TestGetSecretFromDB(t *testing.T) {
-	pool := config.InitPool(nil, config.InitEnvironment())
-	repo := InitPostgresRepository(pool)
+	env := config.InitEnvironment()
+	pool := config.InitPool(nil, env)
+	repo := InitPostgresRepository(pool, env)
 	ctx := context.Background()
 	PurgeSecrets(pool, ctx)
 	createdSecret := repo.CreateSecret(ctx)
@@ -30,8 +32,9 @@ func TestGetSecretFromDB(t *testing.T) {
 }
 
 func TestGetSecretFromDBWithoutSecret(t *testing.T) {
-	pool := config.InitPool(nil, config.InitEnvironment())
-	repo := InitPostgresRepository(pool)
+	env := config.InitEnvironment()
+	pool := config.InitPool(nil, env)
+	repo := InitPostgresRepository(pool, env)
 	ctx := context.Background()
 	PurgeSecrets(pool, ctx)
 	secret := repo.GetSecret(ctx, uuid.NewV4())
