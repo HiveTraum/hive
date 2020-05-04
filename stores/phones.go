@@ -1,7 +1,6 @@
 package stores
 
 import (
-	"auth/config"
 	"auth/models"
 	"auth/repositories"
 	"context"
@@ -29,12 +28,12 @@ func (store *DatabaseStore) GetPhoneConfirmationCode(ctx context.Context, phone 
 
 func (store *DatabaseStore) GetRandomCodeForPhoneConfirmation() string {
 
-	if !config.GetEnvironment().IsTestEnvironment {
+	if !store.environment.IsTestEnvironment {
 		rand.Seed(time.Now().UnixNano())
 		min := 100000
 		max := 999999
 		return strconv.Itoa(rand.Intn(max-min+1) + min)
 	} else {
-		return config.GetEnvironment().TestConfirmationCode
+		return store.environment.TestConfirmationCode
 	}
 }

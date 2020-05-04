@@ -10,11 +10,11 @@ import (
 	"net/http"
 )
 
-func GetUserRolesV1Query(r *http.Request) repositories.GetUserRoleQuery {
+func (api *API) GetUserRolesV1Query(r *http.Request) repositories.GetUserRoleQuery {
 
 	query := r.URL.Query()
 	return repositories.GetUserRoleQuery{
-		Pagination: functools.GetPagination(query),
+		Pagination: functools.GetPagination(query, api.environment),
 		UserId:     functools.StringsSliceToUUIDSlice(query["users"]),
 		RoleId:     functools.StringsSliceToUUIDSlice(query["roles"]),
 	}
@@ -22,7 +22,7 @@ func GetUserRolesV1Query(r *http.Request) repositories.GetUserRoleQuery {
 
 func (api *API) GetUserRolesV1(w http.ResponseWriter, r *http.Request) {
 
-	query := GetUserRolesV1Query(r)
+	query := api.GetUserRolesV1Query(r)
 	userRoles, pagination := api.Controller.GetUserRoles(r.Context(), query)
 	usersData := make([]*inout.UserRole, len(userRoles))
 

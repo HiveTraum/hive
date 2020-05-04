@@ -17,7 +17,8 @@ import (
 )
 
 type JWTAuthenticationBackend struct {
-	store stores.IStore
+	store       stores.IStore
+	environment *config.Environment
 }
 
 type JWTAuthenticationBackendUser struct {
@@ -45,7 +46,7 @@ func (backend JWTAuthenticationBackend) EncodeAccessToken(_ context.Context, use
 	claims := JWTAuthenticationBackendUser{
 		UserID:   userID,
 		Roles:    roles,
-		IsAdmin:  functools.Contains(config.GetEnvironment().AdminRole, roles),
+		IsAdmin:  functools.Contains(backend.environment.AdminRole, roles),
 		SecretID: secret.Id,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expires.Unix(),
@@ -108,14 +109,7 @@ func (backend JWTAuthenticationBackend) DecodeAccessToken(_ context.Context, tok
 	}
 }
 
-func (backend JWTAuthenticationBackend) GetUser(ctx context.Context, headerToken string, cookieToken string) (int, models.IAuthenticationBackendUser) {
-
-	var token string
-	if cookieToken != "" {
-		token = cookieToken
-	} else {
-		token = headerToken
-	}
+func (backend JWTAuthenticationBackend) GetUser(ctx context.Context, token string) (int, models.IAuthenticationBackendUser) {
 
 	status, unverifiedPayload := backend.DecodeAccessTokenWithoutValidation(ctx, token)
 	if status != enums.Ok {
@@ -135,8 +129,8 @@ func (backend JWTAuthenticationBackend) GetUser(ctx context.Context, headerToken
 	return enums.Ok, payload
 }
 
-func InitJWTAuthenticationBackend(store stores.IStore) *JWTAuthenticationBackend {
-	return &JWTAuthenticationBackend{store: store}
+func InitJWTAuthenticationBackend(store stores.IStore, environment *config.Environment) *JWTAuthenticationBackend {
+	return &JWTAuthenticationBackend{store: store, environment: environment}
 }
 
 type JWTAuthenticationBackendWithMockedInternals struct {
@@ -147,7 +141,7 @@ type JWTAuthenticationBackendWithMockedInternals struct {
 func InitJWTAuthenticationBackendWithMockedInternals(ctrl *gomock.Controller) *JWTAuthenticationBackendWithMockedInternals {
 	store := stores.NewMockIStore(ctrl)
 	return &JWTAuthenticationBackendWithMockedInternals{
-		Backend: InitJWTAuthenticationBackend(store),
+		Backend: InitJWTAuthenticationBackend(store, config.InitEnvironment()),
 		Store:   store,
 	}
 }

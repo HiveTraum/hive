@@ -5,6 +5,8 @@ import (
 	"auth/functools"
 	"auth/models"
 	"context"
+	"encoding/base64"
+	"fmt"
 	"github.com/golang/mock/gomock"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
@@ -585,4 +587,58 @@ func TestCreateSessionFromPhoneAndCodeWithoutPhone(t *testing.T) {
 	status, loggedUserID := backend.Backend.getUserFromPhoneAndCode(ctx, phone, code)
 	require.Equal(t, enums.PhoneNotFound, status)
 	require.Nil(t, loggedUserID)
+}
+
+func TestBasicAuthenticationBackend_GetUser(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	backend := InitBasicAuthenticationWithMockedInternals(ctrl)
+
+	code := "123456"
+	phone := "+79234567890"
+	formattedPhone := functools.NormalizePhone(phone)
+
+	token := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", phone, code)))
+
+	userID := uuid.NewV4()
+
+	backend.
+		Store.
+		EXPECT().
+		GetPhoneConfirmationCode(ctx, formattedPhone).
+		Times(1).
+		Return(code)
+
+	backend.
+		Store.
+		EXPECT().
+		GetPhone(ctx, formattedPhone).
+		Times(1).
+		Return(enums.Ok, &models.Phone{
+			Id:      uuid.NewV4(),
+			Created: 1,
+			UserId:  userID,
+			Value:   formattedPhone,
+		})
+
+	backend.
+		Store.
+		EXPECT().
+		GetUserView(ctx, userID).
+		Times(1).
+		Return(&models.UserView{
+			Id:      userID,
+			Created: 2,
+			Roles:   []string{"hello"},
+			Phones:  []string{formattedPhone},
+		})
+
+	status, loggedUser := backend.Backend.GetUser(ctx, token)
+	require.Equal(t, enums.Ok, status)
+	require.NotNil(t, loggedUser)
+	require.Equal(t, userID, loggedUser.GetUserID())
+	require.False(t, loggedUser.GetIsAdmin())
+	require.Contains(t, loggedUser.GetRoles(), "hello")
 }

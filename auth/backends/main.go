@@ -6,5 +6,5 @@ import (
 )
 
 type IAuthenticationBackend interface {
-	GetUser(ctx context.Context, headerToken string, cookieToken string) (int, models.IAuthenticationBackendUser)
+	GetUser(ctx context.Context, token string) (int, models.IAuthenticationBackendUser)
 }

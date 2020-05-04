@@ -9,10 +9,10 @@ import (
 	"auth/stores"
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/mock/gomock"
 	uuid "github.com/satori/go.uuid"
+	"strings"
 )
 
 type BasicAuthenticationBackendUser struct {
@@ -36,12 +36,14 @@ func (user *BasicAuthenticationBackendUser) GetUserID() uuid.UUID {
 type BasicAuthenticationBackend struct {
 	store             stores.IStore
 	passwordProcessor passwordProcessors.IPasswordProcessor
+	environment       *config.Environment
 }
 
-func InitBasicAuthenticationBackend(store stores.IStore, passwordProcessor passwordProcessors.IPasswordProcessor) *BasicAuthenticationBackend {
+func InitBasicAuthenticationBackend(store stores.IStore, passwordProcessor passwordProcessors.IPasswordProcessor, environment *config.Environment) *BasicAuthenticationBackend {
 	return &BasicAuthenticationBackend{
 		store:             store,
 		passwordProcessor: passwordProcessor,
+		environment:       environment,
 	}
 }
 
@@ -55,16 +57,10 @@ func InitBasicAuthenticationWithMockedInternals(ctrl *gomock.Controller) *BasicA
 	store := stores.NewMockIStore(ctrl)
 	passwordProcessor := passwordProcessors.NewMockIPasswordProcessor(ctrl)
 	return &BasicAuthenticationBackendWithMockedInternals{
-		Backend:           InitBasicAuthenticationBackend(store, passwordProcessor),
+		Backend:           InitBasicAuthenticationBackend(store, passwordProcessor, config.InitEnvironment()),
 		Store:             store,
 		PasswordProcessor: passwordProcessor,
 	}
-}
-
-type CredentialsPair struct {
-	CredentialType   enums.CredentialType `json:"credentialType"`
-	FirstCredential  string               `json:"first"`
-	SecondCredential string               `json:"second"`
 }
 
 func (backend *BasicAuthenticationBackend) getUserFromEmailAndCode(ctx context.Context, emailValue string, emailCode string) (int, *uuid.UUID) {
@@ -177,35 +173,42 @@ func (backend *BasicAuthenticationBackend) getUserFromPhoneAndCode(ctx context.C
 	return enums.Ok, &phone.UserId
 }
 
-func (backend *BasicAuthenticationBackend) GetUserID(ctx context.Context, credentials CredentialsPair) (int, *uuid.UUID) {
-	switch credentials.CredentialType {
-	case enums.EmailAndPassword:
-		return backend.getUserFromEmailAndPassword(ctx, credentials.FirstCredential, credentials.SecondCredential)
-	case enums.EmailAndCode:
-		return backend.getUserFromEmailAndCode(ctx, credentials.FirstCredential, credentials.SecondCredential)
-	case enums.PhoneAndPassword:
-		return backend.getUserFromPhoneAndPassword(ctx, credentials.FirstCredential, credentials.SecondCredential)
-	case enums.PhoneAndCode:
-		return backend.getUserFromPhoneAndCode(ctx, credentials.FirstCredential, credentials.SecondCredential)
-	default:
-		return enums.CredentialsTypeNotFound, nil
+func (backend *BasicAuthenticationBackend) GetUserID(ctx context.Context, first, second string) (int, *uuid.UUID) {
+	if functools.NormalizeEmail(first) != "" {
+		if len(second) == 6 {
+			status, user := backend.getUserFromEmailAndCode(ctx, first, second)
+			if status == enums.Ok && user != nil {
+				return status, user
+			}
+		}
+
+		return backend.getUserFromEmailAndPassword(ctx, first, second)
+	} else {
+		if len(second) == 6 {
+			status, user := backend.getUserFromPhoneAndCode(ctx, first, second)
+			if status == enums.Ok && user != nil {
+				return status, user
+			}
+		}
+
+		return backend.getUserFromPhoneAndPassword(ctx, first, second)
 	}
 }
 
-func (backend *BasicAuthenticationBackend) GetUser(ctx context.Context, headerToken string, _ string) (int, models.IAuthenticationBackendUser) {
-	decodedTokenInBytes, err := base64.StdEncoding.DecodeString(headerToken)
+func (backend *BasicAuthenticationBackend) GetUser(ctx context.Context, token string) (int, models.IAuthenticationBackendUser) {
+	decodedTokenInBytes, err := base64.StdEncoding.DecodeString(token)
 	if err != nil {
 		sentry.CaptureException(err)
 		return enums.IncorrectToken, nil
 	}
 
-	var credentials CredentialsPair
-	err = json.Unmarshal(decodedTokenInBytes, &credentials)
-	if err != nil {
+	decodedToken := string(decodedTokenInBytes)
+	parts := strings.Split(decodedToken, ":")
+	if len(parts) < 2 {
 		return enums.IncorrectToken, nil
 	}
 
-	status, userID := backend.GetUserID(ctx, credentials)
+	status, userID := backend.GetUserID(ctx, parts[0], parts[1])
 	if status != enums.Ok {
 		return status, nil
 	}
@@ -216,7 +219,7 @@ func (backend *BasicAuthenticationBackend) GetUser(ctx context.Context, headerTo
 	}
 
 	return enums.Ok, &BasicAuthenticationBackendUser{
-		IsAdmin: functools.Contains(config.GetEnvironment().AdminRole, user.Roles),
+		IsAdmin: functools.Contains(backend.environment.AdminRole, user.Roles),
 		Roles:   user.Roles,
 		UserID:  user.Id,
 	}

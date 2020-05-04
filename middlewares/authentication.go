@@ -14,7 +14,7 @@ func AuthenticationMiddleware(authenticationController auth.IAuthenticationContr
 			ctx := r.Context()
 
 			status, user := authenticationController.Login(ctx, r)
-			if status == enums.Ok || user == nil {
+			if status == enums.Ok && user != nil {
 				ctx = repositories.SetUserToContext(ctx, user)
 				r = r.WithContext(ctx)
 				next.ServeHTTP(w, r)

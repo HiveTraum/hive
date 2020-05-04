@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/getsentry/sentry-go"
 	"github.com/nsqio/go-nsq"
+	"github.com/rs/zerolog/log"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -19,6 +21,8 @@ func InitNSQEventDispatcher(producer *nsq.Producer, environment *config.Environm
 
 func (dispatcher NSQEventDispatcher) send(object string, version int32, payload proto.Message) {
 	topic := fmt.Sprintf("%s-%s-%d", dispatcher.environment.ESBSender, object, version)
+	payloadJson, _ := protojson.Marshal(payload)
+	log.Log().Str("event", "message sent").Str("topic", topic).RawJSON("payload", payloadJson).Send()
 
 	data, err := proto.Marshal(payload)
 

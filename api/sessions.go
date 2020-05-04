@@ -1,7 +1,6 @@
 package api
 
 import (
-	"auth/config"
 	"auth/enums"
 	"auth/inout"
 	"auth/repositories"
@@ -23,14 +22,14 @@ func (api *API) CreateSessionV1(w http.ResponseWriter, r *http.Request) {
 
 	switch status {
 	case enums.Ok:
-		env := config.GetEnvironment()
 		http.SetCookie(w, &http.Cookie{
 			Name:     enums.RefreshToken,
 			Value:    session.RefreshToken,
 			Domain:   r.Referer(),
-			Expires:  time.Now().Add(time.Hour * 24 * time.Duration(env.RefreshTokenLifetime)),
+			Expires:  time.Now().Add(time.Hour * 24 * time.Duration(api.environment.RefreshTokenLifetime)),
 			Secure:   true,
 			HttpOnly: true,
+			Path:     "/api/v1/sessions",
 		})
 		api.Renderer.Render(w, r, http.StatusCreated, &inout.CreateSessionResponseV1{
 			Data: &inout.CreateSessionResponseV1_Ok{

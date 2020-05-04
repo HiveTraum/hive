@@ -1,7 +1,6 @@
 package stores
 
 import (
-	"auth/config"
 	"auth/functools"
 	"auth/models"
 	"auth/repositories"
@@ -27,9 +26,9 @@ func (store *DatabaseStore) GetEmailConfirmationCode(ctx context.Context, email 
 }
 
 func (store *DatabaseStore) GetRandomCodeForEmailConfirmation() string {
-	if !config.GetEnvironment().IsTestEnvironment {
+	if !store.environment.IsTestEnvironment {
 		return functools.GetRandomString(6)
 	} else {
-		return config.GetEnvironment().TestConfirmationCode
+		return store.environment.TestConfirmationCode
 	}
 }

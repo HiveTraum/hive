@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"auth/config"
 	"auth/enums"
 	"auth/models"
 	"context"
@@ -15,8 +14,7 @@ func (controller *Controller) CreateSession(ctx context.Context, userID uuid.UUI
 	if status != enums.Ok {
 		return status, nil
 	}
-	env := config.GetEnvironment()
-	expires := time.Now().Add(time.Minute * time.Duration(env.AccessTokenLifetime))
+	expires := time.Now().Add(time.Minute * time.Duration(controller.environment.AccessTokenLifetime))
 	session.Expires = expires.Unix()
 	return status, session
 }

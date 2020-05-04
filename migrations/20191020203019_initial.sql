@@ -26,11 +26,10 @@ CREATE TABLE emails
 
 CREATE TABLE phones
 (
-    id           UUID   DEFAULT uuid_generate_v4() PRIMARY KEY,
-    created      BIGINT DEFAULT extract(epoch from now()) * 1000,
-    user_id      UUID,
-    value        varchar(50) UNIQUE,
-    country_code varchar(4),
+    id      UUID   DEFAULT uuid_generate_v4() PRIMARY KEY,
+    created BIGINT DEFAULT extract(epoch from now()) * 1000,
+    user_id UUID,
+    value   varchar(50) UNIQUE,
     FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE
 );
 

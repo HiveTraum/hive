@@ -99,8 +99,8 @@ func (api *API) CreateUserV1(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetUsersV1Query(query url.Values, user models.IAuthenticationBackendUser) repositories.GetUsersQuery {
-	pagination := functools.GetPagination(query)
+func (api *API) GetUsersV1Query(query url.Values, user models.IAuthenticationBackendUser) repositories.GetUsersQuery {
+	pagination := functools.GetPagination(query, api.environment)
 
 	var requestedUserIdentifiers []uuid.UUID
 	if user.GetIsAdmin() {
@@ -119,7 +119,7 @@ func GetUsersV1Query(query url.Values, user models.IAuthenticationBackendUser) r
 func (api *API) GetUsersV1(w http.ResponseWriter, r *http.Request) {
 
 	user := repositories.GetUserFromContext(r.Context())
-	query := GetUsersV1Query(r.URL.Query(), user)
+	query := api.GetUsersV1Query(r.URL.Query(), user)
 	users := api.Controller.GetUsers(r.Context(), query)
 	usersData := make([]*inout.User, len(users))
 

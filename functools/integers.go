@@ -37,6 +37,16 @@ func Min(list []int) int {
 	return min
 }
 
+func In(array []int, num int) bool {
+	for _, i := range array {
+		if i == num {
+			return true
+		}
+	}
+
+	return false
+}
+
 func Int64SliceToString(slice []int64, delimiter string) string {
 	return strings.Trim(strings.Replace(fmt.Sprint(slice), " ", delimiter, -1), "[]")
 }

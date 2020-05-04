@@ -70,8 +70,8 @@ func main() {
 	redisRepo := redisRepository.InitRedisRepository(redis)
 	inMemoryRepo := inMemoryRepository.InitInMemoryRepository(inMemoryCache)
 	store := stores.InitStore(pool, redis, inMemoryCache, environment, postgresRepo, redisRepo, inMemoryRepo)
-	jwtAuthenticationBackend := backends.InitJWTAuthenticationBackend(store)
-	basicAuthenticationBackend := backends.InitBasicAuthenticationBackend(store, passwordProcessor)
+	jwtAuthenticationBackend := backends.InitJWTAuthenticationBackend(store, environment)
+	basicAuthenticationBackend := backends.InitBasicAuthenticationBackend(store, passwordProcessor, environment)
 	authenticationController := auth.InitAuthController(map[string]backends.IAuthenticationBackend{
 		"Basic":  basicAuthenticationBackend,
 		"Bearer": jwtAuthenticationBackend,

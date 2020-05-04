@@ -158,34 +158,39 @@ func TestCreateUserRenderingBinary(t *testing.T) {
 
 func TestGetUsersV1QueryForAdminUser(t *testing.T) {
 	t.Parallel()
-
+	ctrl := gomock.NewController(t)
+	api := InitAPIWithMockedInternals(ctrl)
 	adminUserID := uuid.NewV4()
 	requestedIdentifiers := []string{uuid.NewV4().String(), adminUserID.String()}
 	require.Equal(t, repositories.GetUsersQuery{
 		Limit: 50,
 		Page:  1,
 		Id:    functools.StringsSliceToUUIDSlice(requestedIdentifiers),
-	}, GetUsersV1Query(map[string][]string{
+	}, api.API.GetUsersV1Query(map[string][]string{
 		"id": requestedIdentifiers,
 	}, &backends.BasicAuthenticationBackendUser{
 		IsAdmin: true,
 		UserID:  adminUserID,
 	}))
+	ctrl.Finish()
 }
 
 func TestGetUsersV1QueryForRegularUser(t *testing.T) {
 	t.Parallel()
 
+	ctrl := gomock.NewController(t)
+	api := InitAPIWithMockedInternals(ctrl)
 	userID := uuid.NewV4()
 	requestedIdentifiers := []string{uuid.NewV4().String(), userID.String()}
 	require.Equal(t, repositories.GetUsersQuery{
 		Limit: 50,
 		Page:  1,
 		Id:    []uuid.UUID{userID},
-	}, GetUsersV1Query(map[string][]string{
+	}, api.API.GetUsersV1Query(map[string][]string{
 		"id": requestedIdentifiers,
 	}, &backends.BasicAuthenticationBackendUser{
 		IsAdmin: false,
 		UserID:  userID,
 	}))
+	ctrl.Finish()
 }

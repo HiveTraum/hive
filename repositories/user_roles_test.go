@@ -3,6 +3,7 @@ package repositories
 import (
 	"auth/config"
 	"auth/enums"
+	"auth/functools"
 	"auth/models"
 	"context"
 	uuid "github.com/satori/go.uuid"
@@ -54,7 +55,7 @@ func TestCreateUserRoleWithoutUserAndRole(t *testing.T) {
 	PurgeRoles(pool, ctx)
 	PurgeUsers(pool, ctx)
 	status, userRole := CreateUserRole(pool, ctx, uuid.NewV4(), uuid.NewV4())
-	require.Equal(t, enums.RoleNotFound, status)
+	require.True(t, functools.In([]int{enums.RoleNotFound, enums.UserNotFound}, status))
 	require.Nil(t, userRole)
 }
 

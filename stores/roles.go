@@ -1,7 +1,6 @@
 package stores
 
 import (
-	"auth/config"
 	"auth/enums"
 	"auth/models"
 	"auth/repositories"
@@ -38,5 +37,5 @@ func (store *DatabaseStore) GetRoleByTitle(ctx context.Context, title string) (i
 }
 
 func (store *DatabaseStore) GetAdminRole(ctx context.Context) (int, *models.Role) {
-	return store.GetRoleByTitle(ctx, config.GetEnvironment().AdminRole)
+	return store.GetRoleByTitle(ctx, store.environment.AdminRole)
 }

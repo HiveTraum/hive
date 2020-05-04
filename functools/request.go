@@ -68,17 +68,15 @@ func (request *Request) ParseBody(message proto.Message) error {
 	return err
 }
 
-func GetLimit(values url.Values) int {
+func GetLimit(values url.Values, environment *config.Environment) int {
 	limitQuery := values.Get("limit")
 	if limitQuery == "" {
-		env := config.GetEnvironment()
-		return env.DefaultPaginationLimit
+		return environment.DefaultPaginationLimit
 	}
 
 	limit, err := strconv.Atoi(limitQuery)
 	if err != nil {
-		env := config.GetEnvironment()
-		return env.DefaultPaginationLimit
+		return environment.DefaultPaginationLimit
 	}
 
 	return limit
@@ -98,10 +96,10 @@ func GetPage(values url.Values) int {
 	return page
 }
 
-func GetPagination(values url.Values) *models.PaginationRequest {
+func GetPagination(values url.Values, environment *config.Environment) *models.PaginationRequest {
 	return &models.PaginationRequest{
 		Page:  GetPage(values),
-		Limit: GetLimit(values),
+		Limit: GetLimit(values, environment),
 	}
 }
 

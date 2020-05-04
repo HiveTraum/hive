@@ -35,7 +35,7 @@ func TestCreateSessionFromTokens(t *testing.T) {
 		Times(1).
 		Return(secret)
 
-	status, loggedUser := backend.Backend.GetUser(ctx, accessToken, "")
+	status, loggedUser := backend.Backend.GetUser(ctx, accessToken)
 	require.Equal(t, enums.Ok, status)
 	require.NotNil(t, loggedUser.GetUserID())
 	require.Equal(t, userID, loggedUser.GetUserID())
@@ -65,7 +65,7 @@ func TestCreateSessionFromTokensWithoutSecret(t *testing.T) {
 		Return(nil).
 		Times(1)
 
-	status, loggedUserID := backend.Backend.GetUser(ctx, accessToken, "")
+	status, loggedUserID := backend.Backend.GetUser(ctx, accessToken)
 	require.Equal(t, enums.SecretNotFound, status)
 	require.Nil(t, loggedUserID)
 }

@@ -9,10 +9,10 @@ import (
 	"net/http"
 )
 
-func GetRolesV1Query(r *http.Request) repositories.GetRolesQuery {
+func (api *API) GetRolesV1Query(r *http.Request) repositories.GetRolesQuery {
 	query := r.URL.Query()
 	return repositories.GetRolesQuery{
-		Pagination:  functools.GetPagination(query),
+		Pagination:  functools.GetPagination(query, api.environment),
 		Identifiers: query["id"],
 	}
 }
@@ -38,7 +38,7 @@ func (api *API) GetRoleV1(w http.ResponseWriter, r *http.Request) {
 
 func (api *API) GetRolesV1(w http.ResponseWriter, r *http.Request) {
 
-	query := GetRolesV1Query(r)
+	query := api.GetRolesV1Query(r)
 	roles, pagination := api.Controller.GetRoles(r.Context(), query)
 	rolesData := make([]*inout.Role, len(roles))
 

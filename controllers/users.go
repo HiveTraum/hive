@@ -27,7 +27,7 @@ func (controller *Controller) CreateUser(ctx context.Context, password, email, e
 	}
 
 	if len(phone) > 0 {
-		phone := functools.NormalizePhone(phone)
+		phone = functools.NormalizePhone(phone)
 		if phone == "" {
 			return enums.IncorrectPhone, nil
 		}

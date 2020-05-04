@@ -8,9 +8,9 @@ import (
 	"net/http"
 )
 
-func getUsersViewV1Query(r *http.Request) repositories.GetUsersViewStoreQuery {
+func (api *API) getUsersViewV1Query(r *http.Request) repositories.GetUsersViewStoreQuery {
 	query := r.URL.Query()
-	pagination := functools.GetPagination(query)
+	pagination := functools.GetPagination(query, api.environment)
 	return repositories.GetUsersViewStoreQuery{
 		Limit:  pagination.Limit,
 		Page:   pagination.Page,
@@ -22,7 +22,7 @@ func getUsersViewV1Query(r *http.Request) repositories.GetUsersViewStoreQuery {
 }
 
 func (api *API) GetUsersViewV1(w http.ResponseWriter, r *http.Request) {
-	query := getUsersViewV1Query(r)
+	query := api.getUsersViewV1Query(r)
 	users, pagination := api.Controller.GetUserViews(r.Context(), query)
 
 	userViews := make([]*inout.UserView, len(users))

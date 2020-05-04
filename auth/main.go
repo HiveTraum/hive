@@ -52,8 +52,6 @@ func (controller *AuthenticationController) Login(ctx context.Context, r *http.R
 		return enums.BackendNotFound, nil
 	}
 
-	refreshToken := repositories.GetAuthorizationCookie(r, controller.environment)
-
-	status, user := backend.GetUser(ctx, token, refreshToken)
+	status, user := backend.GetUser(ctx, token)
 	return status, user
 }

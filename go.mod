@@ -21,6 +21,7 @@ require (
 	github.com/opentracing-contrib/go-stdlib v0.0.0-20190519235532-cf7a6c988dc9 // indirect
 	github.com/opentracing/opentracing-go v1.1.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/rs/zerolog v1.15.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.4.0
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
