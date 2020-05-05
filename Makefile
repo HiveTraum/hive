@@ -1,6 +1,12 @@
 #!make
 include .env
 
+run:
+	cd src && go run hive
+
+build:
+	cd src && go build hive
+
 migrate: migrate-db-up migrate-test-up
 
 migrate-db-up:
