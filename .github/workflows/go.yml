@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  IMAGE: docker.pkg.github.com/hivetraum/hive:${{ github.ref }}
+  IMAGE: docker.pkg.github.com/hivetraum/hive/hive:${{ github.ref }}
   ACTOR: ${{ github.actor }}
 
 jobs:
