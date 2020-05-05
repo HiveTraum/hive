@@ -25,7 +25,7 @@ jobs:
         fi
 
     - name: Test
-      run: go test auth -i -coverprofile=coverage.out --race
+      run: go test hive -i -coverprofile=coverage.out --race
 
     - name: Build
       run: go build -v .
