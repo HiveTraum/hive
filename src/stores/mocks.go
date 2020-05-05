@@ -5,11 +5,11 @@
 package stores
 
 import (
-	models "hive/models"
-	repositories "hive/repositories"
 	context "context"
 	gomock "github.com/golang/mock/gomock"
 	go_uuid "github.com/satori/go.uuid"
+	models "hive/models"
+	repositories "hive/repositories"
 	reflect "reflect"
 	time "time"
 )

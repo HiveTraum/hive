@@ -5,9 +5,9 @@
 package api
 
 import (
+	gomock "github.com/golang/mock/gomock"
 	auth "hive/auth"
 	controllers "hive/controllers"
-	gomock "github.com/golang/mock/gomock"
 	http "net/http"
 	reflect "reflect"
 )
