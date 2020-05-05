@@ -94,20 +94,13 @@ func (logger *PGXOpenTracingLogger) Log(ctx context.Context, level pgx.LogLevel,
 
 func InitPool(tracer opentracing.Tracer, environment *Environment) *pgxpool.Pool {
 
-	databaseName := environment.DatabaseName
+	databaseURI := environment.DatabaseURI
 
 	if isTest() {
-		databaseName = databaseName + "_test"
+		databaseURI = databaseURI + "_test"
 	}
 
-	configString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?pool_max_conns=5",
-		environment.DatabaseUser,
-		environment.DatabasePass,
-		environment.DatabaseHost,
-		environment.DatabasePort,
-		databaseName)
-
-	config, err := pgxpool.ParseConfig(configString)
+	config, err := pgxpool.ParseConfig(databaseURI)
 
 	if err != nil {
 		panic(err)

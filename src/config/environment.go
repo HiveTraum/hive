@@ -7,11 +7,7 @@ import (
 )
 
 type Environment struct {
-	DatabaseHost           string `env:"DATABASE_HOST" envDefault:"localhost"`
-	DatabasePort           int    `env:"DATABASE_PORT" envDefault:"5432"`
-	DatabaseUser           string `env:"DATABASE_USER" envDefault:"hive"`
-	DatabasePass           string `env:"DATABASE_PASS" envDefault:"123"`
-	DatabaseName           string `env:"DATABASE_NAME" envDefault:"hive"`
+	DatabaseURI            string `env:"DATABASE_URI" envDefault:"postgres://hive:123@localhost:5432/hive"`
 	NSQLookupAddress       string `env:"NSQ_LOOKUP_ADDRESS" envDefault:"localhost:4180"`
 	RedisUrl               string `env:"REDIS_URL" envDefault:"localhost:6379"`
 	SentryDsn              string `env:"SENTRY_DSN" envDefault:"https://3e6b6318d35a457dbd57b1445919b38d@sentry.io/1797534"`
