@@ -8,9 +8,6 @@ env:
   REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   IMAGE: docker.pkg.github.com/${{ github.repository }}:${{ github.ref }}
   ACTOR: ${{ github.actor }}
-  CLUSTER_TOKEN: ${{ secrets.DIGITAL_OCEAN_KUBERNETES_SERVICE_ACCOUNT_TOKEN }}
-  CERTIFICATE: ${{ secrets.DIGITAL_OCEAN_KUBERNETES_CERTIFICATE }}
-  CLUSTER_SERVER: ${{ secrets.DIGITAL_OCEAN_KUBERNETES_SERVER }}
 
 jobs:
 
@@ -33,39 +30,3 @@ jobs:
         run: docker login --username $ACTOR --password $REGISTRY_TOKEN docker.pkg.github.com
       - name: push image to registry
         run: docker push $IMAGE
-
-  generate_manifest:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v1
-      - name: set release variable
-        run: echo ::set-env name=RELEASE::$(echo ${{ github.ref }} | sed -e "s/refs\/tags\///g")
-      - name: set image variable
-        run: echo ::set-env name=IMAGE::$(echo $IMAGE | sed -e "s/refs\/tags\///g")
-      - name: generate manifest
-        run: envsubst < ./devops/manifest.yaml > manifest.out.yaml
-      - uses: actions/upload-artifact@v1
-        with:
-          name: manifest
-          path: manifest.out.yaml
-
-  deploy:
-    needs: [build, generate_manifest]
-    runs-on: ubuntu-latest
-
-    container:
-      image: gcr.io/cloud-builders/kubectl:latest
-
-    steps:
-      - uses: actions/checkout@v1
-      - name: generate cert
-        run: echo $CERTIFICATE | base64 --decode > cert.crt
-      - name: download manifest from artifact
-        uses: actions/download-artifact@v1
-        with:
-          name: manifest
-      - name: calculate diff
-        run: kubectl --kubeconfig=/dev/null --server=$CLUSTER_SERVER --certificate-authority=cert.crt --token=$CLUSTER_TOKEN diff -f manifest/manifest.out.yaml || true
-      - name: apply to cluster
-        run: kubectl --kubeconfig=/dev/null --server=$CLUSTER_SERVER --certificate-authority=cert.crt --token=$CLUSTER_TOKEN apply -f manifest/manifest.out.yaml
