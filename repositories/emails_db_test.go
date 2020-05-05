@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"auth/config"
-	"auth/enums"
+	"hive/config"
+	"hive/enums"
 	"context"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"

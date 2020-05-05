@@ -1,4 +1,4 @@
-module auth
+module hive
 
 go 1.13
 

@@ -5,7 +5,7 @@
 package inMemoryRepository
 
 import (
-	models "auth/models"
+	models "hive/models"
 	context "context"
 	gomock "github.com/golang/mock/gomock"
 	go_uuid "github.com/satori/go.uuid"

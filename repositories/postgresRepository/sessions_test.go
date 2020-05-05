@@ -1,8 +1,8 @@
 package postgresRepository
 
 import (
-	"auth/config"
-	"auth/repositories"
+	"hive/config"
+	"hive/repositories"
 	"context"
 	"github.com/stretchr/testify/require"
 	"testing"

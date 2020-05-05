@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"auth/functools"
-	"auth/models"
+	"hive/functools"
+	"hive/models"
 	"context"
 	"github.com/getsentry/sentry-go"
 	"github.com/jackc/pgx/v4"

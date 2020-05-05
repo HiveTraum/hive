@@ -1,7 +1,7 @@
 package stores
 
 import (
-	"auth/models"
+	"hive/models"
 	"context"
 	"github.com/getsentry/sentry-go"
 	uuid "github.com/satori/go.uuid"

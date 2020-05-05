@@ -1,11 +1,11 @@
 package api
 
 import (
-	"auth/enums"
-	"auth/extractors"
-	"auth/functools"
-	"auth/inout"
-	"auth/repositories"
+	"hive/enums"
+	"hive/extractors"
+	"hive/functools"
+	"hive/inout"
+	"hive/repositories"
 	"net/http"
 )
 

@@ -1,12 +1,12 @@
 package auth
 
 import (
-	"auth/auth/backends"
-	"auth/config"
-	"auth/enums"
-	"auth/models"
-	"auth/repositories"
 	"context"
+	"hive/auth/backends"
+	"hive/config"
+	"hive/enums"
+	"hive/models"
+	"hive/repositories"
 	"net/http"
 	"strings"
 )

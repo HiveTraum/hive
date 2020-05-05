@@ -1,8 +1,8 @@
 package api
 
 import (
-	"auth/enums"
-	"auth/inout"
+	"hive/enums"
+	"hive/inout"
 	uuid "github.com/satori/go.uuid"
 	"net/http"
 )

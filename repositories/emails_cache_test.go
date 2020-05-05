@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"auth/config"
+	"hive/config"
 	"context"
 	"github.com/stretchr/testify/require"
 	"testing"

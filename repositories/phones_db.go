@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"auth/enums"
-	"auth/models"
+	"hive/enums"
+	"hive/models"
 	"context"
 	"errors"
 	"github.com/getsentry/sentry-go"

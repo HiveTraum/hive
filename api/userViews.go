@@ -1,10 +1,10 @@
 package api
 
 import (
-	"auth/extractors"
-	"auth/functools"
-	"auth/inout"
-	"auth/repositories"
+	"hive/extractors"
+	"hive/functools"
+	"hive/inout"
+	"hive/repositories"
 	"net/http"
 )
 

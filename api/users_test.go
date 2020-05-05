@@ -1,12 +1,12 @@
 package api
 
 import (
-	"auth/auth/backends"
-	"auth/enums"
-	"auth/functools"
-	"auth/inout"
-	"auth/models"
-	"auth/repositories"
+	"hive/hive/backends"
+	"hive/enums"
+	"hive/functools"
+	"hive/inout"
+	"hive/models"
+	"hive/repositories"
 	"bytes"
 	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/proto"

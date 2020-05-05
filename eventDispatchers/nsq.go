@@ -1,7 +1,7 @@
 package eventDispatchers
 
 import (
-	"auth/config"
+	"hive/config"
 	"fmt"
 	"github.com/getsentry/sentry-go"
 	"github.com/nsqio/go-nsq"

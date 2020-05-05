@@ -1,11 +1,11 @@
 package middlewares
 
 import (
-	"auth/auth"
-	"auth/auth/backends"
-	"auth/enums"
-	"auth/models"
-	"auth/repositories"
+	"hive/auth"
+	"hive/hive/backends"
+	"hive/enums"
+	"hive/models"
+	"hive/repositories"
 	"bytes"
 	"github.com/golang/mock/gomock"
 	uuid "github.com/satori/go.uuid"

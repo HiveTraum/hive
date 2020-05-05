@@ -1,8 +1,8 @@
 package api
 
 import (
-	"auth/extractors"
-	"auth/inout"
+	"hive/extractors"
+	"hive/inout"
 	"net/http"
 )
 

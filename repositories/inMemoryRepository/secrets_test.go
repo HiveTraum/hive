@@ -1,8 +1,8 @@
 package inMemoryRepository
 
 import (
-	"auth/config"
-	"auth/models"
+	"hive/config"
+	"hive/models"
 	"context"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"

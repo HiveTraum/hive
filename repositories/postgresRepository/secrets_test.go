@@ -1,7 +1,7 @@
 package postgresRepository
 
 import (
-	"auth/config"
+	"hive/config"
 	"context"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"

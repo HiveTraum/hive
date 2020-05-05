@@ -1,9 +1,9 @@
 package api
 
 import (
-	"auth/enums"
-	"auth/inout"
-	"auth/models"
+	"hive/enums"
+	"hive/inout"
+	"hive/models"
 	"bytes"
 	"encoding/base64"
 	"fmt"

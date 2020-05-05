@@ -1,8 +1,8 @@
 package functools
 
 import (
-	"auth/config"
-	"auth/models"
+	"hive/config"
+	"hive/models"
 	"encoding/json"
 	"github.com/getsentry/sentry-go"
 	"google.golang.org/protobuf/proto"

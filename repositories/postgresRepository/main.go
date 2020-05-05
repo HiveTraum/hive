@@ -1,8 +1,8 @@
 package postgresRepository
 
 import (
-	"auth/config"
-	"auth/models"
+	"hive/config"
+	"hive/models"
 	"context"
 	"github.com/jackc/pgx/v4/pgxpool"
 	uuid "github.com/satori/go.uuid"

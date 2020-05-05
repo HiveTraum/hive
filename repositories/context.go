@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"auth/models"
+	"hive/models"
 	"context"
 )
 

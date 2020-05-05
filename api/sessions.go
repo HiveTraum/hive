@@ -1,10 +1,10 @@
 package api
 
 import (
-	"auth/enums"
-	"auth/inout"
-	"auth/models"
-	"auth/repositories"
+	"hive/enums"
+	"hive/inout"
+	"hive/models"
+	"hive/repositories"
 	"net/http"
 	"time"
 )

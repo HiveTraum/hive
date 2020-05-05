@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"auth/config"
-	"auth/models"
+	"hive/config"
+	"hive/models"
 	"context"
 	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"

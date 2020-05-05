@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"auth/enums"
-	"auth/models"
+	"hive/enums"
+	"hive/models"
 	"context"
 	"github.com/badoux/checkmail"
 	"github.com/getsentry/sentry-go"

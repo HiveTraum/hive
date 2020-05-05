@@ -1,8 +1,8 @@
 package inMemoryRepository
 
 import (
-	"auth/enums"
-	"auth/models"
+	"hive/enums"
+	"hive/models"
 	"context"
 	"fmt"
 	"github.com/opentracing/opentracing-go"

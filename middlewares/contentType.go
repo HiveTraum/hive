@@ -1,9 +1,9 @@
 package middlewares
 
 import (
-	"auth/enums"
-	"auth/functools"
-	"auth/repositories"
+	"hive/enums"
+	"hive/functools"
+	"hive/repositories"
 	"net/http"
 )
 

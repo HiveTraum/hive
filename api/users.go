@@ -1,12 +1,12 @@
 package api
 
 import (
-	"auth/enums"
-	"auth/extractors"
-	"auth/functools"
-	"auth/inout"
-	"auth/models"
-	"auth/repositories"
+	"hive/enums"
+	"hive/extractors"
+	"hive/functools"
+	"hive/inout"
+	"hive/models"
+	"hive/repositories"
 	"github.com/getsentry/sentry-go"
 	uuid "github.com/satori/go.uuid"
 	"net/http"

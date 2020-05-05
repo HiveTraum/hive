@@ -1,12 +1,12 @@
 package stores
 
 import (
-	"auth/config"
-	"auth/models"
-	"auth/repositories"
-	"auth/repositories/inMemoryRepository"
-	"auth/repositories/postgresRepository"
-	"auth/repositories/redisRepository"
+	"hive/config"
+	"hive/models"
+	"hive/repositories"
+	"hive/repositories/inMemoryRepository"
+	"hive/repositories/postgresRepository"
+	"hive/repositories/redisRepository"
 	"context"
 	"github.com/go-redis/redis/v7"
 	"github.com/jackc/pgx/v4/pgxpool"

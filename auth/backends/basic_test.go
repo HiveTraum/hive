@@ -1,9 +1,9 @@
 package backends
 
 import (
-	"auth/enums"
-	"auth/functools"
-	"auth/models"
+	"hive/enums"
+	"hive/functools"
+	"hive/models"
 	"context"
 	"encoding/base64"
 	"fmt"

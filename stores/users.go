@@ -1,10 +1,10 @@
 package stores
 
 import (
-	"auth/enums"
-	"auth/functools"
-	"auth/models"
-	"auth/repositories"
+	"hive/enums"
+	"hive/functools"
+	"hive/models"
+	"hive/repositories"
 	"context"
 	"github.com/getsentry/sentry-go"
 	uuid "github.com/satori/go.uuid"

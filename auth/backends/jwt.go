@@ -1,11 +1,11 @@
 package backends
 
 import (
-	"auth/config"
-	"auth/enums"
-	"auth/functools"
-	"auth/models"
-	"auth/stores"
+	"hive/config"
+	"hive/enums"
+	"hive/functools"
+	"hive/models"
+	"hive/stores"
 	"context"
 	"errors"
 	"github.com/dgrijalva/jwt-go"

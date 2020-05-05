@@ -1,8 +1,8 @@
 package presenters
 
 import (
-	"auth/enums"
-	"auth/repositories"
+	"hive/enums"
+	"hive/repositories"
 	"errors"
 	"fmt"
 	"github.com/getsentry/sentry-go"

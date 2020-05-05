@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"auth/config"
-	"auth/eventDispatchers"
-	"auth/models"
-	"auth/passwordProcessors"
-	"auth/repositories"
-	"auth/stores"
 	"context"
 	"github.com/golang/mock/gomock"
 	uuid "github.com/satori/go.uuid"
+	"hive/config"
+	"hive/eventDispatchers"
+	"hive/models"
+	"hive/passwordProcessors"
+	"hive/repositories"
+	"hive/stores"
 )
 
 type IController interface {

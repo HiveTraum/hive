@@ -1,10 +1,10 @@
 package api
 
 import (
-	"auth/auth"
-	"auth/config"
-	"auth/controllers"
-	"auth/presenters"
+	"hive/auth"
+	"hive/config"
+	"hive/controllers"
+	"hive/presenters"
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/mock/gomock"
 	"net/http"

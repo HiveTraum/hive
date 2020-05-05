@@ -1,8 +1,8 @@
 package backends
 
 import (
-	"auth/enums"
-	"auth/models"
+	"hive/enums"
+	"hive/models"
 	"context"
 	"github.com/golang/mock/gomock"
 	uuid "github.com/satori/go.uuid"

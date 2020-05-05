@@ -1,12 +1,12 @@
 package backends
 
 import (
-	"auth/config"
-	"auth/enums"
-	"auth/functools"
-	"auth/models"
-	"auth/passwordProcessors"
-	"auth/stores"
+	"hive/config"
+	"hive/enums"
+	"hive/functools"
+	"hive/models"
+	"hive/passwordProcessors"
+	"hive/stores"
 	"context"
 	"encoding/base64"
 	"github.com/getsentry/sentry-go"

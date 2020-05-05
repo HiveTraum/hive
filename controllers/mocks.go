@@ -5,8 +5,8 @@
 package controllers
 
 import (
-	models "auth/models"
-	repositories "auth/repositories"
+	models "hive/models"
+	repositories "hive/repositories"
 	context "context"
 	gomock "github.com/golang/mock/gomock"
 	go_uuid "github.com/satori/go.uuid"

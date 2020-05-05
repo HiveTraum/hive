@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"auth/eventDispatchers"
-	"auth/functools"
-	"auth/inout"
-	"auth/models"
-	"auth/stores"
+	"hive/eventDispatchers"
+	"hive/functools"
+	"hive/inout"
+	"hive/models"
+	"hive/stores"
 	"context"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"

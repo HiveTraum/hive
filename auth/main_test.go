@@ -2,10 +2,10 @@ package auth
 
 //
 //import (
-//	"auth/backends"
-//	"auth/enums"
-//	"auth/models"
-//	"auth/processors"
+//	"hive/backends"
+//	"hive/enums"
+//	"hive/models"
+//	"hive/processors"
 //	"context"
 //	"github.com/golang/mock/gomock"
 //	uuid "github.com/satori/go.uuid"

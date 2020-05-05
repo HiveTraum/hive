@@ -1,7 +1,7 @@
 package inMemoryRepository
 
 import (
-	"auth/models"
+	"hive/models"
 	"context"
 	"github.com/patrickmn/go-cache"
 	uuid "github.com/satori/go.uuid"

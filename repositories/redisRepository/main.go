@@ -1,7 +1,7 @@
 package redisRepository
 
 import (
-	"auth/models"
+	"hive/models"
 	"context"
 	"github.com/go-redis/redis/v7"
 	uuid "github.com/satori/go.uuid"

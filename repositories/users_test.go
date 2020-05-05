@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"auth/config"
-	"auth/enums"
+	"hive/config"
+	"hive/enums"
 	"context"
 	"fmt"
 	uuid "github.com/satori/go.uuid"

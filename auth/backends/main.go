@@ -1,7 +1,7 @@
 package backends
 
 import (
-	"auth/models"
+	"hive/models"
 	"context"
 )
 

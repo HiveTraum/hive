@@ -1,9 +1,9 @@
 package redisRepository
 
 import (
-	"auth/enums"
-	"auth/inout"
-	"auth/models"
+	"hive/enums"
+	"hive/inout"
+	"hive/models"
 	"context"
 	"fmt"
 	"github.com/getsentry/sentry-go"

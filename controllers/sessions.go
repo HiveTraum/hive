@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"auth/enums"
-	"auth/models"
+	"hive/enums"
+	"hive/models"
 	"context"
 	uuid "github.com/satori/go.uuid"
 	"time"

@@ -1,9 +1,9 @@
 package stores
 
 import (
-	"auth/functools"
-	"auth/models"
-	"auth/repositories"
+	"hive/functools"
+	"hive/models"
+	"hive/repositories"
 	"context"
 	uuid "github.com/satori/go.uuid"
 	"time"

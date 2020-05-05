@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"auth/config"
-	"auth/enums"
+	"hive/config"
+	"hive/enums"
 	"github.com/getsentry/sentry-go"
 	uuid "github.com/satori/go.uuid"
 	"net/http"

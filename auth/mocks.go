@@ -5,7 +5,7 @@
 package auth
 
 import (
-	models "auth/models"
+	models "hive/models"
 	context "context"
 	gomock "github.com/golang/mock/gomock"
 	http "net/http"
