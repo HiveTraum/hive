@@ -5,6 +5,10 @@ import (
 	"fmt"
 	sentryHttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
+	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/stdlib"
+	"github.com/pressly/goose"
+	"github.com/urfave/cli/v2"
 	api2 "hive/api"
 	"hive/auth"
 	"hive/auth/backends"
@@ -20,6 +24,7 @@ import (
 	"hive/stores"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
@@ -54,7 +59,7 @@ func InitialAdminRole(environment *config.Environment, store stores.IStore) {
 	}
 }
 
-func main() {
+func server() {
 
 	// Initialization
 
@@ -160,4 +165,44 @@ func main() {
 	defer tracerCloser.Close()
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func migrate() error {
+	environment := config.InitEnvironment()
+	dbConfig, err := pgx.ParseConfig(environment.DatabaseURI)
+	if err != nil {
+		return err
+	}
+	db := stdlib.OpenDB(*dbConfig)
+	err = goose.Up(db, "./migrations")
+	if err != nil {
+		return err
+	}
+	return db.Close()
+}
+
+func main() {
+	app := &cli.App{
+		Name:  "hive",
+		Usage: "Start hive server",
+		Action: func(c *cli.Context) error {
+			server()
+			return nil
+		},
+		Commands: []*cli.Command{
+			{
+				Name:  "migrate",
+				Usage: "Apply migrations for current database",
+				Action: func(c *cli.Context) error {
+					migrate()
+					return nil
+				},
+			},
+		},
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

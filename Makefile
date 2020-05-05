@@ -7,12 +7,6 @@ run:
 build:
 	cd src && go build hive
 
-migrate-db-up:
-	cd src/migrations && goose postgres "${DATABASE_URI}" up
-
-migrate-db-down:
-	cd src/migrations && goose postgres "${DATABASE_URI}" down
-
 protobuf:
 	cd src/inout && protoc --go_out=. ./*.proto
 

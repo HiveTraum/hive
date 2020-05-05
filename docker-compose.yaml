@@ -1,0 +1,21 @@
+version: '3.6'
+
+services:
+  database:
+    image: postgres:alpine
+    environment:
+      POSTGRES_PASSWORD: 123
+      POSTGRES_USER: hive
+      POSTGRES_DB: hive
+    ports:
+      - 5433:5432
+
+  hive:
+    build:
+      context: .
+      dockerfile: devops/Dockerfile
+    depends_on:
+      - database
+    environment:
+      DATABASE_URI: postgres://hive:123@database:5432/hive
+    command: "/app/hive migrate"
