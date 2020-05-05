@@ -9,4 +9,4 @@ FROM alpine
 WORKDIR /app
 COPY --from=compiler /app/hive /app/hive
 COPY --from=compiler /app/migrations /app/migrations
-RUN ls /app
+ENV PATH="/app:${PATH}"
