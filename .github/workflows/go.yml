@@ -1,31 +1,32 @@
-name: Go
-on: [push]
+on:
+  push:
+    tags:
+      - 0.*
+      - 1.*
+
+env:
+  REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  IMAGE: docker.pkg.github.com/${{ github.repository }}:${{ github.ref }}
+  ACTOR: ${{ github.actor }}
+
 jobs:
 
   build:
     name: Build
     runs-on: ubuntu-latest
+
+    container:
+      image: docker
+
     steps:
-
-    - name: Set up Go 1.14
-      uses: actions/setup-go@v1
-      with:
-        go-version: 1.14
-      id: go
-
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v1
-
-    - name: Get dependencies
-      run: |
-        go get -v -t -d ./...
-        if [ -f Gopkg.toml ]; then
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
-        fi
-
-    - name: Test
-      run: go test hive -i -coverprofile=coverage.out --race
-
-    - name: Build
-      run: go build -v .
+      - uses: actions/checkout@v1
+      - name: set image variable
+        run: echo ::set-env name=IMAGE::$(echo $IMAGE | sed -e "s/refs\/tags\///g")
+      - name: test image var
+        run: echo $IMAGE
+      - name: build image
+        run: docker build -t $IMAGE -f ./devops/Dockerfile .
+      - name: registry login
+        run: docker login --username $ACTOR --password $REGISTRY_TOKEN docker.pkg.github.com
+      - name: push image to registry
+        run: docker push $IMAGE
