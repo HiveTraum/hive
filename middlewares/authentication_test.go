@@ -1,15 +1,15 @@
 package middlewares
 
 import (
-	"hive/auth"
-	"hive/hive/backends"
-	"hive/enums"
-	"hive/models"
-	"hive/repositories"
 	"bytes"
 	"github.com/golang/mock/gomock"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
+	"hive/auth"
+	"hive/auth/backends"
+	"hive/enums"
+	"hive/models"
+	"hive/repositories"
 	"net/http"
 	"net/http/httptest"
 	"testing"

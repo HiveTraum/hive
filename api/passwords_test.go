@@ -1,9 +1,6 @@
 package api
 
 import (
-	"hive/enums"
-	"hive/inout"
-	"hive/models"
 	"bytes"
 	"encoding/base64"
 	"fmt"
@@ -12,6 +9,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
+	"hive/enums"
+	"hive/inout"
+	"hive/models"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
