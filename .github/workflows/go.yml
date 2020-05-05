@@ -1,31 +1,71 @@
-name: Go
-on: [push]
+on:
+  push:
+    tags:
+      - 0.*
+      - 1.*
+
+env:
+  REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  IMAGE: docker.pkg.github.com/${{ github.repository }}:${{ github.ref }}
+  ACTOR: ${{ github.actor }}
+  CLUSTER_TOKEN: ${{ secrets.DIGITAL_OCEAN_KUBERNETES_SERVICE_ACCOUNT_TOKEN }}
+  CERTIFICATE: ${{ secrets.DIGITAL_OCEAN_KUBERNETES_CERTIFICATE }}
+  CLUSTER_SERVER: ${{ secrets.DIGITAL_OCEAN_KUBERNETES_SERVER }}
+
 jobs:
 
   build:
     name: Build
     runs-on: ubuntu-latest
+
+    container:
+      image: docker
+
     steps:
+      - uses: actions/checkout@v1
+      - name: set image variable
+        run: echo ::set-env name=IMAGE::$(echo $IMAGE | sed -e "s/refs\/tags\///g")
+      - name: test image var
+        run: echo $IMAGE
+      - name: build image
+        run: docker build -t $IMAGE -f ./devops/Dockerfile .
+      - name: registry login
+        run: docker login --username $ACTOR --password $REGISTRY_TOKEN docker.pkg.github.com
+      - name: push image to registry
+        run: docker push $IMAGE
 
-    - name: Set up Go 1.14
-      uses: actions/setup-go@v1
-      with:
-        go-version: 1.14
-      id: go
+  generate_manifest:
+    runs-on: ubuntu-latest
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v1
+    steps:
+      - uses: actions/checkout@v1
+      - name: set release variable
+        run: echo ::set-env name=RELEASE::$(echo ${{ github.ref }} | sed -e "s/refs\/tags\///g")
+      - name: set image variable
+        run: echo ::set-env name=IMAGE::$(echo $IMAGE | sed -e "s/refs\/tags\///g")
+      - name: generate manifest
+        run: envsubst < ./devops/manifest.yaml > manifest.out.yaml
+      - uses: actions/upload-artifact@v1
+        with:
+          name: manifest
+          path: manifest.out.yaml
 
-    - name: Get dependencies
-      run: |
-        go get -v -t -d ./...
-        if [ -f Gopkg.toml ]; then
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
-        fi
+  deploy:
+    needs: [build, generate_manifest]
+    runs-on: ubuntu-latest
 
-    - name: Test
-      run: go test hive -i -coverprofile=coverage.out --race
+    container:
+      image: gcr.io/cloud-builders/kubectl:latest
 
-    - name: Build
-      run: go build -v .
+    steps:
+      - uses: actions/checkout@v1
+      - name: generate cert
+        run: echo $CERTIFICATE | base64 --decode > cert.crt
+      - name: download manifest from artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: manifest
+      - name: calculate diff
+        run: kubectl --kubeconfig=/dev/null --server=$CLUSTER_SERVER --certificate-authority=cert.crt --token=$CLUSTER_TOKEN diff -f manifest/manifest.out.yaml || true
+      - name: apply to cluster
+        run: kubectl --kubeconfig=/dev/null --server=$CLUSTER_SERVER --certificate-authority=cert.crt --token=$CLUSTER_TOKEN apply -f manifest/manifest.out.yaml
