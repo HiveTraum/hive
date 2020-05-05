@@ -2,13 +2,13 @@
 -- +goose StatementBegin
 CREATE TABLE users
 (
-    id      UUID   DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id      UUID PRIMARY KEY,
     created bigint DEFAULT extract(epoch from now()) * 1000
 );
 
 CREATE TABLE passwords
 (
-    id      UUID   DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id      UUID PRIMARY KEY,
     created BIGINT DEFAULT extract(epoch from now()) * 1000,
     user_id UUID,
     value   varchar(255),
@@ -17,7 +17,7 @@ CREATE TABLE passwords
 
 CREATE TABLE emails
 (
-    id      UUID   DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id      UUID PRIMARY KEY,
     created BIGINT DEFAULT extract(epoch from now()) * 1000,
     user_id UUID,
     value   varchar(255) UNIQUE,
@@ -26,24 +26,23 @@ CREATE TABLE emails
 
 CREATE TABLE phones
 (
-    id           UUID   DEFAULT uuid_generate_v4() PRIMARY KEY,
-    created      BIGINT DEFAULT extract(epoch from now()) * 1000,
-    user_id      UUID,
-    value        varchar(50) UNIQUE,
-    country_code varchar(4),
+    id      UUID PRIMARY KEY,
+    created BIGINT DEFAULT extract(epoch from now()) * 1000,
+    user_id UUID,
+    value   varchar(50) UNIQUE,
     FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE
 );
 
 CREATE TABLE roles
 (
-    id      UUID   DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id      UUID PRIMARY KEY,
     created BIGINT DEFAULT extract(epoch from now()) * 1000,
     title   VARCHAR(255) UNIQUE
 );
 
 CREATE TABLE user_roles
 (
-    id      UUID   DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id      UUID PRIMARY KEY,
     created BIGINT DEFAULT extract(epoch from now()) * 1000,
     user_id UUID,
     role_id UUID,
@@ -64,19 +63,20 @@ CREATE TABLE users_view
 
 CREATE TABLE secrets
 (
-    id      UUID   DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id      UUID PRIMARY KEY,
     created BIGINT DEFAULT extract(epoch from now()) * 1000,
-    value   UUID   DEFAULT uuid_generate_v4()
+    value   UUID
 );
 
 CREATE TABLE sessions
 (
-    refresh_token UUID   DEFAULT uuid_generate_v4(),
-    fingerprint   VARCHAR(200),
-    user_id       UUID,
-    secret_id     UUID,
-    created       BIGINT DEFAULT extract(epoch from now()) * 1000,
-    user_agent    TEXT,
+    id          UUID PRIMARY KEY,
+    fingerprint VARCHAR(200),
+    user_id     UUID,
+    secret_id   UUID,
+    created     BIGINT DEFAULT extract(epoch from now()) * 1000,
+    user_agent  TEXT,
+    expires     BIGINT,
     FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE,
     FOREIGN KEY (secret_id) REFERENCES secrets ON DELETE CASCADE
 );
@@ -94,7 +94,7 @@ CREATE INDEX user_views_role_id_idx on users_view USING GIN (role_id);
 CREATE INDEX user_views_phones_idx on users_view USING GIN (phones);
 CREATE INDEX user_views_idx on users_view (id, created, updated, phones, roles, emails, role_id);
 CREATE INDEX sessions_fingerprint_idx on sessions (fingerprint);
-CREATE INDEX sessions_refresh_token_idx on sessions (refresh_token);
+CREATE INDEX sessions_refresh_token_idx on sessions (id);
 CREATE UNIQUE INDEX user_roles_idx ON user_roles (user_id, role_id);
 -- +goose StatementEnd
 

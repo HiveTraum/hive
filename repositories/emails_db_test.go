@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"auth/config"
-	"auth/enums"
+	"hive/config"
+	"hive/enums"
 	"context"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
@@ -10,7 +10,7 @@ import (
 )
 
 func TestCreateEmail(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	PurgeEmails(pool, ctx)
@@ -21,7 +21,7 @@ func TestCreateEmail(t *testing.T) {
 }
 
 func TestCreateEmailWithoutUser(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	PurgeEmails(pool, ctx)
@@ -31,7 +31,7 @@ func TestCreateEmailWithoutUser(t *testing.T) {
 }
 
 func TestGetEmail(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	PurgeEmails(pool, ctx)
@@ -44,7 +44,7 @@ func TestGetEmail(t *testing.T) {
 }
 
 func TestGetEmailWithEmptyResult(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUsers(pool, ctx)
 	PurgeEmails(pool, ctx)

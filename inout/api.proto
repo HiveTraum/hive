@@ -1,5 +1,6 @@
 syntax = "proto3";
 package inout;
+option go_package = ".;inout";
 
 // Common
 
@@ -35,7 +36,7 @@ message UserRole {
 }
 
 message Session {
-    string refreshToken = 1;
+    bytes refreshToken = 1;
     string accessToken = 2;
     int64 created = 3;
     int64 expired = 4;
@@ -199,16 +200,14 @@ message CreatePhoneResponseV1 {
 
     message Request {
         string phone = 1;
-        string phoneCountryCode = 2;
-        string code = 3;
-        bytes userID = 4;
+        string code = 2;
+        bytes userID = 3;
     }
 
     message ValidationError {
         repeated string phone = 1;
-        repeated string phoneCountryCode = 2;
-        repeated string code = 3;
-        repeated string userID = 4;
+        repeated string code = 2;
+        repeated string userID = 3;
     }
 
     oneof data {
@@ -223,12 +222,10 @@ message CreatePhoneResponseV1 {
 message CreatePhoneConfirmationResponseV1 {
     message Request {
         string phone = 1;
-        string phoneCountryCode = 2;
     }
 
     message ValidationError {
         repeated string phone = 1;
-        repeated string phoneCountryCode = 2;
     }
 
     oneof data {
@@ -266,20 +263,18 @@ message CreateUserResponseV1 {
     message Request {
         string password = 1;
         string phone = 2;
-        string phoneCountryCode = 3;
-        string email = 4;
-        string phoneCode = 5;
-        string emailCode = 6;
+        string email = 3;
+        string phoneCode = 4;
+        string emailCode = 5;
     }
 
     message ValidationError {
         repeated string password = 1;
         repeated string phone = 2;
-        repeated string phoneCountryCode = 3;
-        repeated string email = 4;
-        repeated string phoneCode = 5;
-        repeated string emailCode = 6;
-        repeated string errors = 7;
+        repeated string email = 3;
+        repeated string phoneCode = 4;
+        repeated string emailCode = 5;
+        repeated string errors = 6;
     }
 
     oneof data {
@@ -301,44 +296,8 @@ message ListUserResponseV1 {
 message CreateSessionResponseV1 {
 
     message Request {
-
         string fingerprint = 1;
         string userAgent = 2;
-
-        oneof data {
-            PhoneAndPassword phoneAndPassword = 3;
-            PhoneAndCode phoneAndCode = 4;
-            EmailAndPassword emailAndPassword = 5;
-            EmailAndCode emailAndCode = 6;
-            Tokens tokens = 7;
-        }
-
-        message PhoneAndPassword {
-            string phone = 1;
-            string phoneCountryCode = 2;
-            string password = 3;
-        }
-
-        message PhoneAndCode {
-            string phone = 1;
-            string phoneCountryCode = 2;
-            string code = 3;
-        }
-
-        message EmailAndPassword {
-            string email = 1;
-            string password = 2;
-        }
-
-        message EmailAndCode {
-            string email = 1;
-            string code = 2;
-        }
-
-        message Tokens {
-            string accessToken = 1;
-            string refreshToken = 2;
-        }
     }
 
     message ValidationError {

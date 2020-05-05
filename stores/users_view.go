@@ -1,25 +1,25 @@
 package stores
 
 import (
-	"auth/models"
-	"auth/repositories"
+	"hive/models"
+	"hive/repositories"
 	"context"
 	uuid "github.com/satori/go.uuid"
 )
 
 func (store *DatabaseStore) GetUsersView(ctx context.Context, query repositories.GetUsersViewStoreQuery) ([]*models.UserView, *models.PaginationResponse) {
-	return repositories.GetUsersView(store.Db, ctx, query)
+	return repositories.GetUsersView(store.db, ctx, query)
 }
 
 func (store *DatabaseStore) GetUserView(ctx context.Context, id uuid.UUID) *models.UserView {
 
-	userView := repositories.GetUserViewFromCache(store.Cache, ctx, id)
+	userView := repositories.GetUserViewFromCache(store.cache, ctx, id)
 
 	if userView != nil {
 		return userView
 	}
 
-	userView = repositories.GetUserView(store.Db, ctx, id)
+	userView = repositories.GetUserView(store.db, ctx, id)
 
 	if userView != nil {
 		store.CacheUserView(ctx, []*models.UserView{userView})
@@ -29,7 +29,7 @@ func (store *DatabaseStore) GetUserView(ctx context.Context, id uuid.UUID) *mode
 }
 
 func (store *DatabaseStore) CreateOrUpdateUsersView(ctx context.Context, query repositories.CreateOrUpdateUsersViewStoreQuery) []*models.UserView {
-	return repositories.CreateOrUpdateUsersView(store.Db, ctx, query)
+	return repositories.CreateOrUpdateUsersView(store.db, ctx, query)
 }
 
 func (store *DatabaseStore) CreateOrUpdateUsersViewByUsersID(context context.Context, id []uuid.UUID) []*models.UserView {
@@ -50,13 +50,13 @@ func (store *DatabaseStore) CreateOrUpdateUsersViewByRoleID(context context.Cont
 	return store.CreateOrUpdateUsersViewByRolesID(context, []uuid.UUID{id})
 }
 
-// Cache
+// cache
 
 func (store *DatabaseStore) GetUserViewFromCache(ctx context.Context, id uuid.UUID) *models.UserView {
-	return repositories.GetUserViewFromCache(store.Cache, ctx, id)
+	return repositories.GetUserViewFromCache(store.cache, ctx, id)
 }
 
 func (store *DatabaseStore) CacheUserView(ctx context.Context, userViews []*models.UserView) {
 
-	repositories.CacheUserView(store.Cache, ctx, userViews)
+	repositories.CacheUserView(store.cache, ctx, userViews)
 }

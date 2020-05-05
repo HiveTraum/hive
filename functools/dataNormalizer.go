@@ -3,7 +3,7 @@ package functools
 import (
 	"github.com/badoux/checkmail"
 	"github.com/getsentry/sentry-go"
-	"github.com/nyaruka/phonenumbers"
+	"github.com/ttacon/libphonenumber"
 )
 
 func NormalizeEmail(email string) string {
@@ -17,22 +17,18 @@ func NormalizeEmail(email string) string {
 	return email
 }
 
-func NormalizePhone(phone string, countryCode string) string {
+func NormalizePhone(phone string) string {
 
-	if countryCode == "" {
-		return ""
-	}
-
-	num, err := phonenumbers.Parse(phone, countryCode)
+	num, err := libphonenumber.Parse(phone, "")
 
 	if err != nil {
 		sentry.CaptureException(err)
 		return ""
 	}
 
-	if num == nil || !phonenumbers.IsPossibleNumber(num) {
+	if num == nil || !libphonenumber.IsPossibleNumber(num) {
 		return ""
 	}
 
-	return phonenumbers.Format(num, phonenumbers.E164)
+	return libphonenumber.Format(num, libphonenumber.INTERNATIONAL)
 }

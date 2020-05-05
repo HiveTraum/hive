@@ -1,9 +1,10 @@
 package repositories
 
 import (
-	"auth/config"
-	"auth/enums"
-	"auth/models"
+	"hive/config"
+	"hive/enums"
+	"hive/functools"
+	"hive/models"
 	"context"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
@@ -11,7 +12,7 @@ import (
 )
 
 func TestCreateUserRole(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -24,7 +25,7 @@ func TestCreateUserRole(t *testing.T) {
 }
 
 func TestCreateUserRoleWithoutRole(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -36,7 +37,7 @@ func TestCreateUserRoleWithoutRole(t *testing.T) {
 }
 
 func TestCreateUserRoleWithoutUser(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -48,18 +49,18 @@ func TestCreateUserRoleWithoutUser(t *testing.T) {
 }
 
 func TestCreateUserRoleWithoutUserAndRole(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
 	PurgeUsers(pool, ctx)
 	status, userRole := CreateUserRole(pool, ctx, uuid.NewV4(), uuid.NewV4())
-	require.Equal(t, enums.UserNotFound, status)
+	require.True(t, functools.In([]int{enums.RoleNotFound, enums.UserNotFound}, status))
 	require.Nil(t, userRole)
 }
 
 func TestCreateUserRoleThatAlreadyExist(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -73,7 +74,7 @@ func TestCreateUserRoleThatAlreadyExist(t *testing.T) {
 }
 
 func TestGetUserRolesWithTwoRoles(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -86,13 +87,13 @@ func TestGetUserRolesWithTwoRoles(t *testing.T) {
 	userRoles, _ := GetUserRoles(pool, ctx, GetUserRoleQuery{
 		UserId:     []uuid.UUID{user.Id},
 		RoleId:     nil,
-		Pagination: &models.PaginationRequest{Limit: 10,},
+		Pagination: &models.PaginationRequest{Limit: 10},
 	})
 	require.Len(t, userRoles, 2)
 }
 
 func TestDeleteUserRole(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -104,14 +105,14 @@ func TestDeleteUserRole(t *testing.T) {
 	userRoles, _ := GetUserRoles(pool, ctx, GetUserRoleQuery{
 		UserId:     []uuid.UUID{user.Id},
 		RoleId:     nil,
-		Pagination: &models.PaginationRequest{Limit: 10,},
+		Pagination: &models.PaginationRequest{Limit: 10},
 	})
 
 	require.Len(t, userRoles, 0)
 }
 
 func TestGetUserRolesWithLimitedPagination(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -122,7 +123,7 @@ func TestGetUserRolesWithLimitedPagination(t *testing.T) {
 	_, userRole := CreateUserRole(pool, ctx, user.Id, role.Id)
 	CreateUserRole(pool, ctx, user.Id, lore.Id)
 	userRoles, _ := GetUserRoles(pool, ctx, GetUserRoleQuery{
-		Pagination: &models.PaginationRequest{Limit: 1,},
+		Pagination: &models.PaginationRequest{Limit: 1},
 	})
 
 	require.Len(t, userRoles, 1)
@@ -130,7 +131,7 @@ func TestGetUserRolesWithLimitedPagination(t *testing.T) {
 }
 
 func TestGetUserRolesWithPagination(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)
@@ -141,14 +142,14 @@ func TestGetUserRolesWithPagination(t *testing.T) {
 	CreateUserRole(pool, ctx, user.Id, role.Id)
 	CreateUserRole(pool, ctx, user.Id, lore.Id)
 	userRoles, _ := GetUserRoles(pool, ctx, GetUserRoleQuery{
-		Pagination: &models.PaginationRequest{Limit: 10,},
+		Pagination: &models.PaginationRequest{Limit: 10},
 	})
 
 	require.Len(t, userRoles, 2)
 }
 
 func TestGetUserRolesWithLimitedPaginationAndSecondPage(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeUserRoles(pool, ctx)
 	PurgeRoles(pool, ctx)

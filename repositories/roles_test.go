@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"auth/config"
-	"auth/enums"
-	"auth/models"
+	"hive/config"
+	"hive/enums"
+	"hive/models"
 	"context"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
@@ -11,7 +11,7 @@ import (
 )
 
 func TestCreateRole(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeRoles(pool, ctx)
 	status, role := CreateRole(pool, ctx, "admin")
@@ -25,7 +25,7 @@ func TestCreateRole(t *testing.T) {
 }
 
 func TestCreateRoleThatAlreadyExist(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeRoles(pool, ctx)
 	_, _ = CreateRole(pool, ctx, "admin")
@@ -40,7 +40,7 @@ func TestCreateRoleThatAlreadyExist(t *testing.T) {
 }
 
 func TestGetRolesWithEmptyTable(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeRoles(pool, ctx)
 	roles, _ := GetRoles(pool, ctx, GetRolesQuery{
@@ -51,7 +51,7 @@ func TestGetRolesWithEmptyTable(t *testing.T) {
 }
 
 func TestGetRole(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeRoles(pool, ctx)
 	_, createdRole := CreateRole(pool, ctx, "admin")
@@ -63,7 +63,7 @@ func TestGetRole(t *testing.T) {
 }
 
 func TestGetRoleWithEmptyTable(t *testing.T) {
-	pool := config.InitPool(nil)
+	pool := config.InitPool(nil, config.InitEnvironment())
 	ctx := context.Background()
 	PurgeRoles(pool, ctx)
 	status, role := GetRole(pool, ctx, uuid.NewV4())

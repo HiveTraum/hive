@@ -1,108 +1,86 @@
 package api
 
 import (
-	"auth/app"
-	"auth/controllers"
-	"auth/enums"
-	"auth/functools"
-	"auth/infrastructure"
-	"auth/inout"
-	"auth/middlewares"
-	"github.com/golang/protobuf/proto"
+	"hive/enums"
+	"hive/inout"
 	uuid "github.com/satori/go.uuid"
 	"net/http"
 )
 
-func createPhoneV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.CreatePhoneResponseV1) {
-	b := inout.CreatePhoneResponseV1_Request{}
-	err := r.ParseBody(&b)
-
+func (api *API) CreatePhoneV1(w http.ResponseWriter, r *http.Request) {
+	body := &inout.CreatePhoneResponseV1_Request{}
+	err := api.Parser.Parse(r, w, body)
 	if err != nil {
-		return http.StatusBadRequest, nil
+		return
 	}
 
-	status, phone := controllers.CreatePhone(app.GetStore(), app.GetESB(), r.Context(), b.Phone, b.Code, uuid.FromBytesOrNil(b.UserID), b.PhoneCountryCode)
+	status, phone := api.Controller.CreatePhone(r.Context(), body.Phone, body.Code, uuid.FromBytesOrNil(body.UserID))
 
 	switch status {
 	case enums.Ok:
-		return http.StatusCreated, &inout.CreatePhoneResponseV1{
+		api.Renderer.Render(w, r, http.StatusCreated, &inout.CreatePhoneResponseV1{
 			Data: &inout.CreatePhoneResponseV1_Ok{
 				Ok: &inout.Phone{
-					Id:               phone.Id.Bytes(),
-					Created:          phone.Created,
-					UserID:           phone.UserId.Bytes(),
-					Phone:            phone.Value,
-					PhoneCountryCode: phone.CountryCode,
-				}}}
+					Id:      phone.Id.Bytes(),
+					Created: phone.Created,
+					UserID:  phone.UserId.Bytes(),
+					Phone:   phone.Value,
+				}}})
 	case enums.IncorrectPhoneCode:
-		return http.StatusBadRequest, &inout.CreatePhoneResponseV1{
+		api.Renderer.Render(w, r, http.StatusBadRequest, &inout.CreatePhoneResponseV1{
 			Data: &inout.CreatePhoneResponseV1_ValidationError_{
 				ValidationError: &inout.CreatePhoneResponseV1_ValidationError{
 					Code: []string{"Неверный код"},
-				}}}
+				}}})
 	case enums.PhoneNotFound:
-		return http.StatusBadRequest, &inout.CreatePhoneResponseV1{
+		api.Renderer.Render(w, r, http.StatusBadRequest, &inout.CreatePhoneResponseV1{
 			Data: &inout.CreatePhoneResponseV1_ValidationError_{
 				ValidationError: &inout.CreatePhoneResponseV1_ValidationError{
 					Phone: []string{"Не удалось найти код для данного телефона."},
-				}}}
+				}}})
 	case enums.UserNotFound:
-		return http.StatusBadRequest, &inout.CreatePhoneResponseV1{
+		api.Renderer.Render(w, r, http.StatusBadRequest, &inout.CreatePhoneResponseV1{
 			Data: &inout.CreatePhoneResponseV1_ValidationError_{
 				ValidationError: &inout.CreatePhoneResponseV1_ValidationError{
 					UserID: []string{"Такого пользователя не существует"},
-				}}}
+				}}})
 	case enums.IncorrectPhone:
-		return http.StatusBadRequest, &inout.CreatePhoneResponseV1{
+		api.Renderer.Render(w, r, http.StatusBadRequest, &inout.CreatePhoneResponseV1{
 			Data: &inout.CreatePhoneResponseV1_ValidationError_{
 				ValidationError: &inout.CreatePhoneResponseV1_ValidationError{
 					Phone: []string{"Некорректный номер телефона"},
-				}}}
+				}}})
 	default:
-		return unhandledStatus(r, status), nil
+		api.Renderer.Render(w, r, unhandledStatus(r, status), nil)
 	}
 }
 
-func PhonesAPIV1(app *app.App) middlewares.ResponseControllerHandler {
-	return func(r *functools.Request) (int, proto.Message) {
-		return createPhoneV1(r, app)
-	}
-}
+func (api *API) CreatePhoneConfirmationV1(w http.ResponseWriter, r *http.Request) {
 
-func createPhoneConfirmationV1(r *functools.Request, app infrastructure.AppInterface) (int, *inout.CreatePhoneConfirmationResponseV1) {
-
-	body := inout.CreatePhoneConfirmationResponseV1_Request{}
-
-	err := r.ParseBody(&body)
-
+	body := &inout.CreatePhoneConfirmationResponseV1_Request{}
+	err := api.Parser.Parse(r, w, body)
 	if err != nil {
-		return http.StatusBadRequest, nil
+		return
 	}
 
-	status, phoneConfirmation := controllers.CreatePhoneConfirmation(app.GetStore(), app.GetESB(), r.Context(), body.Phone, body.PhoneCountryCode)
+	status, phoneConfirmation := api.Controller.CreatePhoneConfirmation(r.Context(), body.Phone)
 
 	switch status {
 	case enums.Ok:
-		return http.StatusCreated, &inout.CreatePhoneConfirmationResponseV1{
+		api.Renderer.Render(w, r, http.StatusCreated, &inout.CreatePhoneConfirmationResponseV1{
 			Data: &inout.CreatePhoneConfirmationResponseV1_Ok{
 				Ok: &inout.PhoneConfirmation{
 					Created: phoneConfirmation.Created,
 					Expire:  phoneConfirmation.Expire,
 					Phone:   phoneConfirmation.Phone,
-				}}}
+				}}})
 	case enums.IncorrectPhone:
-		return http.StatusBadRequest, &inout.CreatePhoneConfirmationResponseV1{
+		api.Renderer.Render(w, r, http.StatusBadRequest, &inout.CreatePhoneConfirmationResponseV1{
 			Data: &inout.CreatePhoneConfirmationResponseV1_ValidationError_{
 				ValidationError: &inout.CreatePhoneConfirmationResponseV1_ValidationError{
 					Phone: []string{"Некорректный номер телефона"},
-				}}}
+				}}})
 	default:
-		return unhandledStatus(r, status), nil
-	}
-}
-
-func PhoneConfirmationsAPIV1(app *app.App) middlewares.ResponseControllerHandler {
-	return func(r *functools.Request) (int, proto.Message) {
-		return createPhoneConfirmationV1(r, app)
+		api.Renderer.Render(w, r, unhandledStatus(r, status), nil)
 	}
 }

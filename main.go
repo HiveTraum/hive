@@ -1,144 +1,163 @@
 package main
 
 import (
-	"auth/api"
-	"auth/app"
-	"auth/middlewares"
-	"auth/views"
+	"context"
+	"fmt"
 	sentryHttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
-	"github.com/opentracing-contrib/go-gorilla/gorilla"
-	"github.com/opentracing/opentracing-go"
-	jaegerConfig "github.com/uber/jaeger-client-go/config"
-	"go.elastic.co/apm/module/apmgorilla"
+	api2 "hive/api"
+	"hive/auth"
+	"hive/auth/backends"
+	"hive/config"
+	"hive/controllers"
+	"hive/enums"
+	"hive/eventDispatchers"
+	"hive/middlewares"
+	"hive/passwordProcessors"
+	"hive/repositories/inMemoryRepository"
+	"hive/repositories/postgresRepository"
+	"hive/repositories/redisRepository"
+	"hive/stores"
 	"log"
 	"net/http"
+	"strings"
+	"time"
 )
 
-type handler struct {
-	pattern string
-	h       http.HandlerFunc
-	methods []string
+func InitialAdmin(environment *config.Environment, store stores.IStore) {
+	if environment.InitialAdmin == "" {
+		return
+	}
+
+	ctx := context.Background()
+
+	emailAndPassword := strings.Split(environment.InitialAdmin, ":")
+	emailValue := emailAndPassword[0]
+	passwordValue := emailAndPassword[1]
+	status, email := store.GetEmail(ctx, emailValue)
+
+	if status != enums.Ok || email != nil {
+		return
+	}
+
+	store.CreateEmailConfirmationCode(ctx, emailValue, environment.TestConfirmationCode, time.Minute)
+	_, user := store.CreateUser(ctx, passwordValue, emailValue, "")
+	_, role := store.GetAdminRole(ctx)
+	store.CreateUserRole(ctx, user.Id, role.Id)
+}
+
+func InitialAdminRole(environment *config.Environment, store stores.IStore) {
+	ctx := context.Background()
+	_, role := store.GetAdminRole(ctx)
+	if role == nil {
+		_, _ = store.CreateRole(ctx, environment.AdminRole)
+	}
 }
 
 func main() {
 
-	// Tracing
+	// Initialization
 
-	tracer, closer, err := jaegerConfig.Configuration{
-		ServiceName: "auth",
-		RPCMetrics:  true,
-	}.NewTracer()
+	environment := config.InitEnvironment()
+	tracer, tracerCloser := config.InitTracing(environment)
+	config.InitSentry(environment)
+	pool := config.InitPool(tracer, environment)
+	redis := config.InitRedis(environment)
+	inMemoryCache := config.InitInMemoryCache()
+	producer := config.InitNSQProducer(environment)
+	passwordProcessor := passwordProcessors.InitPasswordProcessor()
+	postgresRepo := postgresRepository.InitPostgresRepository(pool, environment)
+	redisRepo := redisRepository.InitRedisRepository(redis)
+	inMemoryRepo := inMemoryRepository.InitInMemoryRepository(inMemoryCache)
+	store := stores.InitStore(pool, redis, inMemoryCache, environment, postgresRepo, redisRepo, inMemoryRepo)
+	jwtAuthenticationBackend := backends.InitJWTAuthenticationBackend(store, environment)
+	basicAuthenticationBackend := backends.InitBasicAuthenticationBackend(store, passwordProcessor, environment)
+	authenticationController := auth.InitAuthController(map[string]backends.IAuthenticationBackend{
+		"Basic":  basicAuthenticationBackend,
+		"Bearer": jwtAuthenticationBackend,
+	}, environment)
+	dispatcher := eventDispatchers.InitNSQEventDispatcher(producer, environment)
+	controller := controllers.InitController(store, passwordProcessor, dispatcher, environment, jwtAuthenticationBackend.EncodeAccessToken)
+	API := api2.InitAPI(controller, authenticationController, environment)
+	InitialAdminRole(environment, store)
+	InitialAdmin(environment, store)
 
-	if err != nil {
-		panic(err)
-	}
-
-	opentracing.SetGlobalTracer(tracer)
-
-	// App
-
-	application := app.InitApp(tracer)
-
-	// Handlers
-
-	usersView := middlewares.ResponseControllerMiddleware(views.UsersViewV1(application))
-	userView := middlewares.ResponseControllerMiddleware(views.UserViewV1(application))
-
-	usersAPI := middlewares.ResponseControllerMiddleware(api.UsersAPIV1(application))
-	userAPI := middlewares.ResponseControllerMiddleware(api.UserAPIV1(application))
-
-	passwordsAPI := middlewares.ResponseControllerMiddleware(api.PasswordsAPIV1(application))
-
-	rolesAPI := middlewares.ResponseControllerMiddleware(api.RolesAPIV1(application))
-	roleAPI := middlewares.ResponseControllerMiddleware(api.RoleAPIV1(application))
-
-	userRolesAPI := middlewares.ResponseControllerMiddleware(api.UserRolesAPIV1(application))
-	userRoleAPI := middlewares.ResponseControllerMiddleware(api.UserRoleAPIV1(application))
-
-	phoneConfirmationsAPI := middlewares.ResponseControllerMiddleware(api.PhoneConfirmationsAPIV1(application))
-	phonesAPI := middlewares.ResponseControllerMiddleware(api.PhonesAPIV1(application))
-
-	emailConfirmationsAPI := middlewares.ResponseControllerMiddleware(api.EmailConfirmationsAPIV1(application))
-	emailsAPI := middlewares.ResponseControllerMiddleware(api.EmailsAPIV1(application))
-
-	sessionsAPI := middlewares.ResponseControllerMiddleware(api.SessionsAPIV1(application))
-
-	secretsAPI := middlewares.ResponseControllerMiddleware(api.SecretAPIV1(application))
-
-	// Middleware
-
-	// Methods Middleware
-	CR := []string{http.MethodGet, http.MethodPost, http.MethodOptions}
-	RD := []string{http.MethodGet, http.MethodDelete, http.MethodOptions}
-	R := []string{http.MethodGet, http.MethodOptions}
-	C := []string{http.MethodPost, http.MethodOptions}
-	D := []string{http.MethodDelete, http.MethodOptions}
-
-	handlers := []handler{
-		{pattern: "/views/v1/users", h: usersView, methods: R},
-		{pattern: "/views/v1/users/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: userView, methods: R},
-
-		{pattern: "/api/v1/users", h: usersAPI, methods: CR},
-		{pattern: "/api/v1/users/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: userAPI, methods: RD},
-
-		{pattern: "/api/v1/passwords", h: passwordsAPI, methods: C},
-
-		{pattern: "/api/v1/roles", h: rolesAPI, methods: CR},
-		{pattern: "/api/v1/roles/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: roleAPI, methods: R},
-
-		{pattern: "/api/v1/userRoles", h: userRolesAPI, methods: CR},
-		{pattern: "/api/v1/userRoles/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: userRoleAPI, methods: D},
-
-		{pattern: "/api/v1/phoneConfirmations", h: phoneConfirmationsAPI, methods: C},
-		{pattern: "/api/v1/phones", h: phonesAPI, methods: C},
-
-		{pattern: "/api/v1/emailConfirmations", h: emailConfirmationsAPI, methods: C},
-		{pattern: "/api/v1/emails", h: emailsAPI, methods: C},
-
-		{pattern: "/api/v1/sessions", h: sessionsAPI, methods: C},
-
-		{pattern: "/api/v1/secrets/{id:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}}", h: secretsAPI, methods: R},
-	}
-
-	// Content Type Middleware
-
-	for i, h := range handlers {
-		h.h = middlewares.ContentTypeMiddleware(h.h)
-		handlers[i] = h
-	}
-
-	// Sentry
-
-	sentryHandler := sentryHttp.New(sentryHttp.Options{})
-
-	for i, h := range handlers {
-		h.h = sentryHandler.HandleFunc(h.h)
-		handlers[i] = h
-	}
+	authentication := middlewares.AuthenticationMiddleware(authenticationController)
+	isLocalRequest := middlewares.IsLocalRequestMiddleware(environment.LocalNetworkNamespace)
 
 	// Init Routing
 
 	router := mux.NewRouter().StrictSlash(false)
 
-	apmgorilla.Instrument(router)
+	CreateUserV1 := http.HandlerFunc(API.CreateUserV1)
+	GetUsersV1 := authentication(http.HandlerFunc(API.GetUsersV1), true)
+	GetUserV1 := authentication(http.HandlerFunc(API.GetUserV1), true)
+	DeleteUserV1 := authentication(http.HandlerFunc(API.DeleteUserV1), true)
 
-	for _, h := range handlers {
-		router.HandleFunc(h.pattern, h.h).Methods(h.methods...)
-	}
+	CreatePasswordV1 := authentication(http.HandlerFunc(API.CreatePasswordV1), true)
 
-	// Tracing routes
+	CreateEmailV1 := authentication(http.HandlerFunc(API.CreateEmailV1), true)
+	CreateEmailConfirmationV1 := http.HandlerFunc(API.CreateEmailConfirmationV1)
 
-	_ = router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
-		route.Handler(gorilla.Middleware(tracer, route.GetHandler()))
-		return nil
-	})
+	CreateRoleV1 := authentication(http.HandlerFunc(API.CreateRoleV1), true)
+	GetRolesV1 := authentication(http.HandlerFunc(API.GetRolesV1), true)
+	GetRoleV1 := authentication(http.HandlerFunc(API.GetRoleV1), true)
+
+	CreateUserRoleV1 := authentication(http.HandlerFunc(API.CreateUserRoleV1), true)
+	GetUserRolesV1 := authentication(http.HandlerFunc(API.GetUserRolesV1), true)
+	DeleteUserRoleV1 := authentication(http.HandlerFunc(API.DeleteUserRoleV1), true)
+
+	CreatePhoneConfirmationV1 := http.HandlerFunc(API.CreatePhoneConfirmationV1)
+	CreatePhoneV1 := authentication(http.HandlerFunc(API.CreatePhoneV1), true)
+
+	CreateSessionV1 := authentication(http.HandlerFunc(API.CreateSessionV1), false)
+
+	GetSecretV1 := isLocalRequest(http.HandlerFunc(API.GetSecretV1))
+
+	GetUserViewV1 := authentication(http.HandlerFunc(API.GetUserViewV1), true)
+	GetUsersViewV1 := authentication(http.HandlerFunc(API.GetUsersViewV1), true)
+
+	uuidRE := "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}"
+
+	router.Handle("/api/v1/users", CreateUserV1).Methods(http.MethodPost)
+	router.Handle("/api/v1/users", GetUsersV1).Methods(http.MethodGet)
+	router.Handle(fmt.Sprintf("/api/v1/users/{id:%s}", uuidRE), GetUserV1).Methods(http.MethodGet)
+	router.Handle(fmt.Sprintf("/api/v1/users/{id:%s}", uuidRE), DeleteUserV1).Methods(http.MethodDelete)
+
+	router.Handle("/api/v1/passwords", CreatePasswordV1).Methods(http.MethodPost)
+
+	router.Handle("/api/v1/emails", CreateEmailV1).Methods(http.MethodPost)
+	router.Handle("/api/v1/emailConfirmations", CreateEmailConfirmationV1).Methods(http.MethodPost)
+
+	router.Handle("/api/v1/roles", CreateRoleV1).Methods(http.MethodPost)
+	router.Handle("/api/v1/roles", GetRolesV1).Methods(http.MethodGet)
+	router.Handle(fmt.Sprintf("/api/v1/roles/{id:%s}", uuidRE), GetRoleV1).Methods(http.MethodGet)
+
+	router.Handle("/api/v1/userRoles", CreateUserRoleV1).Methods(http.MethodPost)
+	router.Handle("/api/v1/userRoles", GetUserRolesV1).Methods(http.MethodGet)
+	router.Handle(fmt.Sprintf("/api/v1/userRoles/{id:%s}", uuidRE), DeleteUserRoleV1).Methods(http.MethodDelete)
+
+	router.Handle("/api/v1/phoneConfirmations", CreatePhoneConfirmationV1).Methods(http.MethodPost)
+	router.Handle("/api/v1/phones", CreatePhoneV1).Methods(http.MethodPost)
+
+	router.Handle("/api/v1/sessions", CreateSessionV1).Methods(http.MethodPost)
+
+	router.Handle(fmt.Sprintf("/api/v1/secrets/{id:%s}", uuidRE), GetSecretV1).Methods(http.MethodGet)
+
+	router.Handle("/views/v1/users", GetUserViewV1).Methods(http.MethodGet)
+	router.Handle(fmt.Sprintf("/views/v1/users/{id:%s}", uuidRE), GetUsersViewV1).Methods(http.MethodGet)
+
+	// Middleware
+
+	router.Use(middlewares.TracerMiddleware(tracer))
+	router.Use(sentryHttp.New(sentryHttp.Options{}).Handle)
+	router.Use(middlewares.ContentTypeMiddleware)
 
 	// Finish
 
 	http.Handle("/", router)
 
-	defer closer.Close()
+	defer tracerCloser.Close()
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

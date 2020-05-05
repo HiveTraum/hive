@@ -4,12 +4,10 @@ import (
 	"github.com/getsentry/sentry-go"
 )
 
-func InitSentry() {
-
-	env := InitEnv()
+func InitSentry(environment *Environment) {
 
 	err := sentry.Init(sentry.ClientOptions{
-		Dsn: env.SentryDsn,
+		Dsn: environment.SentryDsn,
 	})
 
 	if err != nil {

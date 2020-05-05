@@ -1,5 +1,6 @@
 syntax = "proto3";
 package inout;
+option go_package = ".;inout";
 
 message SecretCache {
     bytes id = 1;

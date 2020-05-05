@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"auth/config"
+	"hive/config"
 	"context"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -9,7 +9,7 @@ import (
 )
 
 func TestCreateEmailConfirmationCode(t *testing.T) {
-	cache := config.InitRedis()
+	cache := config.InitRedis(config.InitEnvironment())
 	cache.FlushAll()
 	code := CreateEmailConfirmationCode(context.Background(), cache, "mail@mail.com", "1234", time.Millisecond)
 	require.NotNil(t, code)
@@ -18,7 +18,7 @@ func TestCreateEmailConfirmationCode(t *testing.T) {
 }
 
 func TestGetEmailConfirmationCode(t *testing.T) {
-	cache := config.InitRedis()
+	cache := config.InitRedis(config.InitEnvironment())
 	cache.FlushAll()
 	email := "mail@mail.com"
 	CreateEmailConfirmationCode(context.Background(), cache, email, "1234", time.Millisecond)
@@ -27,7 +27,7 @@ func TestGetEmailConfirmationCode(t *testing.T) {
 }
 
 func TestGetExpiredEmailConfirmationCode(t *testing.T) {
-	cache := config.InitRedis()
+	cache := config.InitRedis(config.InitEnvironment())
 	cache.FlushAll()
 	email := "mail@mail.com"
 	CreateEmailConfirmationCode(context.Background(), cache, email, "1234", time.Millisecond)

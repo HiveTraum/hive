@@ -1,13 +1,22 @@
 package controllers
 
 import (
-	"auth/infrastructure"
-	"auth/models"
+	"hive/models"
 	"context"
 	uuid "github.com/satori/go.uuid"
 )
 
-func GetSecret(store infrastructure.StoreInterface, ctx context.Context, id uuid.UUID) *models.Secret {
-	secret := store.GetSecret(ctx, id)
+func (controller *Controller) GetSecret(ctx context.Context, id uuid.UUID) *models.Secret {
+	return controller.store.GetSecret(ctx, id)
+}
+
+func (controller *Controller) GetActualSecret(ctx context.Context) *models.Secret {
+	secret := controller.store.GetActualSecret(ctx)
+	if secret != nil {
+		return secret
+	}
+
+	secret = controller.store.CreateSecret(ctx)
+	controller.OnSecretCreatedV1(secret)
 	return secret
 }

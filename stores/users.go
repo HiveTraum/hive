@@ -1,18 +1,17 @@
 package stores
 
 import (
-	"auth/enums"
-	"auth/functools"
-	"auth/inout"
-	"auth/models"
-	"auth/repositories"
+	"hive/enums"
+	"hive/functools"
+	"hive/models"
+	"hive/repositories"
 	"context"
 	"github.com/getsentry/sentry-go"
 	uuid "github.com/satori/go.uuid"
 )
 
-func createPhoneForUser(tx repositories.DB, ctx context.Context, phone string, userId uuid.UUID, countryCode string) int {
-	status, _ := repositories.CreatePhone(tx, ctx, userId, phone, countryCode)
+func createPhoneForUser(tx repositories.DB, ctx context.Context, phone string, userId uuid.UUID) int {
+	status, _ := repositories.CreatePhone(tx, ctx, userId, phone)
 	return status
 }
 
@@ -26,8 +25,8 @@ func createPasswordForUser(tx repositories.DB, ctx context.Context, password str
 	return status
 }
 
-func (store *DatabaseStore) CreateUser(ctx context.Context, query *inout.CreateUserResponseV1_Request) (int, *models.User) {
-	tx, err := store.Db.Begin(ctx)
+func (store *DatabaseStore) CreateUser(ctx context.Context, password, email, phone string) (int, *models.User) {
+	tx, err := store.db.Begin(ctx)
 
 	if tx == nil {
 		return enums.NotOk, nil
@@ -46,16 +45,16 @@ func (store *DatabaseStore) CreateUser(ctx context.Context, query *inout.CreateU
 
 	var statuses []int
 
-	if query.Phone != "" {
-		statuses = append(statuses, createPhoneForUser(tx, ctx, query.Phone, user.Id, query.PhoneCountryCode))
+	if phone != "" {
+		statuses = append(statuses, createPhoneForUser(tx, ctx, phone, user.Id))
 	}
 
-	if query.Email != "" {
-		statuses = append(statuses, createEmailForUser(tx, ctx, query.Email, user.Id))
+	if email != "" {
+		statuses = append(statuses, createEmailForUser(tx, ctx, email, user.Id))
 	}
 
-	if query.Password != "" {
-		statuses = append(statuses, createPasswordForUser(tx, ctx, query.Password, user.Id))
+	if password != "" {
+		statuses = append(statuses, createPasswordForUser(tx, ctx, password, user.Id))
 	}
 
 	if repositories.Rollback(tx, ctx, !functools.All(enums.Ok, statuses)) {
@@ -73,13 +72,13 @@ func (store *DatabaseStore) CreateUser(ctx context.Context, query *inout.CreateU
 }
 
 func (store *DatabaseStore) GetUser(context context.Context, id uuid.UUID) *models.User {
-	return repositories.GetUser(store.Db, context, id)
+	return repositories.GetUser(store.db, context, id)
 }
 
 func (store *DatabaseStore) GetUsers(context context.Context, query repositories.GetUsersQuery) []*models.User {
-	return repositories.GetUsers(store.Db, context, query)
+	return repositories.GetUsers(store.db, context, query)
 }
 
 func (store *DatabaseStore) DeleteUser(ctx context.Context, id uuid.UUID) (int, *models.User) {
-	return repositories.DeleteUser(store.Db, ctx, id)
+	return repositories.DeleteUser(store.db, ctx, id)
 }

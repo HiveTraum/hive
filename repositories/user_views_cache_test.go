@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"auth/config"
-	"auth/models"
+	"hive/config"
+	"hive/models"
 	"context"
 	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
@@ -10,7 +10,7 @@ import (
 )
 
 func TestGetUserViewFromCache(t *testing.T) {
-	cache := config.InitRedis()
+	cache := config.InitRedis(config.InitEnvironment())
 	cache.FlushAll()
 	ctx := context.Background()
 	userView := &models.UserView{
@@ -27,7 +27,7 @@ func TestGetUserViewFromCache(t *testing.T) {
 }
 
 func TestGetUserViewFromCacheWithoutUserView(t *testing.T) {
-	cache := config.InitRedis()
+	cache := config.InitRedis(config.InitEnvironment())
 	cache.FlushAll()
 	ctx := context.Background()
 	userViewFromCache := GetUserViewFromCache(cache, ctx, uuid.NewV4())

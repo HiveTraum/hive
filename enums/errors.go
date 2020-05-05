@@ -3,8 +3,8 @@ package enums
 const (
 	// Common
 
-	Ok = iota
-	NotOk // 1
+	Ok                      = iota
+	NotOk                   // 1
 	MinimumOneFieldRequired // 2
 
 	// Users
@@ -13,52 +13,54 @@ const (
 
 	// Phones
 
-	IncorrectPhoneCode // 4
-	IncorrectPhone // 5
-	PhoneNotFound // 6
+	IncorrectPhoneCode            // 4
+	IncorrectPhone                // 5
+	PhoneNotFound                 // 6
 	PhoneConfirmationCodeNotFound // 7
 
 	// Emails
 
-	IncorrectEmailCode // 8
-	IncorrectEmail // 9
-	EmailNotFound // 10
+	IncorrectEmailCode            // 8
+	IncorrectEmail                // 9
+	EmailNotFound                 // 10
 	EmailConfirmationCodeNotFound // 11
+	EmailConfirmationCodeRequired // 12
 
 	// Passwords
 
-	PasswordRequired // 12
-	IncorrectPassword // 13
-	PasswordNotFound // 14
+	PasswordRequired  // 13
+	IncorrectPassword // 14
+	PasswordNotFound  // 15
 
 	// Roles
 
-	RoleAlreadyExist // 15
-	RoleNotFound // 16
+	RoleAlreadyExist // 16
+	RoleNotFound     // 17
 
 	// User Roles
 
-	UserRoleAlreadyExist // 17
-	UserRoleNotFound // 18
+	UserRoleAlreadyExist // 18
+	UserRoleNotFound     // 19
 
 	// Sessions
 
-	SessionNotFound // 19
+	SessionNotFound // 20
 
 	// Secrets
 
-	SecretNotFound // 20
+	SecretNotFound // 21
 
 	// Tokens
 
-	IncorrectToken // 21
-	InvalidToken   // 22
+	IncorrectToken // 22
+	InvalidToken   // 23
 
 	// Credentials
 
-	CredentialsNotProvided // 23
+	CredentialsNotProvided  // 24
+	CredentialsTypeNotFound // 25
 
-	// Auth Backends
+	// Auth backends
 
-	BackendNotFound // 24
+	BackendNotFound // 26
 )

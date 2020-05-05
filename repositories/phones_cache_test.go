@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"auth/config"
+	"hive/config"
 	"context"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -9,7 +9,7 @@ import (
 )
 
 func TestCreatePhoneConfirmationCode(t *testing.T) {
-	cache := config.InitRedis()
+	cache := config.InitRedis(config.InitEnvironment())
 	cache.FlushAll()
 	ctx := context.Background()
 	code := CreatePhoneConfirmationCode(cache, ctx, "+79691234567", "1234", time.Millisecond)
@@ -19,7 +19,7 @@ func TestCreatePhoneConfirmationCode(t *testing.T) {
 }
 
 func TestGetPhoneConfirmationCode(t *testing.T) {
-	cache := config.InitRedis()
+	cache := config.InitRedis(config.InitEnvironment())
 	cache.FlushAll()
 	ctx := context.Background()
 	phone := "+79691234567"
@@ -29,7 +29,7 @@ func TestGetPhoneConfirmationCode(t *testing.T) {
 }
 
 func TestGetExpiredPhoneConfirmationCode(t *testing.T) {
-	cache := config.InitRedis()
+	cache := config.InitRedis(config.InitEnvironment())
 	cache.FlushAll()
 	ctx := context.Background()
 	phone := "+79691234567"
