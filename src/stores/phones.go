@@ -1,10 +1,10 @@
 package stores
 
 import (
-	"hive/models"
-	"hive/repositories"
 	"context"
 	uuid "github.com/satori/go.uuid"
+	"hive/models"
+	"hive/repositories"
 	"math/rand"
 	"strconv"
 	"time"
@@ -27,13 +27,8 @@ func (store *DatabaseStore) GetPhoneConfirmationCode(ctx context.Context, phone 
 }
 
 func (store *DatabaseStore) GetRandomCodeForPhoneConfirmation() string {
-
-	if !store.environment.IsTestEnvironment {
-		rand.Seed(time.Now().UnixNano())
-		min := 100000
-		max := 999999
-		return strconv.Itoa(rand.Intn(max-min+1) + min)
-	} else {
-		return store.environment.TestConfirmationCode
-	}
+	rand.Seed(time.Now().UnixNano())
+	min := 100000
+	max := 999999
+	return strconv.Itoa(rand.Intn(max-min+1) + min)
 }

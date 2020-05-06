@@ -1,11 +1,11 @@
 package stores
 
 import (
+	"context"
+	uuid "github.com/satori/go.uuid"
 	"hive/functools"
 	"hive/models"
 	"hive/repositories"
-	"context"
-	uuid "github.com/satori/go.uuid"
 	"time"
 )
 
@@ -26,9 +26,5 @@ func (store *DatabaseStore) GetEmailConfirmationCode(ctx context.Context, email 
 }
 
 func (store *DatabaseStore) GetRandomCodeForEmailConfirmation() string {
-	if !store.environment.IsTestEnvironment {
-		return functools.GetRandomString(6)
-	} else {
-		return store.environment.TestConfirmationCode
-	}
+	return functools.GetRandomString(6)
 }

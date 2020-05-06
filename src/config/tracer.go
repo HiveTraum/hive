@@ -9,7 +9,7 @@ import (
 
 func InitTracing(environment *Environment) (opentracing.Tracer, io.Closer) {
 	tracer, closer, err := jaegerConfig.Configuration{
-		ServiceName: environment.ServiceName,
+		ServiceName: environment.Service,
 		RPCMetrics:  true,
 	}.NewTracer()
 

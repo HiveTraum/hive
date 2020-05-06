@@ -45,7 +45,7 @@ func InitialAdmin(environment *config.Environment, store stores.IStore) {
 		return
 	}
 
-	store.CreateEmailConfirmationCode(ctx, emailValue, environment.TestConfirmationCode, time.Minute)
+	store.CreateEmailConfirmationCode(ctx, emailValue, "111111", time.Minute)
 	_, user := store.CreateUser(ctx, passwordValue, emailValue, "")
 	_, role := store.GetAdminRole(ctx)
 	store.CreateUserRole(ctx, user.Id, role.Id)
@@ -163,7 +163,8 @@ func server() error {
 
 	http.Handle("/", router)
 
-	err := http.ListenAndServe(":8080", nil)
+	log.Log().Msg(fmt.Sprintf("Server starting at address %s", environment.ServerAddress))
+	err := http.ListenAndServe(environment.ServerAddress, nil)
 	if err != nil {
 		log.Fatal()
 		return err

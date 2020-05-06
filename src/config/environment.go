@@ -8,26 +8,25 @@ import (
 )
 
 type Environment struct {
-	DatabaseURI            string `env:"DATABASE_URI" envDefault:"postgres://hive:123@localhost:5432/hive"`
-	NSQLookupAddress       string `env:"NSQ_LOOKUP_ADDRESS" envDefault:"localhost:4180"`
-	RedisURL               string `env:"REDIS_URL" envDefault:"localhost:6379"`
-	SentryDSN              string `env:"SENTRY_DSN" envDefault:"https://3e6b6318d35a457dbd57b1445919b38d@sentry.io/1797534"`
-	EsbUrl                 string `env:"ESB_URL"`
-	ESBSender              string `env:"ESB_SENDER" envDefault:"auth"`
+	Service  string `env:"SERVICE" envDefault:"hive"`
+	Instance string `env:"INSTANCE" envDefault:"local"`
+
+	DatabaseURI      string `env:"DATABASE_URI" envDefault:"postgres://hive:123@localhost:5432/hive"`
+	RedisURI         string `env:"REDIS_URL" envDefault:"redis://localhost/"`
+	SentryDSN        string `env:"SENTRY_DSN"`
+	NSQLookupAddress string `env:"NSQ_LOOKUP_ADDRESS" envDefault:"localhost:4180"`
+
 	AccessTokenLifetime    int64  `env:"ACCESS_TOKEN_LIFETIME" envDefault:"15"`  // Minutes
 	RefreshTokenLifetime   int64  `env:"REFRESH_TOKEN_LIFETIME" envDefault:"30"` // Days
 	RefreshTokenCookieName string `env:"REFRESH_TOKEN_COOKIE_NAME" envDefault:"refreshToken"`
 	ActualSecretLifetime   int64  `env:"ACTUAL_SECRET_LIFETIME" envDefault:"1440"` // Minutes
 	DefaultPaginationLimit int    `env:"DEFAULT_PAGINATION_LIMIT" envDefault:"50"`
-	IsTestEnvironment      bool   `env:"IS_TEST_ENVIRONMENT" envDefault:"false"`
-	TestConfirmationCode   string `env:"TEST_CONFIRMATION_CODE" envDefault:"111111"`
-	InitialAdmin           string `env:"INITIAL_ADMIN"`
-	AdminRole              string `env:"ADMIN_ROLE" envDefault:"admin"`
-	RequestContextUserKey  string `env:"REQUEST_CONTEXT_USER_KEY" envDefault:"UserContextKey"`
-	ServerAddress          string `env:"SERVER_ADDRESS" envDefault:"0.0.0.0:8080"`
-	ServiceName            string `env:"SERVICE_NAME" envDefault:"auth"`
-	Instance               string `env:"INSTANCE" envDefault:"local"`
-	LocalNetworkNamespace  string `env:"LOCAL_NETWORK_NAMESPACE" envDefault:"[::1]:"`
+	
+	InitialAdmin          string `env:"INITIAL_ADMIN"`
+	AdminRole             string `env:"ADMIN_ROLE" envDefault:"admin"`
+	RequestContextUserKey string `env:"REQUEST_CONTEXT_USER_KEY" envDefault:"UserContextKey"`
+	ServerAddress         string `env:"SERVER_ADDRESS" envDefault:"0.0.0.0:8080"`
+	LocalNetworkNamespace string `env:"LOCAL_NETWORK_NAMESPACE" envDefault:"[::1]:"`
 }
 
 func InitEnvironment() *Environment {
