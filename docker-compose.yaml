@@ -10,7 +10,10 @@ services:
     ports:
       - 5433:5432
 
-  hive:
+  redis:
+    image: redis:alpine
+
+  migration:
     build:
       context: .
       dockerfile: devops/Dockerfile
@@ -18,4 +21,18 @@ services:
       - database
     environment:
       DATABASE_URI: postgres://hive:123@database:5432/hive
-    command: "/app/hive migrate"
+    command: "hive migrate"
+
+  hive:
+    build:
+      context: .
+      dockerfile: devops/Dockerfile
+    depends_on:
+      - migration
+      - redis
+    environment:
+      DATABASE_URI: postgres://hive:123@database:5432/hive
+      REDIS_URL: redis:6379
+    command: "hive"
+    ports:
+      - 8080:8080
