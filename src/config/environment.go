@@ -21,7 +21,7 @@ type Environment struct {
 	RefreshTokenCookieName string `env:"REFRESH_TOKEN_COOKIE_NAME" envDefault:"refreshToken"`
 	ActualSecretLifetime   int64  `env:"ACTUAL_SECRET_LIFETIME" envDefault:"1440"` // Minutes
 	DefaultPaginationLimit int    `env:"DEFAULT_PAGINATION_LIMIT" envDefault:"50"`
-	
+
 	ServerAddress         string `env:"SERVER_ADDRESS" envDefault:"0.0.0.0:8080"`
 	LocalNetworkNamespace string `env:"LOCAL_NETWORK_NAMESPACE" envDefault:"[::1]:"`
 }
