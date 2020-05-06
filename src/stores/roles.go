@@ -1,11 +1,11 @@
 package stores
 
 import (
+	"context"
+	uuid "github.com/satori/go.uuid"
 	"hive/enums"
 	"hive/models"
 	"hive/repositories"
-	"context"
-	uuid "github.com/satori/go.uuid"
 )
 
 func (store *DatabaseStore) CreateRole(ctx context.Context, title string) (int, *models.Role) {
@@ -34,8 +34,4 @@ func (store *DatabaseStore) GetRoleByTitle(ctx context.Context, title string) (i
 	} else {
 		return enums.Ok, nil
 	}
-}
-
-func (store *DatabaseStore) GetAdminRole(ctx context.Context) (int, *models.Role) {
-	return store.GetRoleByTitle(ctx, store.environment.AdminRole)
 }

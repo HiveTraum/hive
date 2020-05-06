@@ -28,7 +28,6 @@ import (
 func server() error {
 
 	// Initialization
-
 	environment := config.InitEnvironment()
 	tracer, tracerCloser := config.InitTracing(environment)
 	config.InitSentry(environment)

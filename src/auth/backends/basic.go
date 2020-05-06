@@ -1,17 +1,17 @@
 package backends
 
 import (
+	"context"
+	"encoding/base64"
+	"github.com/getsentry/sentry-go"
+	"github.com/golang/mock/gomock"
+	uuid "github.com/satori/go.uuid"
 	"hive/config"
 	"hive/enums"
 	"hive/functools"
 	"hive/models"
 	"hive/passwordProcessors"
 	"hive/stores"
-	"context"
-	"encoding/base64"
-	"github.com/getsentry/sentry-go"
-	"github.com/golang/mock/gomock"
-	uuid "github.com/satori/go.uuid"
 	"strings"
 )
 
@@ -219,7 +219,7 @@ func (backend *BasicAuthenticationBackend) GetUser(ctx context.Context, token st
 	}
 
 	return enums.Ok, &BasicAuthenticationBackendUser{
-		IsAdmin: functools.Contains(backend.environment.AdminRole, user.Roles),
+		IsAdmin: functools.Contains(config.AdminRole, user.Roles),
 		Roles:   user.Roles,
 		UserID:  user.Id,
 	}
