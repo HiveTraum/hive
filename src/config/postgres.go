@@ -7,6 +7,8 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
+	zerolog "github.com/rs/zerolog/log"
+
 	"strings"
 	"time"
 )
@@ -115,6 +117,7 @@ func InitPool(tracer opentracing.Tracer, environment *Environment) *pgxpool.Pool
 	if err != nil {
 		panic(err)
 	}
+	zerolog.Log().Msg("PostgreSQL connection successfully initiated")
 
 	return pool
 }

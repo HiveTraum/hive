@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/stdlib"
 	"github.com/pressly/goose"
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 	api2 "hive/api"
 	"hive/auth"
@@ -22,7 +23,6 @@ import (
 	"hive/repositories/postgresRepository"
 	"hive/repositories/redisRepository"
 	"hive/stores"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -59,7 +59,7 @@ func InitialAdminRole(environment *config.Environment, store stores.IStore) {
 	}
 }
 
-func server() {
+func server() error {
 
 	// Initialization
 
@@ -154,6 +154,7 @@ func server() {
 
 	// Middleware
 
+	router.Use(middlewares.RequestLoggingMiddleware(environment))
 	router.Use(middlewares.TracerMiddleware(tracer))
 	router.Use(sentryHttp.New(sentryHttp.Options{}).Handle)
 	router.Use(middlewares.ContentTypeMiddleware)
@@ -162,9 +163,13 @@ func server() {
 
 	http.Handle("/", router)
 
-	defer tracerCloser.Close()
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatal()
+		return err
+	}
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	return tracerCloser.Close()
 }
 
 func migrate() error {
@@ -186,16 +191,14 @@ func main() {
 		Name:  "hive",
 		Usage: "Start hive server",
 		Action: func(c *cli.Context) error {
-			server()
-			return nil
+			return server()
 		},
 		Commands: []*cli.Command{
 			{
 				Name:  "migrate",
 				Usage: "Apply migrations for current database",
 				Action: func(c *cli.Context) error {
-					migrate()
-					return nil
+					return migrate()
 				},
 			},
 		},
@@ -203,6 +206,6 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }

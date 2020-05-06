@@ -4,13 +4,14 @@ import (
 	"flag"
 	"github.com/caarlos0/env/v6"
 	"github.com/joho/godotenv"
+	"github.com/rs/zerolog/log"
 )
 
 type Environment struct {
 	DatabaseURI            string `env:"DATABASE_URI" envDefault:"postgres://hive:123@localhost:5432/hive"`
 	NSQLookupAddress       string `env:"NSQ_LOOKUP_ADDRESS" envDefault:"localhost:4180"`
-	RedisUrl               string `env:"REDIS_URL" envDefault:"localhost:6379"`
-	SentryDsn              string `env:"SENTRY_DSN" envDefault:"https://3e6b6318d35a457dbd57b1445919b38d@sentry.io/1797534"`
+	RedisURL               string `env:"REDIS_URL" envDefault:"localhost:6379"`
+	SentryDSN              string `env:"SENTRY_DSN" envDefault:"https://3e6b6318d35a457dbd57b1445919b38d@sentry.io/1797534"`
 	EsbUrl                 string `env:"ESB_URL"`
 	ESBSender              string `env:"ESB_SENDER" envDefault:"auth"`
 	AccessTokenLifetime    int64  `env:"ACCESS_TOKEN_LIFETIME" envDefault:"15"`  // Minutes
@@ -25,6 +26,7 @@ type Environment struct {
 	RequestContextUserKey  string `env:"REQUEST_CONTEXT_USER_KEY" envDefault:"UserContextKey"`
 	ServerAddress          string `env:"SERVER_ADDRESS" envDefault:"0.0.0.0:8080"`
 	ServiceName            string `env:"SERVICE_NAME" envDefault:"auth"`
+	Instance               string `env:"INSTANCE" envDefault:"local"`
 	LocalNetworkNamespace  string `env:"LOCAL_NETWORK_NAMESPACE" envDefault:"[::1]:"`
 }
 
@@ -34,6 +36,7 @@ func InitEnvironment() *Environment {
 	if err := env.Parse(&cfg); err != nil {
 		panic(err)
 	}
+	log.Log().Msg("Environment successfully parsed")
 	return &cfg
 }
 
