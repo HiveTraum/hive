@@ -17,7 +17,7 @@ func RequestLoggingMiddleware(environment *config.Environment) mux.MiddlewareFun
 		New(os.Stdout).
 		With().
 		Timestamp().
-		Str("service", environment.ServiceName).
+		Str("service", environment.Service).
 		Str("instance", environment.Instance).
 		Logger()
 

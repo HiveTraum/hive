@@ -104,15 +104,16 @@ func (s SentryRedisHook) AfterProcessPipeline(ctx context.Context, cmds []redis.
 func InitRedis(environment *Environment) *redis.Client {
 
 	onceRedis.Do(func() {
-		client = redis.NewClient(&redis.Options{
-			Addr: environment.RedisURL,
-		})
 
+		config, err := redis.ParseURL(environment.RedisURI)
+		if err != nil {
+			panic(err)
+		}
+
+		client = redis.NewClient(config)
 		client.AddHook(OpenTracingHook{})
 		client.AddHook(SentryRedisHook{})
-
-		_, err := client.Ping().Result()
-
+		_, err = client.Ping().Result()
 		if err != nil {
 			panic(err)
 		}
