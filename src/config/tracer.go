@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/opentracing/opentracing-go"
+	"github.com/rs/zerolog/log"
 	jaegerConfig "github.com/uber/jaeger-client-go/config"
 	"io"
 )
@@ -17,5 +18,6 @@ func InitTracing(environment *Environment) (opentracing.Tracer, io.Closer) {
 	}
 
 	opentracing.SetGlobalTracer(tracer)
+	log.Log().Msg("OpenTracing successfully initiated")
 	return tracer, closer
 }

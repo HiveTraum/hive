@@ -14,6 +14,7 @@ require (
 	github.com/jackc/pgconn v1.1.0
 	github.com/jackc/pgx/v4 v4.1.2
 	github.com/joho/godotenv v1.3.0
+	github.com/justinas/alice v1.2.0
 	github.com/nsqio/go-nsq v1.0.8
 	github.com/opentracing-contrib/go-gorilla v0.0.0-20190110000444-ced666783644
 	github.com/opentracing-contrib/go-stdlib v0.0.0-20190519235532-cf7a6c988dc9 // indirect

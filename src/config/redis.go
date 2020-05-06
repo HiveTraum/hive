@@ -6,6 +6,7 @@ import (
 	"github.com/go-redis/redis/v7"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
+	zerolog "github.com/rs/zerolog/log"
 	"strconv"
 	"sync"
 	"time"
@@ -104,7 +105,7 @@ func InitRedis(environment *Environment) *redis.Client {
 
 	onceRedis.Do(func() {
 		client = redis.NewClient(&redis.Options{
-			Addr: environment.RedisUrl,
+			Addr: environment.RedisURL,
 		})
 
 		client.AddHook(OpenTracingHook{})
@@ -115,6 +116,7 @@ func InitRedis(environment *Environment) *redis.Client {
 		if err != nil {
 			panic(err)
 		}
+		zerolog.Log().Msg("Redis connection successfully initiated")
 	})
 
 	return client
