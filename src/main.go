@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	sentryHttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
@@ -15,7 +14,6 @@ import (
 	"hive/auth/backends"
 	"hive/config"
 	"hive/controllers"
-	"hive/enums"
 	"hive/eventDispatchers"
 	"hive/middlewares"
 	"hive/passwordProcessors"
@@ -25,39 +23,7 @@ import (
 	"hive/stores"
 	"net/http"
 	"os"
-	"strings"
-	"time"
 )
-
-func InitialAdmin(environment *config.Environment, store stores.IStore) {
-	if environment.InitialAdmin == "" {
-		return
-	}
-
-	ctx := context.Background()
-
-	emailAndPassword := strings.Split(environment.InitialAdmin, ":")
-	emailValue := emailAndPassword[0]
-	passwordValue := emailAndPassword[1]
-	status, email := store.GetEmail(ctx, emailValue)
-
-	if status != enums.Ok || email != nil {
-		return
-	}
-
-	store.CreateEmailConfirmationCode(ctx, emailValue, "111111", time.Minute)
-	_, user := store.CreateUser(ctx, passwordValue, emailValue, "")
-	_, role := store.GetAdminRole(ctx)
-	store.CreateUserRole(ctx, user.Id, role.Id)
-}
-
-func InitialAdminRole(environment *config.Environment, store stores.IStore) {
-	ctx := context.Background()
-	_, role := store.GetAdminRole(ctx)
-	if role == nil {
-		_, _ = store.CreateRole(ctx, environment.AdminRole)
-	}
-}
 
 func server() error {
 
@@ -84,8 +50,6 @@ func server() error {
 	dispatcher := eventDispatchers.InitNSQEventDispatcher(producer, environment)
 	controller := controllers.InitController(store, passwordProcessor, dispatcher, environment, jwtAuthenticationBackend.EncodeAccessToken)
 	API := api2.InitAPI(controller, authenticationController, environment)
-	InitialAdminRole(environment, store)
-	InitialAdmin(environment, store)
 
 	authentication := middlewares.AuthenticationMiddleware(authenticationController)
 	isLocalRequest := middlewares.IsLocalRequestMiddleware(environment.LocalNetworkNamespace)

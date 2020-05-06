@@ -22,9 +22,6 @@ type Environment struct {
 	ActualSecretLifetime   int64  `env:"ACTUAL_SECRET_LIFETIME" envDefault:"1440"` // Minutes
 	DefaultPaginationLimit int    `env:"DEFAULT_PAGINATION_LIMIT" envDefault:"50"`
 	
-	InitialAdmin          string `env:"INITIAL_ADMIN"`
-	AdminRole             string `env:"ADMIN_ROLE" envDefault:"admin"`
-	RequestContextUserKey string `env:"REQUEST_CONTEXT_USER_KEY" envDefault:"UserContextKey"`
 	ServerAddress         string `env:"SERVER_ADDRESS" envDefault:"0.0.0.0:8080"`
 	LocalNetworkNamespace string `env:"LOCAL_NETWORK_NAMESPACE" envDefault:"[::1]:"`
 }
