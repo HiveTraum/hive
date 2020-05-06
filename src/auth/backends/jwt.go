@@ -46,7 +46,7 @@ func (backend JWTAuthenticationBackend) EncodeAccessToken(_ context.Context, use
 	claims := JWTAuthenticationBackendUser{
 		UserID:   userID,
 		Roles:    roles,
-		IsAdmin:  functools.Contains(backend.environment.AdminRole, roles),
+		IsAdmin:  functools.Contains(config.AdminRole, roles),
 		SecretID: secret.Id,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expires,

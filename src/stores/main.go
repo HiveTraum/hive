@@ -67,7 +67,6 @@ type IStore interface {
 	GetRole(context context.Context, id uuid.UUID) (int, *models.Role)
 	GetRoles(context context.Context, query repositories.GetRolesQuery) ([]*models.Role, *models.PaginationResponse)
 	GetRoleByTitle(ctx context.Context, title string) (int, *models.Role)
-	GetAdminRole(ctx context.Context) (int, *models.Role)
 
 	// User Roles
 
